@@ -1,5 +1,6 @@
 import 'traffic_record.dart';
 
+/// نموذج اتصال شبكي تم التقاطه عبر خدمة VpnService
 class CapturedConnection {
   final String id;
   final DateTime timestamp;

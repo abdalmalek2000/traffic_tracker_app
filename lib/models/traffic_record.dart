@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-/// Represents the status category of an HTTP transaction.
+/// تصنيف حالة المعاملة الشبكية
 enum TrafficStatusCategory {
   pending,
   success,
@@ -10,7 +10,7 @@ enum TrafficStatusCategory {
   failed,
 }
 
-/// A comprehensive model capturing an HTTP/HTTPS network transaction.
+/// نموذج بيانات معاملة شبكة HTTP/HTTPS
 class TrafficRecord {
   final String id;
   final DateTime timestamp;
@@ -72,14 +72,12 @@ class TrafficRecord {
     return TrafficStatusCategory.failed;
   }
 
-  /// Formatted duration string (e.g. "124 ms" or "1.52 s").
   String get formattedDuration {
     if (durationMs == null) return isPending ? '...' : 'N/A';
     if (durationMs! < 1000) return '$durationMs ms';
     return '${(durationMs! / 1000).toStringAsFixed(2)} s';
   }
 
-  /// Formats byte count to human-readable format (B, KB, MB).
   static String formatBytes(int bytes) {
     if (bytes <= 0) return '0 B';
     if (bytes < 1024) return '$bytes B';
@@ -92,13 +90,12 @@ class TrafficRecord {
   String get formattedResponseSize => formatBytes(responseContentLength);
   String get formattedRequestSize => formatBytes(requestContentLength);
 
-  /// Generates a reproducible cURL command for this request.
+  /// توليد أمر cURL كامل للطلب
   String toCurlCommand() {
     final buffer = StringBuffer('curl -X ${method.toUpperCase()}');
     buffer.write(' "$url"');
 
     requestHeaders.forEach((key, value) {
-      // Escape any quotes in headers
       final escaped = value.replaceAll('"', r'\"');
       buffer.write(' \\\n  -H "$key: $escaped"');
     });
@@ -111,7 +108,6 @@ class TrafficRecord {
     return buffer.toString();
   }
 
-  /// Attempts to parse and format response body as indented JSON.
   String get prettyResponseBody {
     if (responseBody == null || responseBody!.isEmpty) return '';
     try {
@@ -123,7 +119,6 @@ class TrafficRecord {
     }
   }
 
-  /// Attempts to parse and format request body as indented JSON.
   String get prettyRequestBody {
     if (requestBody == null || requestBody!.isEmpty) return '';
     try {

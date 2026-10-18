@@ -1,6 +1,7 @@
 import 'dart:convert';
-import '../core/interceptor/traffic_client.dart';
+import 'traffic_client.dart';
 
+/// خدمة إرسال طلبات شبكة تجريبية لاختبار عمل المراقبة
 class TestRequestService {
   final TrafficHttpClient _client = TrafficHttpClient();
 
@@ -26,8 +27,8 @@ class TestRequestService {
           'Authorization': 'Bearer sample_sec_token_98234',
         },
         body: jsonEncode({
-          'title': 'Security Audit Report',
-          'body': 'Payload verification for HTTP traffic monitoring',
+          'title': 'تقرير فحص أمني',
+          'body': 'بيانات اختبارية لمراقبة حركة طلبات الشبكة وحزم البيانات',
           'userId': 42,
           'timestamp': DateTime.now().toIso8601String(),
         }),
@@ -46,7 +47,6 @@ class TestRequestService {
 
   Future<void> sendSampleServerError() async {
     try {
-      // Testing an endpoint that responds with 500 or simulates failure
       await _client.get(
         Uri.parse('https://httpstat.us/500'),
         headers: {'Accept': 'application/json'},

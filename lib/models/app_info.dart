@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+/// نموذج يمثل تطبيق أندرويد مثبت على الجهاز
 class AppInfo {
   final String appName;
   final String packageName;

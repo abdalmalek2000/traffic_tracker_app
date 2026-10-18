@@ -1,0 +1,12 @@
+import 'package:get/get.dart';
+
+/// متحكم التنقل بين شاشات التطبيق الرئيسية
+class NavigationController extends GetxController {
+  static NavigationController get to => Get.find();
+
+  final RxInt currentIndex = 0.obs;
+
+  void changeIndex(int index) {
+    currentIndex.value = index;
+  }
+}

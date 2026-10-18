@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import '../core/models/traffic_record.dart';
+import 'package:get/get.dart';
+import '../models/traffic_record.dart';
 
 enum TrafficFilter {
   all,
@@ -11,34 +11,30 @@ enum TrafficFilter {
   failed,
 }
 
-class TrafficManager extends ChangeNotifier {
-  TrafficManager._internal();
-  static final TrafficManager instance = TrafficManager._internal();
+/// متحكم فحص وإدارة طلبات الـ HTTP/HTTPS الداخلية (In-App Traffic Controller)
+class TrafficController extends GetxController {
+  static TrafficController get to => Get.find();
 
-  final List<TrafficRecord> _records = [];
-  bool _isRecording = true;
-  String _searchQuery = '';
-  TrafficFilter _activeFilter = TrafficFilter.all;
-  String? _methodFilter; // e.g. 'GET', 'POST', null for all
+  final RxList<TrafficRecord> records = <TrafficRecord>[].obs;
+  final RxBool isRecording = true.obs;
+  final RxString searchQuery = ''.obs;
+  final Rx<TrafficFilter> activeFilter = TrafficFilter.all.obs;
+  final RxnString methodFilter = RxnString();
 
-  bool get isRecording => _isRecording;
-  String get searchQuery => _searchQuery;
-  TrafficFilter get activeFilter => _activeFilter;
-  String? get methodFilter => _methodFilter;
-
-  List<TrafficRecord> get allRecords => List.unmodifiable(_records);
-
-  /// Filtered records based on active filter, method filter, and search query.
+  /// قائمة الطلبات المفلترة بحسب البحث وحالة الاستجابة والـ Method
   List<TrafficRecord> get filteredRecords {
-    return _records.where((record) {
-      // 1. Method filter
-      if (_methodFilter != null &&
-          record.method.toUpperCase() != _methodFilter!.toUpperCase()) {
+    final query = searchQuery.value.trim().toLowerCase();
+    final filter = activeFilter.value;
+    final method = methodFilter.value?.toUpperCase();
+
+    return records.where((record) {
+      // 1. تصفية بحسب نوع الطلب (GET, POST, ...)
+      if (method != null && record.method.toUpperCase() != method) {
         return false;
       }
 
-      // 2. Status category filter
-      switch (_activeFilter) {
+      // 2. تصفية بحسب فئة الحالة (2xx, 3xx, 4xx, 5xx, failed)
+      switch (filter) {
         case TrafficFilter.all:
           break;
         case TrafficFilter.success:
@@ -58,14 +54,15 @@ class TrafficManager extends ChangeNotifier {
           break;
       }
 
-      // 3. Search query (URL, host, path, status, body)
-      if (_searchQuery.isNotEmpty) {
-        final query = _searchQuery.toLowerCase();
+      // 3. تصفية بحسب نص البحث
+      if (query.isNotEmpty) {
         final matchesUrl = record.url.toLowerCase().contains(query);
         final matchesMethod = record.method.toLowerCase().contains(query);
-        final matchesStatus = record.statusCode?.toString().contains(query) ?? false;
-        final matchesBody = (record.responseBody?.toLowerCase().contains(query) ?? false) ||
-            (record.requestBody?.toLowerCase().contains(query) ?? false);
+        final matchesStatus =
+            record.statusCode?.toString().contains(query) ?? false;
+        final matchesBody =
+            (record.responseBody?.toLowerCase().contains(query) ?? false) ||
+                (record.requestBody?.toLowerCase().contains(query) ?? false);
         return matchesUrl || matchesMethod || matchesStatus || matchesBody;
       }
 
@@ -74,47 +71,40 @@ class TrafficManager extends ChangeNotifier {
   }
 
   void addRecord(TrafficRecord record) {
-    if (!_isRecording) return;
-    _records.insert(0, record); // Most recent first
-    notifyListeners();
+    if (!isRecording.value) return;
+    records.insert(0, record);
   }
 
   void updateRecord(TrafficRecord updated) {
-    final index = _records.indexWhere((r) => r.id == updated.id);
+    final index = records.indexWhere((r) => r.id == updated.id);
     if (index != -1) {
-      _records[index] = updated;
-      notifyListeners();
+      records[index] = updated;
     }
   }
 
   void clearRecords() {
-    _records.clear();
-    notifyListeners();
+    records.clear();
   }
 
   void toggleRecording() {
-    _isRecording = !_isRecording;
-    notifyListeners();
+    isRecording.value = !isRecording.value;
   }
 
   void setSearchQuery(String query) {
-    _searchQuery = query;
-    notifyListeners();
+    searchQuery.value = query;
   }
 
   void setActiveFilter(TrafficFilter filter) {
-    _activeFilter = filter;
-    notifyListeners();
+    activeFilter.value = filter;
   }
 
   void setMethodFilter(String? method) {
-    _methodFilter = method;
-    notifyListeners();
+    methodFilter.value = method;
   }
 
-  /// Exports current records as JSON string for archiving/exporting.
+  /// تصدير سجلات الطلبات بصيغة JSON
   String exportAsJson() {
-    final list = _records.map((r) => {
+    final list = records.map((r) => {
       'id': r.id,
       'timestamp': r.timestamp.toIso8601String(),
       'method': r.method,

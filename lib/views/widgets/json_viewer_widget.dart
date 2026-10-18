@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
-class FormattedCodeViewer extends StatelessWidget {
+/// ويدجت منسق لعرض أكواد JSON والـ Payloads مع زر نسخ سريع
+class JsonViewerWidget extends StatelessWidget {
   final String content;
   final String? title;
 
-  const FormattedCodeViewer({
+  const JsonViewerWidget({
     super.key,
     required this.content,
     this.title,
@@ -63,12 +65,10 @@ class FormattedCodeViewer extends StatelessWidget {
                   tooltip: 'نسخ المحتوى',
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: content));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('تم نسخ البيانات إلى الحافظة'),
-                        duration: Duration(seconds: 1),
-                        behavior: SnackBarBehavior.floating,
-                      ),
+                    Get.rawSnackbar(
+                      message: 'تم نسخ البيانات إلى الحافظة',
+                      duration: const Duration(seconds: 1),
+                      snackPosition: SnackPosition.BOTTOM,
                     );
                   },
                 ),

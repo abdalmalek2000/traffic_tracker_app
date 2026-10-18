@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:traffic_tracker_app/core/models/traffic_record.dart';
-import 'package:traffic_tracker_app/core/models/captured_connection.dart';
-import 'package:traffic_tracker_app/core/models/app_info.dart';
-import 'package:traffic_tracker_app/services/traffic_manager.dart';
+import 'package:get/get.dart';
+import 'package:traffic_tracker_app/models/traffic_record.dart';
+import 'package:traffic_tracker_app/models/captured_connection.dart';
+import 'package:traffic_tracker_app/models/app_info.dart';
+import 'package:traffic_tracker_app/controllers/traffic_controller.dart';
+import 'package:traffic_tracker_app/controllers/vpn_controller.dart';
 
 void main() {
   group('TrafficRecord Unit Tests', () {
@@ -63,10 +65,10 @@ void main() {
     });
   });
 
-  group('TrafficManager Tests', () {
+  group('TrafficController (GetX) Tests', () {
     test('Filtering and searching works as expected', () {
-      final manager = TrafficManager.instance;
-      manager.clearRecords();
+      final controller = Get.put(TrafficController());
+      controller.clearRecords();
 
       final r1 = TrafficRecord(
         id: 'r1',
@@ -88,32 +90,32 @@ void main() {
         isPending: false,
       );
 
-      manager.addRecord(r1);
-      manager.addRecord(r2);
+      controller.addRecord(r1);
+      controller.addRecord(r2);
 
-      expect(manager.allRecords.length, 2);
+      expect(controller.records.length, 2);
 
       // Search by keyword
-      manager.setSearchQuery('users');
-      expect(manager.filteredRecords.length, 1);
-      expect(manager.filteredRecords.first.id, 'r1');
+      controller.setSearchQuery('users');
+      expect(controller.filteredRecords.length, 1);
+      expect(controller.filteredRecords.first.id, 'r1');
 
       // Clear search
-      manager.setSearchQuery('');
-      expect(manager.filteredRecords.length, 2);
+      controller.setSearchQuery('');
+      expect(controller.filteredRecords.length, 2);
 
       // Filter by status category
-      manager.setActiveFilter(TrafficFilter.clientError);
-      expect(manager.filteredRecords.length, 1);
-      expect(manager.filteredRecords.first.id, 'r2');
+      controller.setActiveFilter(TrafficFilter.clientError);
+      expect(controller.filteredRecords.length, 1);
+      expect(controller.filteredRecords.first.id, 'r2');
 
       // Reset filter
-      manager.setActiveFilter(TrafficFilter.all);
-      expect(manager.filteredRecords.length, 2);
+      controller.setActiveFilter(TrafficFilter.all);
+      expect(controller.filteredRecords.length, 2);
     });
   });
 
-  group('CapturedConnection & AppInfo Tests', () {
+  group('CapturedConnection & AppInfo Models Tests', () {
     test('CapturedConnection correctly parses map and formats name', () {
       final conn = CapturedConnection.fromMap({
         'timestamp': 1700000000000,
@@ -146,6 +148,20 @@ void main() {
       expect(app.appName, 'Test Browser');
       expect(app.packageName, 'com.test.browser');
       expect(app.isSystemApp, isFalse);
+    });
+  });
+
+  group('VpnController (GetX) Tests', () {
+    test('Package selection and connection filtering work reactively', () {
+      final vpnCtrl = Get.put(VpnController());
+      vpnCtrl.clearSelection();
+      vpnCtrl.clearConnections();
+
+      vpnCtrl.togglePackage('com.whatsapp');
+      expect(vpnCtrl.selectedPackages.contains('com.whatsapp'), isTrue);
+
+      vpnCtrl.togglePackage('com.whatsapp');
+      expect(vpnCtrl.selectedPackages.contains('com.whatsapp'), isFalse);
     });
   });
 }

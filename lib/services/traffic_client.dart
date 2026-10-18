@@ -1,14 +1,24 @@
 import 'dart:convert';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../models/traffic_record.dart';
-import '../../services/traffic_manager.dart';
+import '../controllers/traffic_controller.dart';
 
-/// An HTTP client wrapper that intercepts, inspects, and logs all network requests.
+/// عميل شبكة مخصص يعترض كافة طلبات واستجابات HTTP ويسجلها في متحكم TrafficController
 class TrafficHttpClient extends http.BaseClient {
   final http.Client _inner;
   static int _idCounter = 0;
 
   TrafficHttpClient([http.Client? inner]) : _inner = inner ?? http.Client();
+
+  TrafficController? get _controller {
+    try {
+      if (Get.isRegistered<TrafficController>()) {
+        return TrafficController.to;
+      }
+    } catch (_) {}
+    return null;
+  }
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
@@ -35,7 +45,7 @@ class TrafficHttpClient extends http.BaseClient {
       isPending: true,
     );
 
-    TrafficManager.instance.addRecord(record);
+    _controller?.addRecord(record);
 
     try {
       final streamedResponse = await _inner.send(request);
@@ -46,7 +56,7 @@ class TrafficHttpClient extends http.BaseClient {
       try {
         responseBody = utf8.decode(responseBodyBytes, allowMalformed: true);
       } catch (_) {
-        responseBody = '[Binary Data / Non-UTF8: ${responseBodyBytes.length} bytes]';
+        responseBody = '[بيانات ثنائية / Non-UTF8: ${responseBodyBytes.length} bytes]';
       }
 
       final updatedRecord = record.copyWith(
@@ -59,9 +69,8 @@ class TrafficHttpClient extends http.BaseClient {
         isPending: false,
       );
 
-      TrafficManager.instance.updateRecord(updatedRecord);
+      _controller?.updateRecord(updatedRecord);
 
-      // Return a new StreamedResponse with the same data so caller can read it
       return http.StreamedResponse(
         Stream.value(responseBodyBytes),
         streamedResponse.statusCode,
@@ -79,7 +88,7 @@ class TrafficHttpClient extends http.BaseClient {
         error: error.toString(),
         isPending: false,
       );
-      TrafficManager.instance.updateRecord(failedRecord);
+      _controller?.updateRecord(failedRecord);
       rethrow;
     }
   }

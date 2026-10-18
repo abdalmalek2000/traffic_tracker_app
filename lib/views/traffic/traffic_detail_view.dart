@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/models/traffic_record.dart';
-import '../widgets/json_viewer.dart';
+import 'package:get/get.dart';
+import '../../models/traffic_record.dart';
+import '../widgets/json_viewer_widget.dart';
 
-class TrafficDetailScreen extends StatelessWidget {
+/// شاشة تفاصيل طلب الـ HTTP (Request, Response, Headers, cURL)
+class TrafficDetailView extends StatelessWidget {
   final TrafficRecord record;
 
-  const TrafficDetailScreen({
+  const TrafficDetailView({
     super.key,
     required this.record,
   });
@@ -14,16 +16,16 @@ class TrafficDetailScreen extends StatelessWidget {
   static Color getStatusColor(TrafficStatusCategory category) {
     switch (category) {
       case TrafficStatusCategory.success:
-        return const Color(0xFF2ECC71); // Green
+        return const Color(0xFF2ECC71);
       case TrafficStatusCategory.redirect:
-        return const Color(0xFF3498DB); // Blue
+        return const Color(0xFF3498DB);
       case TrafficStatusCategory.clientError:
-        return const Color(0xFFE67E22); // Orange
+        return const Color(0xFFE67E22);
       case TrafficStatusCategory.serverError:
       case TrafficStatusCategory.failed:
-        return const Color(0xFFE74C3C); // Red
+        return const Color(0xFFE74C3C);
       case TrafficStatusCategory.pending:
-        return const Color(0xFFF1C40F); // Yellow
+        return const Color(0xFFF1C40F);
     }
   }
 
@@ -104,12 +106,10 @@ class TrafficDetailScreen extends StatelessWidget {
               tooltip: 'نسخ كود cURL',
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: record.toCurlCommand()));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('تم نسخ أمر cURL إلى الحافظة'),
-                    duration: Duration(seconds: 1),
-                    behavior: SnackBarBehavior.floating,
-                  ),
+                Get.rawSnackbar(
+                  message: 'تم نسخ أمر cURL إلى الحافظة',
+                  duration: const Duration(seconds: 1),
+                  snackPosition: SnackPosition.BOTTOM,
                 );
               },
             ),
@@ -214,7 +214,7 @@ class TrafficDetailScreen extends StatelessWidget {
           'جسم الطلب (Request Body)',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
-        FormattedCodeViewer(
+        JsonViewerWidget(
           content: record.prettyRequestBody,
           title: 'Request Payload',
         ),
@@ -239,7 +239,7 @@ class TrafficDetailScreen extends StatelessWidget {
           'جسم الاستجابة (Response Body)',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
-        FormattedCodeViewer(
+        JsonViewerWidget(
           content: record.prettyResponseBody,
           title: 'Response Payload (${record.formattedResponseSize})',
         ),
@@ -257,7 +257,7 @@ class TrafficDetailScreen extends StatelessWidget {
           style: TextStyle(fontSize: 13),
         ),
         const SizedBox(height: 12),
-        FormattedCodeViewer(
+        JsonViewerWidget(
           content: curl,
           title: 'cURL Command',
         ),
@@ -265,11 +265,10 @@ class TrafficDetailScreen extends StatelessWidget {
         FilledButton.icon(
           onPressed: () {
             Clipboard.setData(ClipboardData(text: curl));
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم نسخ أمر cURL بنجاح'),
-                behavior: SnackBarBehavior.floating,
-              ),
+            Get.rawSnackbar(
+              message: 'تم نسخ أمر cURL بنجاح',
+              duration: const Duration(seconds: 1),
+              snackPosition: SnackPosition.BOTTOM,
             );
           },
           icon: const Icon(Icons.copy_rounded),
@@ -279,7 +278,8 @@ class TrafficDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, {required String title, required String content, bool canCopy = false}) {
+  Widget _buildInfoCard(BuildContext context,
+      {required String title, required String content, bool canCopy = false}) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -297,21 +297,19 @@ class TrafficDetailScreen extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                 ),
                 if (canCopy)
                   IconButton(
                     icon: const Icon(Icons.copy_rounded, size: 16),
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: content));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('تم النسخ إلى الحافظة'),
-                          duration: Duration(seconds: 1),
-                          behavior: SnackBarBehavior.floating,
-                        ),
+                      Get.rawSnackbar(
+                        message: 'تم النسخ إلى الحافظة',
+                        duration: const Duration(seconds: 1),
+                        snackPosition: SnackPosition.BOTTOM,
                       );
                     },
                   ),
