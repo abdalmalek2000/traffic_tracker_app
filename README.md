@@ -43,21 +43,3 @@ lib/
         └── json_viewer.dart             # Syntax-highlighted payload viewer
 ```
 
----
-
-## 🚀 Getting Started (البدء والتشغيل)
-
-### Prerequisites
-- Flutter SDK `^3.12.0`
-- Android SDK (API 26+)
-
-### Run
-```bash
-flutter pub get
-flutter run
-```
-
-### Run Tests
-```bash
-flutter test
-```
