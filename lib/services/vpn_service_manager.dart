@@ -24,6 +24,9 @@ class VpnServiceManager extends ChangeNotifier {
   List<AppInfo> _installedApps = [];
   bool _isLoadingApps = false;
 
+  String _searchQuery = '';
+  bool _filterBySelectedAppsOnly = false;
+
   bool get isVpnRunning => _isVpnRunning;
   String? get currentPcapPath => _currentPcapPath;
   int get totalPackets => _totalPackets;
@@ -32,8 +35,46 @@ class VpnServiceManager extends ChangeNotifier {
   Set<String> get selectedPackages => _selectedPackages;
   List<AppInfo> get installedApps => _installedApps;
   bool get isLoadingApps => _isLoadingApps;
+  String get searchQuery => _searchQuery;
+  bool get filterBySelectedAppsOnly => _filterBySelectedAppsOnly;
 
   String get formattedTotalBytes => TrafficRecord.formatBytes(_totalBytes);
+
+  /// Filtered connections based on selected target apps and search query.
+  List<CapturedConnection> get filteredConnections {
+    return _connections.where((conn) {
+      // 1. Filter by selected apps if enabled or if selectedPackages is specified
+      if ((_filterBySelectedAppsOnly || _selectedPackages.isNotEmpty) &&
+          _selectedPackages.isNotEmpty) {
+        if (conn.packageName != null && !_selectedPackages.contains(conn.packageName)) {
+          return false;
+        }
+      }
+
+      // 2. Filter by search query
+      if (_searchQuery.isNotEmpty) {
+        final q = _searchQuery.toLowerCase();
+        final matchesDomain = conn.domain?.toLowerCase().contains(q) ?? false;
+        final matchesDstIp = conn.dstIp.toLowerCase().contains(q);
+        final matchesSrcIp = conn.srcIp.toLowerCase().contains(q);
+        final matchesApp = conn.appName?.toLowerCase().contains(q) ?? false;
+        final matchesPkg = conn.packageName?.toLowerCase().contains(q) ?? false;
+        final matchesProto = conn.protocol.toLowerCase().contains(q);
+        final matchesPort =
+            conn.dstPort.toString().contains(q) || conn.srcPort.toString().contains(q);
+
+        return matchesDomain ||
+            matchesDstIp ||
+            matchesSrcIp ||
+            matchesApp ||
+            matchesPkg ||
+            matchesProto ||
+            matchesPort;
+      }
+
+      return true;
+    }).toList();
+  }
 
   StreamSubscription? _subscription;
 
@@ -110,7 +151,8 @@ class VpnServiceManager extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final List<dynamic>? appsData = await _controlChannel.invokeMethod<List<dynamic>>('getInstalledApps');
+      final List<dynamic>? appsData =
+          await _controlChannel.invokeMethod<List<dynamic>>('getInstalledApps');
       if (appsData != null) {
         _installedApps = appsData.map((item) => AppInfo.fromMap(item as Map)).toList();
       }
@@ -123,23 +165,45 @@ class VpnServiceManager extends ChangeNotifier {
     return _installedApps;
   }
 
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
+
+  void setFilterBySelectedAppsOnly(bool value) {
+    _filterBySelectedAppsOnly = value;
+    notifyListeners();
+  }
+
   void togglePackageSelection(String packageName) {
     if (_selectedPackages.contains(packageName)) {
       _selectedPackages.remove(packageName);
     } else {
       _selectedPackages.add(packageName);
     }
+    _syncAllowedPackagesToNative();
     notifyListeners();
   }
 
   void selectAllPackages(Iterable<String> packageNames) {
     _selectedPackages.addAll(packageNames);
+    _syncAllowedPackagesToNative();
     notifyListeners();
   }
 
   void clearPackageSelection() {
     _selectedPackages.clear();
+    _syncAllowedPackagesToNative();
     notifyListeners();
+  }
+
+  Future<void> _syncAllowedPackagesToNative() async {
+    try {
+      final allowed = _selectedPackages.isNotEmpty ? _selectedPackages.toList() : null;
+      await _controlChannel.invokeMethod('updateAllowedPackages', {
+        'allowedPackages': allowed,
+      });
+    } catch (_) {}
   }
 
   void clearConnections() {

@@ -123,11 +123,15 @@ void main() {
         'dstIp': '142.250.180.46',
         'dstPort': 443,
         'domain': 'google.com',
+        'packageName': 'com.android.chrome',
+        'appName': 'Chrome',
         'length': 1420,
       });
 
       expect(conn.protocol, 'TLS/HTTPS');
       expect(conn.domain, 'google.com');
+      expect(conn.packageName, 'com.android.chrome');
+      expect(conn.appName, 'Chrome');
       expect(conn.displayName, 'google.com');
       expect(conn.formattedSize, '1.4 KB');
     });

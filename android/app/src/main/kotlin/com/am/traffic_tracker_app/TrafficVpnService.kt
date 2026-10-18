@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.net.VpnService
 import android.os.Build
 import android.os.Handler
@@ -16,6 +17,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -38,8 +41,18 @@ class TrafficVpnService : VpnService() {
         var pcapFilePath: String? = null
         var packetCount = 0L
         var totalBytesCaptured = 0L
+        val allowedPackageSet: HashSet<String> = hashSetOf()
 
         private val mainHandler = Handler(Looper.getMainLooper())
+
+        fun updateAllowedPackages(packages: List<String>?) {
+            synchronized(allowedPackageSet) {
+                allowedPackageSet.clear()
+                if (!packages.isNullOrEmpty()) {
+                    allowedPackageSet.addAll(packages)
+                }
+            }
+        }
 
         fun sendEvent(data: Map<String, Any?>) {
             mainHandler.post {
@@ -58,6 +71,7 @@ class TrafficVpnService : VpnService() {
         }
 
         val allowedList = intent?.getStringArrayListExtra(EXTRA_ALLOWED_PACKAGES)
+        updateAllowedPackages(allowedList)
         startVpn(allowedList)
         return START_STICKY
     }
@@ -80,7 +94,7 @@ class TrafficVpnService : VpnService() {
                 builder.addDisallowedApplication(packageName)
             } catch (_: Exception) {}
 
-            // Apply per-app filtering if specified
+            // Apply per-app filtering on the TUN interface if specified
             if (!allowedPackages.isNullOrEmpty()) {
                 for (pkg in allowedPackages) {
                     try {
@@ -122,16 +136,14 @@ class TrafficVpnService : VpnService() {
             pcapFilePath = file.absolutePath
             val fos = FileOutputStream(file)
 
-            // Write PCAP Global Header (24 bytes)
-            // Magic number: 0xa1b2c3d4 (standard libpcap)
             val header = ByteBuffer.allocate(24).order(ByteOrder.LITTLE_ENDIAN)
             header.putInt(0xa1b2c3d4.toInt()) // magic_number
             header.putShort(2.toShort())       // version_major
             header.putShort(4.toShort())       // version_minor
-            header.putInt(0)                   // thiszone (GMT to local correction)
-            header.putInt(0)                   // sigfigs (accuracy of timestamps)
-            header.putInt(65535)               // snaplen (max length of captured packets)
-            header.putInt(12)                  // network / linktype (12 = DLT_RAW / RAW IP)
+            header.putInt(0)                   // thiszone
+            header.putInt(0)                   // sigfigs
+            header.putInt(65535)               // snaplen
+            header.putInt(12)                  // DLT_RAW (12)
 
             fos.write(header.array())
             fos.flush()
@@ -149,10 +161,10 @@ class TrafficVpnService : VpnService() {
             val usec = ((nowMs % 1000) * 1000).toInt()
 
             val pcapHeader = ByteBuffer.allocate(16).order(ByteOrder.LITTLE_ENDIAN)
-            pcapHeader.putInt(sec)     // ts_sec
-            pcapHeader.putInt(usec)    // ts_usec
-            pcapHeader.putInt(length)  // incl_len
-            pcapHeader.putInt(length)  // orig_len
+            pcapHeader.putInt(sec)
+            pcapHeader.putInt(usec)
+            pcapHeader.putInt(length)
+            pcapHeader.putInt(length)
 
             synchronized(this) {
                 fos.write(pcapHeader.array())
@@ -170,11 +182,7 @@ class TrafficVpnService : VpnService() {
             try {
                 val length = inputStream.read(buffer)
                 if (length > 0) {
-                    packetCount++
-                    totalBytesCaptured += length
-
-                    writePcapPacket(buffer, length)
-                    parseAndEmitPacket(buffer, length)
+                    parseAndProcessPacket(buffer, length)
                 }
             } catch (e: IOException) {
                 break
@@ -184,7 +192,7 @@ class TrafficVpnService : VpnService() {
         }
     }
 
-    private fun parseAndEmitPacket(packet: ByteArray, length: Int) {
+    private fun parseAndProcessPacket(packet: ByteArray, length: Int) {
         if (length < 20) return
 
         val versionAndIhl = packet[0].toInt() and 0xFF
@@ -202,6 +210,8 @@ class TrafficVpnService : VpnService() {
         var dstPort = 0
         var protocolName = "IP"
         var domain: String? = null
+        var resolvedPkgName: String? = null
+        var resolvedAppName: String? = null
 
         if (protocol == 6 && length >= ihl + 20) { // TCP
             protocolName = "TCP"
@@ -211,7 +221,6 @@ class TrafficVpnService : VpnService() {
             val tcpDataOffset = ((packet[ihl + 12].toInt() and 0xFF) shr 4) * 4
             val payloadOffset = ihl + tcpDataOffset
 
-            // Check for TLS Client Hello on port 443 to extract SNI (domain name)
             if (dstPort == 443 && length > payloadOffset + 5) {
                 domain = extractSniFromTls(packet, payloadOffset, length)
                 if (domain != null) {
@@ -225,12 +234,44 @@ class TrafficVpnService : VpnService() {
             srcPort = ((packet[ihl].toInt() and 0xFF) shl 8) or (packet[ihl + 1].toInt() and 0xFF)
             dstPort = ((packet[ihl + 2].toInt() and 0xFF) shl 8) or (packet[ihl + 3].toInt() and 0xFF)
 
-            // DNS Query Inspection (Port 53)
             if (dstPort == 53 && length > ihl + 8 + 12) {
                 domain = extractDnsQueryName(packet, ihl + 8, length)
                 protocolName = "DNS"
             }
         }
+
+        // Identify originating app on Android 10+ (API 29+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && (protocol == 6 || protocol == 17)) {
+            try {
+                val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+                if (cm != null && srcPort > 0 && dstPort > 0) {
+                    val srcAddr = InetSocketAddress(InetAddress.getByName(srcIp), srcPort)
+                    val dstAddr = InetSocketAddress(InetAddress.getByName(dstIp), dstPort)
+                    val uid = cm.getConnectionOwnerUid(protocol, srcAddr, dstAddr)
+                    if (uid > 0) {
+                        val pkgs = packageManager.getPackagesForUid(uid)
+                        if (!pkgs.isNullOrEmpty()) {
+                            resolvedPkgName = pkgs[0]
+                            val appInfo = packageManager.getApplicationInfo(resolvedPkgName, 0)
+                            resolvedAppName = packageManager.getApplicationLabel(appInfo).toString()
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+
+        // Active app filtering check
+        synchronized(allowedPackageSet) {
+            if (allowedPackageSet.isNotEmpty()) {
+                if (resolvedPkgName != null && !allowedPackageSet.contains(resolvedPkgName)) {
+                    return // Exclude packet from reporting if not in selected apps
+                }
+            }
+        }
+
+        packetCount++
+        totalBytesCaptured += length
+        writePcapPacket(packet, length)
 
         val event = mapOf(
             "type" to "PACKET",
@@ -241,6 +282,8 @@ class TrafficVpnService : VpnService() {
             "dstIp" to dstIp,
             "dstPort" to dstPort,
             "domain" to domain,
+            "packageName" to resolvedPkgName,
+            "appName" to resolvedAppName,
             "length" to length,
             "totalPackets" to packetCount,
             "totalBytes" to totalBytesCaptured
@@ -249,38 +292,30 @@ class TrafficVpnService : VpnService() {
         sendEvent(event)
     }
 
-    /**
-     * Extracts Server Name Indication (SNI) from TLS Client Hello.
-     */
     private fun extractSniFromTls(packet: ByteArray, offset: Int, length: Int): String? {
         try {
-            // Content Type: 0x16 (Handshake), Version: 0x03 0x01/0x02/0x03
             if (packet[offset] != 0x16.toByte()) return null
             if (length < offset + 9) return null
 
             val handshakeType = packet[offset + 5].toInt() and 0xFF
             if (handshakeType != 1) return null // Client Hello
 
-            var pos = offset + 9 // Start of Client Hello
-            pos += 34 // skip client_version (2) + random (32)
+            var pos = offset + 9
+            pos += 34
             if (pos >= length) return null
 
-            // Session ID length
             val sessionIdLen = packet[pos].toInt() and 0xFF
             pos += 1 + sessionIdLen
             if (pos + 2 >= length) return null
 
-            // Cipher Suites length
             val cipherSuitesLen = ((packet[pos].toInt() and 0xFF) shl 8) or (packet[pos + 1].toInt() and 0xFF)
             pos += 2 + cipherSuitesLen
             if (pos + 1 >= length) return null
 
-            // Compression Methods length
             val compressionLen = packet[pos].toInt() and 0xFF
             pos += 1 + compressionLen
             if (pos + 2 >= length) return null
 
-            // Extensions length
             val extensionsLen = ((packet[pos].toInt() and 0xFF) shl 8) or (packet[pos + 1].toInt() and 0xFF)
             pos += 2
             val extensionsEnd = Math.min(pos + extensionsLen, length)
@@ -290,9 +325,8 @@ class TrafficVpnService : VpnService() {
                 val extLen = ((packet[pos + 2].toInt() and 0xFF) shl 8) or (packet[pos + 3].toInt() and 0xFF)
                 pos += 4
 
-                if (extType == 0) { // server_name extension
+                if (extType == 0) { // server_name
                     if (pos + 5 <= extensionsEnd) {
-                        val serverNameListLen = ((packet[pos].toInt() and 0xFF) shl 8) or (packet[pos + 1].toInt() and 0xFF)
                         val nameType = packet[pos + 2].toInt() and 0xFF
                         val nameLen = ((packet[pos + 3].toInt() and 0xFF) shl 8) or (packet[pos + 4].toInt() and 0xFF)
                         if (nameType == 0 && pos + 5 + nameLen <= extensionsEnd) {
@@ -306,12 +340,9 @@ class TrafficVpnService : VpnService() {
         return null
     }
 
-    /**
-     * Extracts queried domain name from DNS request payload.
-     */
     private fun extractDnsQueryName(packet: ByteArray, udpPayloadOffset: Int, totalLength: Int): String? {
         try {
-            var pos = udpPayloadOffset + 12 // Skip DNS header (12 bytes)
+            var pos = udpPayloadOffset + 12
             val domainBuilder = StringBuilder()
 
             while (pos < totalLength) {

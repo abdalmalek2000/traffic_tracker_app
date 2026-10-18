@@ -4,8 +4,21 @@ import '../../core/models/captured_connection.dart';
 import '../../services/vpn_service_manager.dart';
 import 'app_filter_screen.dart';
 
-class VpnDashboardScreen extends StatelessWidget {
+class VpnDashboardScreen extends StatefulWidget {
   const VpnDashboardScreen({super.key});
+
+  @override
+  State<VpnDashboardScreen> createState() => _VpnDashboardScreenState();
+}
+
+class _VpnDashboardScreenState extends State<VpnDashboardScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   static Color getProtocolColor(String protocol) {
     switch (protocol.toUpperCase()) {
@@ -119,12 +132,13 @@ class VpnDashboardScreen extends StatelessWidget {
         listenable: manager,
         builder: (context, _) {
           final isRunning = manager.isVpnRunning;
+          final filteredList = manager.filteredConnections;
 
           return Column(
             children: [
               // Dashboard Top Control Card
               Container(
-                margin: const EdgeInsets.all(16),
+                margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface,
@@ -186,7 +200,7 @@ class VpnDashboardScreen extends StatelessWidget {
                                 Text(
                                   manager.selectedPackages.isEmpty
                                       ? 'كافة التطبيقات'
-                                      : '${manager.selectedPackages.length} تطبيقات',
+                                      : '${manager.selectedPackages.length} تطبيقات محددة',
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
@@ -199,7 +213,7 @@ class VpnDashboardScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -217,19 +231,20 @@ class VpnDashboardScreen extends StatelessWidget {
                         ),
                         _buildMetric(
                           context,
-                          title: 'الاتصالات المسجلة',
-                          value: '${manager.connections.length}',
+                          title: 'المعروض حالياً',
+                          value: '${filteredList.length}',
                           icon: Icons.hub_rounded,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     SizedBox(
                       width: double.infinity,
-                      height: 48,
+                      height: 46,
                       child: FilledButton.icon(
                         style: FilledButton.styleFrom(
-                          backgroundColor: isRunning ? Colors.red.shade600 : const Color(0xFF2563EB),
+                          backgroundColor:
+                              isRunning ? Colors.red.shade600 : const Color(0xFF2563EB),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         onPressed: () {
@@ -242,7 +257,7 @@ class VpnDashboardScreen extends StatelessWidget {
                         icon: Icon(isRunning ? Icons.stop_rounded : Icons.play_arrow_rounded),
                         label: Text(
                           isRunning ? 'إيقاف فحص الشبكة' : 'بدء فحص حركة تطبيقات الجهاز',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5),
                         ),
                       ),
                     ),
@@ -250,16 +265,66 @@ class VpnDashboardScreen extends StatelessWidget {
                 ),
               ),
 
-              // Captured Connection Header
+              // Search Bar in Dashboard
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'بحث بالنطاق، الـ IP، اسم التطبيق، أو المنفذ...',
+                    prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, size: 18),
+                            onPressed: () {
+                              _searchController.clear();
+                              manager.setSearchQuery('');
+                              setState(() {});
+                            },
+                          )
+                        : null,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    filled: true,
+                    fillColor: theme.colorScheme.surface,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
+                    ),
+                  ),
+                  onChanged: (val) {
+                    manager.setSearchQuery(val);
+                    setState(() {});
+                  },
+                ),
+              ),
+
+              // Filter toggles & Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'الاتصالات الحية (Live Captured Traffic)',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    Text(
+                      'الاتصالات (${filteredList.length})',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     ),
+                    if (manager.selectedPackages.isNotEmpty)
+                      FilterChip(
+                        label: Text(
+                          'التطبيقات المحددة فقط (${manager.selectedPackages.length})',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: manager.filterBySelectedAppsOnly ? Colors.white : null,
+                          ),
+                        ),
+                        selected: manager.filterBySelectedAppsOnly,
+                        selectedColor: Colors.green,
+                        checkmarkColor: Colors.white,
+                        onSelected: (val) => manager.setFilterBySelectedAppsOnly(val),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                      ),
                     if (isRunning)
                       Row(
                         children: [
@@ -278,11 +343,10 @@ class VpnDashboardScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 4),
 
               // Connection List
               Expanded(
-                child: manager.connections.isEmpty
+                child: filteredList.isEmpty
                     ? Center(
                         child: Padding(
                           padding: const EdgeInsets.all(24.0),
@@ -297,7 +361,9 @@ class VpnDashboardScreen extends StatelessWidget {
                               const SizedBox(height: 12),
                               Text(
                                 isRunning
-                                    ? 'المراقبة تعمل بنشاط، افتح أي تطبيق على جهازك لتبدأ حزم الشبكة بالظهور هنا!'
+                                    ? (_searchController.text.isNotEmpty
+                                        ? 'لا توجد اتصالات تطابق البحث "${_searchController.text}"'
+                                        : 'المراقبة تعمل بنشاط، افتح أي تطبيق على جهازك لتبدأ حزم الشبكة بالظهور هنا!')
                                     : 'اضغط على "بدء فحص حركة تطبيقات الجهاز" أعلاه للبدء بالتقاط حزم الـ IP والـ TLS والـ DNS.',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(color: Colors.grey, fontSize: 13),
@@ -307,14 +373,14 @@ class VpnDashboardScreen extends StatelessWidget {
                         ),
                       )
                     : ListView.separated(
-                        itemCount: manager.connections.length,
+                        itemCount: filteredList.length,
                         separatorBuilder: (_, _) => Divider(
                           height: 1,
                           thickness: 0.5,
                           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
                         ),
                         itemBuilder: (context, index) {
-                          final item = manager.connections[index];
+                          final item = filteredList[index];
                           return _buildConnectionTile(context, item);
                         },
                       ),
@@ -338,7 +404,7 @@ class VpnDashboardScreen extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5),
         ),
         Text(
           title,
@@ -352,7 +418,7 @@ class VpnDashboardScreen extends StatelessWidget {
     final protocolColor = getProtocolColor(item.protocol);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
       child: Row(
         children: [
           Container(
@@ -376,10 +442,34 @@ class VpnDashboardScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.displayName,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+                Row(
+                  children: [
+                    if (item.appName != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                        margin: const EdgeInsets.only(left: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          item.appName!,
+                          style: const TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                    ],
+                    Expanded(
+                      child: Text(
+                        item.displayName,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(

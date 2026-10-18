@@ -9,6 +9,8 @@ class CapturedConnection {
   final String dstIp;
   final int dstPort;
   final String? domain;
+  final String? packageName;
+  final String? appName;
   final int length;
 
   CapturedConnection({
@@ -20,10 +22,15 @@ class CapturedConnection {
     required this.dstIp,
     required this.dstPort,
     this.domain,
+    this.packageName,
+    this.appName,
     required this.length,
   });
 
-  String get displayName => domain ?? '$dstIp:$dstPort';
+  String get displayName {
+    if (domain != null && domain!.isNotEmpty) return domain!;
+    return '$dstIp:$dstPort';
+  }
 
   String get formattedSize => TrafficRecord.formatBytes(length);
 
@@ -38,6 +45,8 @@ class CapturedConnection {
       dstIp: map['dstIp'] as String? ?? '',
       dstPort: map['dstPort'] as int? ?? 0,
       domain: map['domain'] as String?,
+      packageName: map['packageName'] as String?,
+      appName: map['appName'] as String?,
       length: map['length'] as int? ?? 0,
     );
   }

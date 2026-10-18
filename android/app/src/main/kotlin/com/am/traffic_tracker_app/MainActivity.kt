@@ -60,6 +60,12 @@ class MainActivity : FlutterActivity() {
                 "getPcapPath" -> {
                     result.success(TrafficVpnService.pcapFilePath)
                 }
+                "updateAllowedPackages" -> {
+                    val allowed = call.argument<List<String>>("allowedPackages")
+                    pendingAllowedPackages = if (allowed != null) ArrayList(allowed) else null
+                    TrafficVpnService.updateAllowedPackages(allowed)
+                    result.success(true)
+                }
                 "getInstalledApps" -> {
                     Thread {
                         val apps = getInstalledAppsList()
