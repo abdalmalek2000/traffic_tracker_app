@@ -1,17 +1,63 @@
-# traffic_tracker_app
+# Traffic Tracker App 🛡️📡
 
-A new Flutter project.
+A powerful, cross-platform Network Traffic Inspector & Security Auditor built with **Flutter** and **Android Native VpnService**.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🌟 Features (الميزات الرئيسية)
 
-A few resources to get you started if this is your first Flutter project:
+### 1. In-App HTTP Inspector (فاحص طلبات الـ HTTP الداخلي)
+- **Real-time API Interception**: Intercepts, inspects, and logs all network requests and responses within the application.
+- **Deep Inspection**: View URLs, HTTP Methods (GET, POST, PUT, DELETE, PATCH), Headers, Query Parameters, and Response bodies.
+- **cURL Generator**: Copy any intercepted request as a ready-to-run cURL command with a single tap.
+- **JSON Formatting**: Automatically parses and prettifies response payloads for clean readability.
+- **Filtering & Search**: Filter by status codes (2xx, 3xx, 4xx, 5xx) and search URLs, paths, or payload content.
+- **Built-in Test Generator**: Trigger live sample requests (GET, POST JSON, 404, 500, Custom) to test traffic monitoring instantly.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+### 2. System-Wide Network Inspector via Android VpnService (مراقب شبكة الجهاز الشامل)
+- **No-Root Required**: Leverages `android.net.VpnService` to capture network traffic across all installed Android applications.
+- **Domain & SNI Discovery**: Inspects DNS queries (UDP 53) and TLS Client Hello (SNI) on HTTPS connections to identify destinations without breaking SSL/TLS certificates or triggering SSL Pinning errors.
+- **PCAP Packet Logging**: Captures raw packets into standard `.pcap` files, ready for deep forensic analysis in **Wireshark**.
+- **Per-App Filtering**: Monitor all apps by default, or select specific target apps by name and icon.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🏗️ Architecture (الهيكلية المعمارية)
+
+```
+lib/
+├── core/
+│   ├── interceptor/       # TrafficHttpClient (BaseClient wrapper)
+│   └── models/            # TrafficRecord, CapturedConnection, AppInfo
+├── services/
+│   ├── test_request_service.dart   # Mock and live request tester
+│   ├── traffic_manager.dart        # In-App traffic state & filters
+│   └── vpn_service_manager.dart    # Android Native VPN bridge (Method & Event Channels)
+└── ui/
+    ├── screens/
+    │   ├── app_filter_screen.dart       # Target app selector
+    │   ├── traffic_detail_screen.dart   # Deep request/response & cURL inspection
+    │   ├── traffic_list_screen.dart     # In-App live request feed
+    │   └── vpn_dashboard_screen.dart    # System-wide VPN control & PCAP exporter
+    └── widgets/
+        └── json_viewer.dart             # Syntax-highlighted payload viewer
+```
+
+---
+
+## 🚀 Getting Started (البدء والتشغيل)
+
+### Prerequisites
+- Flutter SDK `^3.12.0`
+- Android SDK (API 26+)
+
+### Run
+```bash
+flutter pub get
+flutter run
+```
+
+### Run Tests
+```bash
+flutter test
+```
