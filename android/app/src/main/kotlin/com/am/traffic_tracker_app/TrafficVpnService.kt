@@ -25,6 +25,9 @@ import java.nio.ByteOrder
 class TrafficVpnService : VpnService() {
 
     private var vpnInterface: ParcelFileDescriptor? = null
+    private var tunOutputStream: FileOutputStream? = null
+    private val tunWriteLock = Any()
+    private var forwarder: VpnForwarder? = null
     private var isThreadRunning = false
     private var vpnThread: Thread? = null
     private var pcapOutputStream: FileOutputStream? = null
@@ -76,18 +79,57 @@ class TrafficVpnService : VpnService() {
         return START_STICKY
     }
 
+    fun writeToTun(packet: ByteArray) {
+        synchronized(tunWriteLock) {
+            try {
+                tunOutputStream?.write(packet)
+                tunOutputStream?.flush()
+            } catch (_: Exception) {}
+        }
+    }
+
+    private fun getSystemDnsServers(): List<String> {
+        val dnsList = mutableListOf<String>()
+        try {
+            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+            if (cm != null) {
+                val activeNetwork = cm.activeNetwork
+                if (activeNetwork != null) {
+                    val linkProperties = cm.getLinkProperties(activeNetwork)
+                    if (linkProperties != null) {
+                        for (dns in linkProperties.dnsServers) {
+                            if (dns is java.net.Inet4Address) {
+                                val host = dns.hostAddress
+                                if (!host.isNullOrEmpty()) {
+                                    dnsList.add(host)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (_: Exception) {}
+        return if (dnsList.isNotEmpty()) dnsList else listOf("8.8.8.8", "1.1.1.1")
+    }
+
     private fun startVpn(allowedPackages: List<String>?) {
         if (isRunning) return
 
         startForegroundNotification()
 
         try {
+            val dnsServers = getSystemDnsServers()
             val builder = Builder()
                 .setSession("TrafficTracker")
                 .addAddress("10.0.0.2", 32)
                 .addRoute("0.0.0.0", 0)
-                .addDnsServer("8.8.8.8")
                 .setMtu(1500)
+
+            for (dns in dnsServers) {
+                try {
+                    builder.addDnsServer(dns)
+                } catch (_: Exception) {}
+            }
 
             // Do not route our own traffic through the VPN to avoid loops
             try {
@@ -108,6 +150,13 @@ class TrafficVpnService : VpnService() {
                 stopSelf()
                 return
             }
+
+            tunOutputStream = FileOutputStream(vpnInterface!!.fileDescriptor)
+            forwarder = VpnForwarder(
+                vpnService = this,
+                tunWriter = { packet -> writeToTun(packet) },
+                defaultDnsServers = dnsServers
+            )
 
             initPcapFile()
 
@@ -213,13 +262,34 @@ class TrafficVpnService : VpnService() {
         var resolvedPkgName: String? = null
         var resolvedAppName: String? = null
 
+        var tcpFlags = 0
+        var tcpSeqNum = 0L
+        var tcpAckNum = 0L
+        var tcpPayload = ByteArray(0)
+        var udpPayload = ByteArray(0)
+
         if (protocol == 6 && length >= ihl + 20) { // TCP
             protocolName = "TCP"
             srcPort = ((packet[ihl].toInt() and 0xFF) shl 8) or (packet[ihl + 1].toInt() and 0xFF)
             dstPort = ((packet[ihl + 2].toInt() and 0xFF) shl 8) or (packet[ihl + 3].toInt() and 0xFF)
 
+            tcpSeqNum = ((packet[ihl + 4].toLong() and 0xFF) shl 24) or
+                    ((packet[ihl + 5].toLong() and 0xFF) shl 16) or
+                    ((packet[ihl + 6].toLong() and 0xFF) shl 8) or
+                    (packet[ihl + 7].toLong() and 0xFF)
+
+            tcpAckNum = ((packet[ihl + 8].toLong() and 0xFF) shl 24) or
+                    ((packet[ihl + 9].toLong() and 0xFF) shl 16) or
+                    ((packet[ihl + 10].toLong() and 0xFF) shl 8) or
+                    (packet[ihl + 11].toLong() and 0xFF)
+
             val tcpDataOffset = ((packet[ihl + 12].toInt() and 0xFF) shr 4) * 4
+            tcpFlags = packet[ihl + 13].toInt() and 0xFF
             val payloadOffset = ihl + tcpDataOffset
+
+            if (length > payloadOffset) {
+                tcpPayload = packet.copyOfRange(payloadOffset, length)
+            }
 
             if (dstPort == 443 && length > payloadOffset + 5) {
                 domain = extractSniFromTls(packet, payloadOffset, length)
@@ -233,6 +303,10 @@ class TrafficVpnService : VpnService() {
             protocolName = "UDP"
             srcPort = ((packet[ihl].toInt() and 0xFF) shl 8) or (packet[ihl + 1].toInt() and 0xFF)
             dstPort = ((packet[ihl + 2].toInt() and 0xFF) shl 8) or (packet[ihl + 3].toInt() and 0xFF)
+
+            if (length > ihl + 8) {
+                udpPayload = packet.copyOfRange(ihl + 8, length)
+            }
 
             if (dstPort == 53 && length > ihl + 8 + 12) {
                 domain = extractDnsQueryName(packet, ihl + 8, length)
@@ -260,7 +334,18 @@ class TrafficVpnService : VpnService() {
             } catch (_: Exception) {}
         }
 
-        // Active app filtering check
+        // Forward packets to the real internet via Userspace Forwarder / NAT engine
+        if (protocol == 6 && srcPort > 0 && dstPort > 0) {
+            forwarder?.forwardTcp(srcIp, srcPort, dstIp, dstPort, tcpFlags, tcpSeqNum, tcpAckNum, tcpPayload)
+        } else if (protocol == 17 && srcPort > 0 && dstPort > 0) {
+            if (dstPort == 53) {
+                forwarder?.forwardDns(srcIp, srcPort, dstIp, dstPort, udpPayload)
+            } else {
+                forwarder?.forwardGeneralUdp(srcIp, srcPort, dstIp, dstPort, udpPayload)
+            }
+        }
+
+        // Active app filtering check for UI inspection reporting
         synchronized(allowedPackageSet) {
             if (allowedPackageSet.isNotEmpty()) {
                 if (resolvedPkgName != null && !allowedPackageSet.contains(resolvedPkgName)) {
@@ -413,9 +498,19 @@ class TrafficVpnService : VpnService() {
         isRunning = false
 
         try {
+            forwarder?.stop()
+            forwarder = null
+        } catch (_: Exception) {}
+
+        try {
             vpnThread?.interrupt()
             vpnInterface?.close()
             vpnInterface = null
+        } catch (_: Exception) {}
+
+        try {
+            tunOutputStream?.close()
+            tunOutputStream = null
         } catch (_: Exception) {}
 
         try {
