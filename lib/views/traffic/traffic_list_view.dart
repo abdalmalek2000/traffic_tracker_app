@@ -222,7 +222,15 @@ class _TrafficListViewState extends State<TrafficListView> {
       appBar: AppBar(
         title: Row(
           children: [
-            const Icon(Icons.radar_rounded, size: 24),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                'assets/images/app_logo.png',
+                width: 26,
+                height: 26,
+                fit: BoxFit.cover,
+              ),
+            ),
             const SizedBox(width: 8),
             Text('network_inspector'.tr,
                 style: const TextStyle(fontWeight: FontWeight.bold)),

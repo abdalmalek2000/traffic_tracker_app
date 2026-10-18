@@ -88,7 +88,21 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('system_vpn_title'.tr),
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                'assets/images/app_logo.png',
+                width: 26,
+                height: 26,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text('system_vpn_title'.tr),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.tune_rounded),
