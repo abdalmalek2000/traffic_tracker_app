@@ -15,7 +15,7 @@ void main() {
     await tester.pumpWidget(const TrafficTrackerApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('مراقب الشبكة'), findsOneWidget);
-    expect(find.text('الكل (0)'), findsOneWidget);
+    expect(find.text('Network Inspector'), findsOneWidget);
+    expect(find.text('All (0)'), findsOneWidget);
   });
 }

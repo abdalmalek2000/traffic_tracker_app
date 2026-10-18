@@ -3,9 +3,10 @@ import 'package:get/get.dart';
 import '../../controllers/traffic_controller.dart';
 import '../../models/traffic_record.dart';
 import '../../services/test_request_service.dart';
+import '../../theme/app_colors.dart';
 import 'traffic_detail_view.dart';
 
-/// واجهة فحص ومراقبة طلبات الـ HTTP/HTTPS الداخلية
+/// In-App HTTP/HTTPS Traffic Inspector View
 class TrafficListView extends StatefulWidget {
   const TrafficListView({super.key});
 
@@ -53,9 +54,9 @@ class _TrafficListViewState extends State<TrafficListView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'إرسال طلبات اختبارية (Test Requests)',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Text(
+                    'test_requests_title'.tr,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -64,14 +65,14 @@ class _TrafficListViewState extends State<TrafficListView> {
                 ],
               ),
               const SizedBox(height: 6),
-              const Text(
-                'اختر نوع الطلب لاختباره ومراقبة تسجيله فورياً في التطبيق:',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+              Text(
+                'test_requests_subtitle'.tr,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
               const SizedBox(height: 16),
               ListTile(
-                leading: _buildMethodBadge('GET', TrafficDetailView.getMethodColor('GET')),
-                title: const Text('طلب GET قياسي (200 OK)'),
+                leading: _buildMethodBadge('GET', AppColors.getProtocolColor('HTTP')),
+                title: const Text('GET Request (200 OK)'),
                 subtitle: const Text('jsonplaceholder.typicode.com/posts/1'),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -84,9 +85,9 @@ class _TrafficListViewState extends State<TrafficListView> {
               ),
               const SizedBox(height: 8),
               ListTile(
-                leading: _buildMethodBadge('POST', TrafficDetailView.getMethodColor('POST')),
-                title: const Text('طلب POST مع JSON Payload (201 Created)'),
-                subtitle: const Text('مع بيانات أمنية ورؤوس توكن تجريبية'),
+                leading: _buildMethodBadge('POST', AppColors.statusSuccess),
+                title: const Text('POST Request with JSON (201 Created)'),
+                subtitle: const Text('Includes payload & auth bearer header'),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
@@ -98,9 +99,9 @@ class _TrafficListViewState extends State<TrafficListView> {
               ),
               const SizedBox(height: 8),
               ListTile(
-                leading: _buildMethodBadge('GET', TrafficDetailView.getMethodColor('GET')),
-                title: const Text('خطأ عميل 404 Not Found'),
-                subtitle: const Text('اختبار التعامل مع المسارات غير الموجودة'),
+                leading: _buildMethodBadge('GET', AppColors.getProtocolColor('HTTP')),
+                title: const Text('Client Error (404 Not Found)'),
+                subtitle: const Text('Test non-existent API route handling'),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
@@ -112,9 +113,9 @@ class _TrafficListViewState extends State<TrafficListView> {
               ),
               const SizedBox(height: 8),
               ListTile(
-                leading: _buildMethodBadge('GET', TrafficDetailView.getMethodColor('GET')),
-                title: const Text('خطأ خادم 500 Internal Server Error'),
-                subtitle: const Text('اختبار استجابة أخطاء الخادم'),
+                leading: _buildMethodBadge('GET', AppColors.getProtocolColor('HTTP')),
+                title: const Text('Server Error (500 Error)'),
+                subtitle: const Text('Test internal server crash simulation'),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
@@ -127,7 +128,7 @@ class _TrafficListViewState extends State<TrafficListView> {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 icon: const Icon(Icons.edit_note_rounded),
-                label: const Text('إرسال طلب مخصص (Custom URL/Body)'),
+                label: Text('send_custom_request'.tr),
                 onPressed: () {
                   Get.back();
                   _showCustomRequestDialog();
@@ -151,14 +152,14 @@ class _TrafficListViewState extends State<TrafficListView> {
       StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
-            title: const Text('إرسال طلب مخصص'),
+            title: Text('send_custom_request'.tr),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   DropdownButtonFormField<String>(
                     initialValue: selectedMethod,
-                    decoration: const InputDecoration(labelText: 'Method'),
+                    decoration: InputDecoration(labelText: 'method_label'.tr),
                     items: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
                         .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                         .toList(),
@@ -169,16 +170,16 @@ class _TrafficListViewState extends State<TrafficListView> {
                   const SizedBox(height: 10),
                   TextField(
                     controller: urlController,
-                    decoration: const InputDecoration(labelText: 'URL'),
+                    decoration: InputDecoration(labelText: 'url_label'.tr),
                   ),
                   if (selectedMethod != 'GET') ...[
                     const SizedBox(height: 10),
                     TextField(
                       controller: bodyController,
                       maxLines: 4,
-                      decoration: const InputDecoration(
-                        labelText: 'Request Body (JSON / Text)',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: 'body_label'.tr,
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                   ],
@@ -188,7 +189,7 @@ class _TrafficListViewState extends State<TrafficListView> {
             actions: [
               TextButton(
                 onPressed: () => Get.back(),
-                child: const Text('إلغاء'),
+                child: Text('cancel'.tr),
               ),
               FilledButton(
                 onPressed: () {
@@ -204,7 +205,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                         ));
                   }
                 },
-                child: const Text('إرسال ومراقبة'),
+                child: Text('send_and_inspect'.tr),
               ),
             ],
           );
@@ -223,20 +224,19 @@ class _TrafficListViewState extends State<TrafficListView> {
           children: [
             const Icon(Icons.radar_rounded, size: 24),
             const SizedBox(width: 8),
-            const Text('مراقب الشبكة', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('network_inspector'.tr,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             const Spacer(),
             Obx(() {
               final isRec = controller.isRecording.value;
               return Tooltip(
-                message: isRec
-                    ? 'المراقبة نشطة (إيقاف مؤقت)'
-                    : 'المراقبة متوقفة (استئناف)',
+                message: isRec ? 'monitoring_active'.tr : 'monitoring_paused'.tr,
                 child: IconButton(
                   icon: Icon(
                     isRec
                         ? Icons.pause_circle_filled_rounded
                         : Icons.play_circle_fill_rounded,
-                    color: isRec ? Colors.green : Colors.grey,
+                    color: isRec ? AppColors.statusSuccess : Colors.grey,
                     size: 26,
                   ),
                   onPressed: () => controller.toggleRecording(),
@@ -245,11 +245,11 @@ class _TrafficListViewState extends State<TrafficListView> {
             }),
             IconButton(
               icon: const Icon(Icons.delete_sweep_rounded),
-              tooltip: 'مسح السجلات',
+              tooltip: 'clear_records'.tr,
               onPressed: () {
                 controller.clearRecords();
                 Get.rawSnackbar(
-                  message: 'تم مسح جميع السجلات',
+                  message: 'records_cleared'.tr,
                   duration: const Duration(seconds: 1),
                   snackPosition: SnackPosition.BOTTOM,
                 );
@@ -267,7 +267,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               )
             : const Icon(Icons.send_rounded),
-        label: Text(_isSendingTest ? 'جاري الإرسال...' : 'طلب اختباري'),
+        label: Text(_isSendingTest ? 'Sending...' : 'test_request_btn'.tr),
       ),
       body: Column(
         children: [
@@ -286,7 +286,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                 TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: 'بحث في الروابط، الحالة، أو المحتوى...',
+                    hintText: 'search_hint_http'.tr,
                     prefixIcon: const Icon(Icons.search_rounded, size: 20),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
@@ -337,21 +337,21 @@ class _TrafficListViewState extends State<TrafficListView> {
                           color: theme.colorScheme.primary.withValues(alpha: 0.4),
                         ),
                         const SizedBox(height: 16),
-                        const Text(
-                          'لا توجد طلبات مسجلة حالياً',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        Text(
+                          'no_records_title'.tr,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'أي طلب شبكة يتم إرساله سيظهر هنا لحظياً مع كافة التفاصيل والـ Headers والـ Payloads.',
+                        Text(
+                          'no_records_desc'.tr,
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
+                          style: const TextStyle(fontSize: 13, color: Colors.grey),
                         ),
                         const SizedBox(height: 20),
                         FilledButton.tonalIcon(
                           onPressed: _showTestRequestsBottomSheet,
                           icon: const Icon(Icons.play_arrow_rounded),
-                          label: const Text('إرسال طلب اختباري لتجربة المراقبة'),
+                          label: Text('test_request_btn'.tr),
                         ),
                       ],
                     ),
@@ -388,35 +388,35 @@ class _TrafficListViewState extends State<TrafficListView> {
         child: Row(
           children: [
             _buildChip(
-              label: 'الكل ($total)',
+              label: '${'filter_all'.tr} ($total)',
               isSelected: active == TrafficFilter.all,
               onSelected: () => controller.setActiveFilter(TrafficFilter.all),
             ),
             const SizedBox(width: 6),
             _buildChip(
-              label: '2xx نجاح',
-              color: const Color(0xFF2ECC71),
+              label: 'filter_2xx'.tr,
+              color: AppColors.statusSuccess,
               isSelected: active == TrafficFilter.success,
               onSelected: () => controller.setActiveFilter(TrafficFilter.success),
             ),
             const SizedBox(width: 6),
             _buildChip(
-              label: '3xx توجيه',
-              color: const Color(0xFF3498DB),
+              label: 'filter_3xx'.tr,
+              color: AppColors.statusRedirect,
               isSelected: active == TrafficFilter.redirect,
               onSelected: () => controller.setActiveFilter(TrafficFilter.redirect),
             ),
             const SizedBox(width: 6),
             _buildChip(
-              label: '4xx خطأ عميل',
-              color: const Color(0xFFE67E22),
+              label: 'filter_4xx'.tr,
+              color: AppColors.statusClientError,
               isSelected: active == TrafficFilter.clientError,
               onSelected: () => controller.setActiveFilter(TrafficFilter.clientError),
             ),
             const SizedBox(width: 6),
             _buildChip(
-              label: '5xx خطأ خادم',
-              color: const Color(0xFFE74C3C),
+              label: 'filter_5xx'.tr,
+              color: AppColors.statusServerError,
               isSelected: active == TrafficFilter.serverError,
               onSelected: () => controller.setActiveFilter(TrafficFilter.serverError),
             ),
@@ -452,7 +452,7 @@ class _TrafficListViewState extends State<TrafficListView> {
   }
 
   Widget _buildTrafficItemTile(BuildContext context, TrafficRecord item) {
-    final statusColor = TrafficDetailView.getStatusColor(item.statusCategory);
+    final statusColor = AppColors.getStatusCategoryColor(item.statusCode, isPending: item.isPending);
     final methodColor = TrafficDetailView.getMethodColor(item.method);
 
     return InkWell(

@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../controllers/vpn_controller.dart';
 import '../../models/captured_connection.dart';
+import '../../theme/app_colors.dart';
 import 'app_filter_view.dart';
+import 'connection_detail_view.dart';
 
-/// شاشة لوحة تحكم ومراقبة شبكة الجهاز بالكامل (System VPN Dashboard)
+/// System VPN Traffic Inspector Dashboard View
 class VpnDashboardView extends StatefulWidget {
   const VpnDashboardView({super.key});
 
@@ -24,40 +26,23 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
     super.dispose();
   }
 
-  static Color getProtocolColor(String protocol) {
-    switch (protocol.toUpperCase()) {
-      case 'TLS/HTTPS':
-        return const Color(0xFF8B5CF6);
-      case 'HTTP':
-        return const Color(0xFF3B82F6);
-      case 'DNS':
-        return const Color(0xFFF59E0B);
-      case 'TCP':
-        return const Color(0xFF10B981);
-      case 'UDP':
-        return const Color(0xFF06B6D4);
-      default:
-        return const Color(0xFF6B7280);
-    }
-  }
-
   void _showPcapExportDialog(String? pcapPath) {
     Get.dialog(
       AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.file_present_rounded, color: Colors.blue),
-            SizedBox(width: 8),
-            Text('ملف تسجيل الحزم PCAP'),
+            const Icon(Icons.file_present_rounded, color: AppColors.protocolHttp),
+            const SizedBox(width: 8),
+            Text('pcap_export_title'.tr),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'تم تسجيل كافة الحزم في ملف PCAP قياسي متوافق مع برنامج Wireshark:',
-              style: TextStyle(fontSize: 13),
+            Text(
+              'pcap_export_desc'.tr,
+              style: const TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 12),
             Container(
@@ -67,7 +52,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: SelectableText(
-                pcapPath ?? 'لم يتم بدء أي جلسة بعد',
+                pcapPath ?? 'No capture session active',
                 style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
               ),
             ),
@@ -76,17 +61,17 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('إغلاق'),
+            child: Text('close'.tr),
           ),
           if (pcapPath != null)
             FilledButton.icon(
               icon: const Icon(Icons.copy_rounded, size: 16),
-              label: const Text('نسخ مسار الملف'),
+              label: Text('copy_file_path'.tr),
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: pcapPath));
                 Get.back();
                 Get.rawSnackbar(
-                  message: 'تم نسخ مسار ملف PCAP إلى الحافظة',
+                  message: 'copied_to_clipboard'.tr,
                   duration: const Duration(seconds: 1),
                   snackPosition: SnackPosition.BOTTOM,
                 );
@@ -103,21 +88,21 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('مراقب شبكة الجهاز (System VPN)'),
+        title: Text('system_vpn_title'.tr),
         actions: [
           IconButton(
             icon: const Icon(Icons.tune_rounded),
-            tooltip: 'تحديد التطبيقات المستهدفة',
+            tooltip: 'select_target_apps'.tr,
             onPressed: () => Get.to(() => const AppFilterView()),
           ),
           IconButton(
             icon: const Icon(Icons.download_rounded),
-            tooltip: 'تصدير ملف PCAP',
+            tooltip: 'pcap_export_title'.tr,
             onPressed: () => _showPcapExportDialog(controller.currentPcapPath.value),
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline_rounded),
-            tooltip: 'مسح السجل',
+            tooltip: 'clear_records'.tr,
             onPressed: () => controller.clearConnections(),
           ),
         ],
@@ -129,23 +114,16 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
 
         return Column(
           children: [
-            // Top Dashboard Status Card
+            // Top Dashboard Status & Metric Card
             Container(
               margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
                 border: Border.all(
                   color: isRunning
-                      ? Colors.green.withValues(alpha: 0.5)
+                      ? AppColors.statusSuccess.withValues(alpha: 0.6)
                       : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                   width: isRunning ? 1.5 : 1,
                 ),
@@ -159,25 +137,26 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                         height: 12,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isRunning ? Colors.green : Colors.grey,
+                          color: isRunning ? AppColors.statusSuccess : Colors.grey,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        isRunning ? 'المراقبة نشطة (VPN يعمل)' : 'المراقبة متوقفة',
+                        isRunning ? 'vpn_active'.tr : 'vpn_stopped'.tr,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: isRunning ? Colors.green : Colors.grey.shade700,
+                          color: isRunning ? AppColors.statusSuccess : Colors.grey.shade600,
                         ),
                       ),
                       const Spacer(),
+                      // Target Apps Pill button
                       InkWell(
                         onTap: () => Get.to(() => const AppFilterView()),
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                            color: theme.colorScheme.secondary.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
@@ -188,8 +167,8 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                               const SizedBox(width: 4),
                               Text(
                                 selectedCount == 0
-                                    ? 'كافة التطبيقات'
-                                    : '$selectedCount تطبيقات محددة',
+                                    ? 'all_apps'.tr
+                                    : 'target_apps_selected'.trParams({'count': '$selectedCount'}),
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
@@ -203,48 +182,51 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                     ],
                   ),
                   const SizedBox(height: 14),
+
+                  // Metrics Row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _buildMetric(
                         context,
-                        title: 'الحزم الملتقطة',
+                        title: 'packets_captured'.tr,
                         value: '${controller.totalPackets.value}',
                         icon: Icons.layers_rounded,
                       ),
                       _buildMetric(
                         context,
-                        title: 'حجم البيانات',
+                        title: 'data_volume'.tr,
                         value: controller.formattedTotalBytes,
                         icon: Icons.data_usage_rounded,
                       ),
                       _buildMetric(
                         context,
-                        title: 'المعروض حالياً',
+                        title: 'live_connections'.tr,
                         value: '${filteredList.length}',
                         icon: Icons.hub_rounded,
                       ),
                     ],
                   ),
                   const SizedBox(height: 14),
+
+                  // Big Toggle Button
                   SizedBox(
                     width: double.infinity,
                     height: 46,
                     child: FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        backgroundColor:
-                            isRunning ? Colors.red.shade600 : const Color(0xFF2563EB),
+                        backgroundColor: isRunning
+                            ? AppColors.statusServerError
+                            : theme.colorScheme.primary,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () => controller.toggleVpn(),
                       icon: Icon(isRunning ? Icons.stop_rounded : Icons.play_arrow_rounded),
                       label: Text(
-                        isRunning
-                            ? 'إيقاف فحص الشبكة'
-                            : 'بدء فحص حركة تطبيقات الجهاز',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14.5),
+                        isRunning ? 'stop_inspection'.tr : 'start_inspection'.tr,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                     ),
                   ),
@@ -252,13 +234,56 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
               ),
             ),
 
+            // Target Mode Active Notice Banner (if apps are selected)
+            if (selectedCount > 0)
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.statusSuccess.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.statusSuccess.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.filter_alt_rounded,
+                        size: 18, color: AppColors.statusSuccess),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'target_mode_active_banner'.trParams({'count': '$selectedCount'}),
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.statusSuccess,
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () => Get.to(() => const AppFilterView()),
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
             // Search Bar in Dashboard
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'بحث بالنطاق، الـ IP، اسم التطبيق، أو المنفذ...',
+                  hintText: 'search_vpn_hint'.tr,
                   prefixIcon: const Icon(Icons.search_rounded, size: 20),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
@@ -289,27 +314,28 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
 
             // Filter toggles & Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'الاتصالات (${filteredList.length})',
+                    '${'live_connections'.tr} (${filteredList.length})',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                   if (selectedCount > 0)
                     FilterChip(
                       label: Text(
-                        'التطبيقات المحددة فقط ($selectedCount)',
+                        'mode_target_only'.tr,
                         style: TextStyle(
                           fontSize: 11,
+                          fontWeight: FontWeight.bold,
                           color: controller.filterBySelectedAppsOnly.value
                               ? Colors.white
                               : null,
                         ),
                       ),
                       selected: controller.filterBySelectedAppsOnly.value,
-                      selectedColor: Colors.green,
+                      selectedColor: AppColors.statusSuccess,
                       checkmarkColor: Colors.white,
                       onSelected: (val) => controller.setFilterBySelectedAppsOnly(val),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -323,19 +349,25 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                           height: 8,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.green,
+                            color: AppColors.statusSuccess,
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Text('بث حي',
-                            style: TextStyle(fontSize: 11, color: Colors.green)),
+                        Text(
+                          'live_feed'.tr,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.statusSuccess,
+                          ),
+                        ),
                       ],
                     ),
                 ],
               ),
             ),
 
-            // Connection List
+            // Live Connection List
             Expanded(
               child: filteredList.isEmpty
                   ? Center(
@@ -353,12 +385,11 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                             Text(
                               isRunning
                                   ? (_searchController.text.isNotEmpty
-                                      ? 'لا توجد اتصالات تطابق البحث "${_searchController.text}"'
-                                      : 'المراقبة تعمل بنشاط، افتح أي تطبيق على جهازك لتبدأ حزم الشبكة بالظهور هنا!')
-                                  : 'اضغط على "بدء فحص حركة تطبيقات الجهاز" أعلاه للبدء بالتقاط حزم الـ IP والـ TLS والـ DNS.',
+                                      ? 'no_connections_search'.trParams({'query': _searchController.text})
+                                      : 'no_connections_active'.tr)
+                                  : 'no_connections_idle'.tr,
                               textAlign: TextAlign.center,
-                              style:
-                                  const TextStyle(color: Colors.grey, fontSize: 13),
+                              style: const TextStyle(color: Colors.grey, fontSize: 13),
                             ),
                           ],
                         ),
@@ -406,91 +437,101 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
   }
 
   Widget _buildConnectionTile(BuildContext context, CapturedConnection item) {
-    final protocolColor = getProtocolColor(item.protocol);
+    // Protocol badge uses theme-independent AppColors
+    final protocolColor = AppColors.getProtocolColor(item.protocol);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-            decoration: BoxDecoration(
-              color: protocolColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: protocolColor.withValues(alpha: 0.5)),
-            ),
-            child: Text(
-              item.protocol,
-              style: TextStyle(
+    return InkWell(
+      onTap: () {
+        ConnectionDetailView.show(item);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          children: [
+            // Theme-independent vibrant Protocol Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+              decoration: BoxDecoration(
                 color: protocolColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 10.5,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                item.protocol,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10.5,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    if (item.appName != null) ...[
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                        margin: const EdgeInsets.only(left: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          item.appName!,
-                          style: const TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
+            const SizedBox(width: 12),
+
+            // App Name Badge, Primary Host, and Intuitive Subtitle
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      if (item.appName != null) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          margin: const EdgeInsets.only(right: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.protocolHttp.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(4),
                           ),
+                          child: Text(
+                            item.appName!,
+                            style: const TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.protocolHttp,
+                            ),
+                          ),
+                        ),
+                      ],
+                      Expanded(
+                        child: Text(
+                          item.primaryTitle,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
                         ),
                       ),
                     ],
-                    Expanded(
-                      child: Text(
-                        item.displayName,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 13),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${item.srcIp}:${item.srcPort} ➔ ${item.dstIp}:${item.dstPort}',
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 11,
-                    color: Colors.grey.shade600,
                   ),
+                  const SizedBox(height: 3),
+                  // Clear, intuitive destination & service subtitle
+                  Text(
+                    item.readableSubtitle,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+
+            // Packet size & formatted time
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  item.formattedSize,
+                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  item.formattedTime,
+                  style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500),
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                item.formattedSize,
-                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500),
-              ),
-              Text(
-                '${item.timestamp.hour.toString().padLeft(2, '0')}:${item.timestamp.minute.toString().padLeft(2, '0')}:${item.timestamp.second.toString().padLeft(2, '0')}',
-                style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500),
-              ),
-            ],
-          ),
-        ],
+            const SizedBox(width: 4),
+            const Icon(Icons.chevron_right_rounded, size: 18, color: Colors.grey),
+          ],
+        ),
       ),
     );
   }

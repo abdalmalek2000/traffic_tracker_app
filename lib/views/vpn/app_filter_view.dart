@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/vpn_controller.dart';
+import '../../theme/app_colors.dart';
 
-/// واجهة اختيار وتصفية التطبيقات المستهدفة لمراقبة شبكتها
+/// Target Applications Selector View
 class AppFilterView extends StatefulWidget {
   const AppFilterView({super.key});
 
@@ -33,10 +34,10 @@ class _AppFilterViewState extends State<AppFilterView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('تحديد التطبيقات المستهدفة'),
+        title: Text('select_target_apps'.tr),
         actions: [
           PopupMenuButton<String>(
-            tooltip: 'خيارات التحديد',
+            tooltip: 'Options',
             icon: const Icon(Icons.more_vert_rounded),
             onSelected: (val) {
               if (val == 'clear') {
@@ -44,13 +45,13 @@ class _AppFilterViewState extends State<AppFilterView> {
               }
             },
             itemBuilder: (_) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'clear',
                 child: Row(
                   children: [
-                    Icon(Icons.clear_all_rounded, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('إلغاء تحديد كافة التطبيقات'),
+                    const Icon(Icons.clear_all_rounded, color: AppColors.statusServerError),
+                    const SizedBox(width: 8),
+                    Text('deselect_all_menu'.tr),
                   ],
                 ),
               ),
@@ -60,13 +61,13 @@ class _AppFilterViewState extends State<AppFilterView> {
       ),
       body: Obx(() {
         if (controller.isLoadingApps.value) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('جاري فحص وتجهيز قائمة تطبيقات الجهاز...'),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text('loading_apps'.tr),
               ],
             ),
           );
@@ -89,8 +90,8 @@ class _AppFilterViewState extends State<AppFilterView> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: currentTab == AppViewTab.selectedOnly
-                          ? 'بحث داخل التطبيقات المحددة فقط ($selectedCount)...'
-                          : 'بحث باسم التطبيق أو الحزمة...',
+                          ? 'search_selected_hint'.tr
+                          : 'search_apps_hint'.tr,
                       prefixIcon: const Icon(Icons.search_rounded),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
@@ -123,26 +124,26 @@ class _AppFilterViewState extends State<AppFilterView> {
                     child: Row(
                       children: [
                         _buildFilterChip(
-                          label: 'الكل ($totalAppsCount)',
+                          label: '${'filter_all_apps'.tr} ($totalAppsCount)',
                           isSelected: currentTab == AppViewTab.all,
                           onSelected: () => controller.setAppTab(AppViewTab.all),
                         ),
                         const SizedBox(width: 6),
                         _buildFilterChip(
-                          label: 'المحددة فقط ($selectedCount)',
-                          color: Colors.green,
+                          label: '${'filter_selected_only'.tr} ($selectedCount)',
+                          color: AppColors.statusSuccess,
                           isSelected: currentTab == AppViewTab.selectedOnly,
                           onSelected: () => controller.setAppTab(AppViewTab.selectedOnly),
                         ),
                         const SizedBox(width: 6),
                         _buildFilterChip(
-                          label: 'تطبيقات المستخدم',
+                          label: 'filter_user_apps'.tr,
                           isSelected: currentTab == AppViewTab.userApps,
                           onSelected: () => controller.setAppTab(AppViewTab.userApps),
                         ),
                         const SizedBox(width: 6),
                         _buildFilterChip(
-                          label: 'تطبيقات النظام',
+                          label: 'filter_system_apps'.tr,
                           isSelected: currentTab == AppViewTab.systemApps,
                           onSelected: () => controller.setAppTab(AppViewTab.systemApps),
                         ),
@@ -155,16 +156,18 @@ class _AppFilterViewState extends State<AppFilterView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        selectedCount == 0
-                            ? 'الوضع: مراقبة حركة كافة التطبيقات'
-                            : 'المحدد: $selectedCount تطبيق (يتم حصر المراقبة فيها)',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: selectedCount == 0
-                              ? theme.colorScheme.primary
-                              : Colors.green.shade700,
+                      Expanded(
+                        child: Text(
+                          selectedCount == 0
+                              ? 'mode_monitoring_all'.tr
+                              : 'mode_monitoring_selected'.trParams({'count': '$selectedCount'}),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: selectedCount == 0
+                                ? theme.colorScheme.primary
+                                : AppColors.statusSuccess,
+                          ),
                         ),
                       ),
                       if (visibleApps.isNotEmpty && currentTab != AppViewTab.selectedOnly)
@@ -184,8 +187,8 @@ class _AppFilterViewState extends State<AppFilterView> {
                           child: Text(
                             visibleApps.every(
                                     (a) => controller.selectedPackages.contains(a.packageName))
-                                ? 'إلغاء المعروض'
-                                : 'تحديد كل المعروض (${visibleApps.length})',
+                                ? 'deselect_all_visible'.tr
+                                : 'select_all_visible'.trParams({'count': '${visibleApps.length}'}),
                             style: const TextStyle(fontSize: 12),
                           ),
                         ),
@@ -195,22 +198,22 @@ class _AppFilterViewState extends State<AppFilterView> {
               ),
             ),
 
-            // Active VPN Notice
+            // Active VPN Live Sync Notice
             if (controller.isVpnRunning.value)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                color: Colors.green.withValues(alpha: 0.12),
-                child: const Row(
+                color: AppColors.statusSuccess.withValues(alpha: 0.12),
+                child: Row(
                   children: [
-                    Icon(Icons.sync_rounded, size: 16, color: Colors.green),
-                    SizedBox(width: 6),
+                    const Icon(Icons.sync_rounded, size: 16, color: AppColors.statusSuccess),
+                    const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        'المراقبة نشطة: أي تعديل في التحديد يطبّق فورياً على تيار الحزم.',
-                        style: TextStyle(
+                        'live_sync_notice'.tr,
+                        style: const TextStyle(
                             fontSize: 11,
-                            color: Colors.green,
+                            color: AppColors.statusSuccess,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -237,8 +240,8 @@ class _AppFilterViewState extends State<AppFilterView> {
                             const SizedBox(height: 12),
                             Text(
                               currentTab == AppViewTab.selectedOnly
-                                  ? 'لم تقم بتحديد أي تطبيقات بعد.\nاختر تبويب "الكل" وحدد التطبيقات التي ترغب بفحصها.'
-                                  : 'لا توجد تطبيقات مطابقة للبحث',
+                                  ? 'no_selected_apps'.tr
+                                  : 'no_apps_found'.tr,
                               textAlign: TextAlign.center,
                               style: const TextStyle(color: Colors.grey, fontSize: 13),
                             ),
@@ -255,6 +258,7 @@ class _AppFilterViewState extends State<AppFilterView> {
 
                         return CheckboxListTile(
                           value: isSelected,
+                          activeColor: AppColors.statusSuccess,
                           onChanged: (_) => controller.togglePackage(app.packageName),
                           secondary: app.iconBytes != null
                               ? ClipRRect(
@@ -267,7 +271,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                                   ),
                                 )
                               : const Icon(Icons.android_rounded,
-                                  size: 36, color: Colors.green),
+                                  size: 36, color: AppColors.statusSuccess),
                           title: Text(
                             app.appName,
                             style: const TextStyle(
@@ -277,16 +281,16 @@ class _AppFilterViewState extends State<AppFilterView> {
                             children: [
                               if (app.isSystemApp)
                                 Container(
-                                  margin: const EdgeInsets.only(left: 6),
+                                  margin: const EdgeInsets.only(right: 6),
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 5, vertical: 1.5),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: const Text(
-                                    'نظام',
-                                    style: TextStyle(
+                                  child: Text(
+                                    'system_badge'.tr,
+                                    style: const TextStyle(
                                         fontSize: 9.5, color: Colors.grey),
                                   ),
                                 ),

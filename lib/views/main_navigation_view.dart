@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/navigation_controller.dart';
+import '../theme/app_colors.dart';
 import 'traffic/traffic_list_view.dart';
 import 'vpn/vpn_dashboard_view.dart';
 
-/// الشاشة الحاوية للتنقل السفلي بين المحلل الداخلي ومراقب شبكة الجهاز
+/// Main navigation view hosting the bottom navigation bar.
 class MainNavigationView extends StatelessWidget {
   const MainNavigationView({super.key});
 
@@ -26,16 +27,16 @@ class MainNavigationView extends StatelessWidget {
         () => NavigationBar(
           selectedIndex: navController.currentIndex.value,
           onDestinationSelected: (index) => navController.changeIndex(index),
-          destinations: const [
+          destinations: [
             NavigationDestination(
-              icon: Icon(Icons.http_rounded),
-              selectedIcon: Icon(Icons.http_rounded, color: Colors.blue),
-              label: 'فحص API (In-App)',
+              icon: const Icon(Icons.http_rounded),
+              selectedIcon: const Icon(Icons.http_rounded, color: AppColors.protocolHttp),
+              label: 'tab_api_inspector'.tr,
             ),
             NavigationDestination(
-              icon: Icon(Icons.security_rounded),
-              selectedIcon: Icon(Icons.security_rounded, color: Colors.green),
-              label: 'فحص تطبيقات الجهاز (VPN)',
+              icon: const Icon(Icons.security_rounded),
+              selectedIcon: const Icon(Icons.security_rounded, color: AppColors.protocolTcp),
+              label: 'tab_system_vpn'.tr,
             ),
           ],
         ),

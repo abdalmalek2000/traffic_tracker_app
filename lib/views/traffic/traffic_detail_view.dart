@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../models/traffic_record.dart';
+import '../../theme/app_colors.dart';
 import '../widgets/json_viewer_widget.dart';
 
-/// شاشة تفاصيل طلب الـ HTTP (Request, Response, Headers, cURL)
+/// Deep HTTP request & response detail inspection view.
 class TrafficDetailView extends StatelessWidget {
   final TrafficRecord record;
 
@@ -16,33 +17,33 @@ class TrafficDetailView extends StatelessWidget {
   static Color getStatusColor(TrafficStatusCategory category) {
     switch (category) {
       case TrafficStatusCategory.success:
-        return const Color(0xFF2ECC71);
+        return AppColors.statusSuccess;
       case TrafficStatusCategory.redirect:
-        return const Color(0xFF3498DB);
+        return AppColors.statusRedirect;
       case TrafficStatusCategory.clientError:
-        return const Color(0xFFE67E22);
+        return AppColors.statusClientError;
       case TrafficStatusCategory.serverError:
       case TrafficStatusCategory.failed:
-        return const Color(0xFFE74C3C);
+        return AppColors.statusServerError;
       case TrafficStatusCategory.pending:
-        return const Color(0xFFF1C40F);
+        return AppColors.statusPending;
     }
   }
 
   static Color getMethodColor(String method) {
     switch (method.toUpperCase()) {
       case 'GET':
-        return const Color(0xFF3B82F6);
+        return AppColors.protocolHttp;
       case 'POST':
-        return const Color(0xFF10B981);
+        return AppColors.statusSuccess;
       case 'PUT':
-        return const Color(0xFFF59E0B);
+        return AppColors.protocolDns;
       case 'DELETE':
-        return const Color(0xFFEF4444);
+        return AppColors.statusServerError;
       case 'PATCH':
-        return const Color(0xFF8B5CF6);
+        return AppColors.protocolTls;
       default:
-        return const Color(0xFF6B7280);
+        return AppColors.protocolOther;
     }
   }
 
@@ -103,25 +104,25 @@ class TrafficDetailView extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.terminal_rounded),
-              tooltip: 'نسخ كود cURL',
+              tooltip: 'copy_curl'.tr,
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: record.toCurlCommand()));
                 Get.rawSnackbar(
-                  message: 'تم نسخ أمر cURL إلى الحافظة',
+                  message: 'copied_to_clipboard'.tr,
                   duration: const Duration(seconds: 1),
                   snackPosition: SnackPosition.BOTTOM,
                 );
               },
             ),
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             tabs: [
-              Tab(icon: Icon(Icons.info_outline_rounded), text: 'نظرة عامة'),
-              Tab(icon: Icon(Icons.upload_rounded), text: 'الطلب (Request)'),
-              Tab(icon: Icon(Icons.download_rounded), text: 'الاستجابة (Response)'),
-              Tab(icon: Icon(Icons.terminal_rounded), text: 'cURL'),
+              Tab(icon: const Icon(Icons.info_outline_rounded), text: 'overview'.tr),
+              Tab(icon: const Icon(Icons.upload_rounded), text: 'request'.tr),
+              Tab(icon: const Icon(Icons.download_rounded), text: 'response'.tr),
+              Tab(icon: const Icon(Icons.terminal_rounded), text: 'curl'.tr),
             ],
           ),
         ),
@@ -143,7 +144,7 @@ class TrafficDetailView extends StatelessWidget {
       children: [
         _buildInfoCard(
           context,
-          title: 'الرابط الكامل (Full URL)',
+          title: 'full_url'.tr,
           content: record.url,
           canCopy: true,
         ),
@@ -158,29 +159,29 @@ class TrafficDetailView extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _buildRow('المضيف (Host)', record.host),
+                _buildRow('host'.tr, record.host),
                 const Divider(),
-                _buildRow('المسار (Path)', record.path),
+                _buildRow('path'.tr, record.path),
                 const Divider(),
-                _buildRow('طريقة الطلب (Method)', record.method.toUpperCase()),
+                _buildRow('method_label'.tr, record.method.toUpperCase()),
                 const Divider(),
                 _buildRow(
-                  'كود الحالة (Status)',
+                  'status'.tr,
                   record.statusCode != null
                       ? '${record.statusCode} (${record.statusMessage ?? ''})'
-                      : (record.isPending ? 'قيد التنفيذ...' : 'فشل'),
+                      : (record.isPending ? 'Pending...' : 'Failed'),
                 ),
                 const Divider(),
-                _buildRow('الزمن المستغرق (Duration)', record.formattedDuration),
+                _buildRow('duration'.tr, record.formattedDuration),
                 const Divider(),
-                _buildRow('حجم الطلب (Req Size)', record.formattedRequestSize),
+                _buildRow('req_size'.tr, record.formattedRequestSize),
                 const Divider(),
-                _buildRow('حجم الاستجابة (Res Size)', record.formattedResponseSize),
+                _buildRow('res_size'.tr, record.formattedResponseSize),
                 const Divider(),
-                _buildRow('وقت الإرسال (Timestamp)', record.timestamp.toLocal().toString()),
+                _buildRow('timestamp'.tr, record.timestamp.toLocal().toString()),
                 if (record.error != null) ...[
                   const Divider(),
-                  _buildRow('الخطأ (Error)', record.error!, isError: true),
+                  _buildRow('Error', record.error!, isError: true),
                 ],
               ],
             ),
@@ -189,7 +190,7 @@ class TrafficDetailView extends StatelessWidget {
         if (record.queryParameters.isNotEmpty) ...[
           const SizedBox(height: 16),
           Text(
-            'معاملات الاستعلام (Query Parameters)',
+            'query_params'.tr,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
@@ -204,14 +205,14 @@ class TrafficDetailView extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          'رؤوس الطلب (Request Headers)',
+          'req_headers'.tr,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         _buildHeadersCard(context, record.requestHeaders),
         const SizedBox(height: 16),
         Text(
-          'جسم الطلب (Request Body)',
+          'request'.tr,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
         JsonViewerWidget(
@@ -229,14 +230,14 @@ class TrafficDetailView extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         Text(
-          'رؤوس الاستجابة (Response Headers)',
+          'res_headers'.tr,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         _buildHeadersCard(context, resHeaders),
         const SizedBox(height: 16),
         Text(
-          'جسم الاستجابة (Response Body)',
+          'response'.tr,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
         JsonViewerWidget(
@@ -252,9 +253,9 @@ class TrafficDetailView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
-          'أمر cURL جاهز للتشغيل مباشرة في سطر الأوامر أو استيراده في أدوات الفحص الأمني (Postman, Burp, etc.):',
-          style: TextStyle(fontSize: 13),
+        Text(
+          'curl_instruction'.tr,
+          style: const TextStyle(fontSize: 13),
         ),
         const SizedBox(height: 12),
         JsonViewerWidget(
@@ -266,13 +267,13 @@ class TrafficDetailView extends StatelessWidget {
           onPressed: () {
             Clipboard.setData(ClipboardData(text: curl));
             Get.rawSnackbar(
-              message: 'تم نسخ أمر cURL بنجاح',
+              message: 'copied_to_clipboard'.tr,
               duration: const Duration(seconds: 1),
               snackPosition: SnackPosition.BOTTOM,
             );
           },
           icon: const Icon(Icons.copy_rounded),
-          label: const Text('نسخ أمر cURL بالكامل'),
+          label: Text('copy_curl'.tr),
         ),
       ],
     );
@@ -307,7 +308,7 @@ class TrafficDetailView extends StatelessWidget {
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: content));
                       Get.rawSnackbar(
-                        message: 'تم النسخ إلى الحافظة',
+                        message: 'copied_to_clipboard'.tr,
                         duration: const Duration(seconds: 1),
                         snackPosition: SnackPosition.BOTTOM,
                       );
@@ -334,9 +335,9 @@ class TrafficDetailView extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
         ),
-        child: const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text('لا توجد رؤوس (No Headers)', style: TextStyle(color: Colors.grey)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text('no_headers'.tr, style: const TextStyle(color: Colors.grey)),
         ),
       );
     }
@@ -406,7 +407,7 @@ class TrafficDetailView extends StatelessWidget {
               value,
               style: TextStyle(
                 fontSize: 13,
-                color: isError ? Colors.red : null,
+                color: isError ? AppColors.statusServerError : null,
                 fontFamily: isError ? 'monospace' : null,
               ),
             ),
