@@ -1,4 +1,4 @@
-package com.example.traffic_tracker_app
+package com.am.traffic_tracker_app
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -27,8 +27,8 @@ class TrafficVpnService : VpnService() {
     private var pcapOutputStream: FileOutputStream? = null
 
     companion object {
-        const val ACTION_START = "com.example.traffic_tracker_app.START"
-        const val ACTION_STOP = "com.example.traffic_tracker_app.STOP"
+        const val ACTION_START = "com.am.traffic_tracker_app.START"
+        const val ACTION_STOP = "com.am.traffic_tracker_app.STOP"
         const val EXTRA_ALLOWED_PACKAGES = "allowed_packages"
 
         var isRunning = false

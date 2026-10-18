@@ -1,4 +1,4 @@
-package com.example.traffic_tracker_app
+package com.am.traffic_tracker_app
 
 import android.app.Activity
 import android.content.Intent
