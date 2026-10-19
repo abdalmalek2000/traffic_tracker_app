@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import '../../constants/icons.dart';
 import '../../models/captured_connection.dart';
 import '../../theme/app_colors.dart';
 
@@ -95,7 +96,7 @@ class ConnectionDetailView extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded),
+                  icon: const Icon(AppIcons.close),
                   onPressed: () => Get.back(),
                 ),
               ],
@@ -110,7 +111,7 @@ class ConnectionDetailView extends StatelessWidget {
               title: 'application'.tr,
               value: connection.appName ?? 'Unknown App',
               subtitle: connection.packageName,
-              icon: Icons.apps_rounded,
+              icon: AppIcons.apps,
               canCopy: connection.packageName != null,
               copyText: connection.packageName,
             ),
@@ -121,7 +122,7 @@ class ConnectionDetailView extends StatelessWidget {
               title: 'destination_host'.tr,
               value: connection.domain ?? connection.dstIp,
               subtitle: 'IP: ${connection.dstIp} (Port ${connection.dstPort})',
-              icon: Icons.public_rounded,
+              icon: AppIcons.public,
               canCopy: true,
               copyText: connection.domain ?? connection.dstIp,
             ),
@@ -131,7 +132,7 @@ class ConnectionDetailView extends StatelessWidget {
               context,
               title: 'local_address'.tr,
               value: '${connection.srcIp}:${connection.srcPort}',
-              icon: Icons.phone_android_rounded,
+              icon: AppIcons.device,
             ),
             const SizedBox(height: 10),
 
@@ -142,7 +143,7 @@ class ConnectionDetailView extends StatelessWidget {
                     context,
                     title: 'packet_length'.tr,
                     value: connection.formattedSize,
-                    icon: Icons.data_usage_rounded,
+                    icon: AppIcons.dataUsage,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -151,7 +152,7 @@ class ConnectionDetailView extends StatelessWidget {
                     context,
                     title: 'timestamp'.tr,
                     value: connection.formattedTime,
-                    icon: Icons.access_time_rounded,
+                    icon: AppIcons.time,
                   ),
                 ),
               ],
@@ -230,7 +231,7 @@ class ConnectionDetailView extends StatelessWidget {
           ),
           if (canCopy)
             IconButton(
-              icon: const Icon(Icons.copy_rounded, size: 16),
+              icon: const Icon(AppIcons.copy, size: 16),
               tooltip: 'Copy',
               onPressed: () {
                 final txt = copyText ?? value;

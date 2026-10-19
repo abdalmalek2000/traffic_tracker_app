@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../constants/icons.dart';
 import '../../controllers/traffic_controller.dart';
 import '../../models/traffic_record.dart';
 import '../../services/test_request_service.dart';
@@ -59,7 +60,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(AppIcons.close),
                     onPressed: () => Get.back(),
                   ),
                 ],
@@ -127,7 +128,7 @@ class _TrafficListViewState extends State<TrafficListView> {
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
-                icon: const Icon(Icons.edit_note_rounded),
+                icon: const Icon(AppIcons.edit),
                 label: Text('send_custom_request'.tr),
                 onPressed: () {
                   Get.back();
@@ -242,8 +243,8 @@ class _TrafficListViewState extends State<TrafficListView> {
                 child: IconButton(
                   icon: Icon(
                     isRec
-                        ? Icons.pause_circle_filled_rounded
-                        : Icons.play_circle_fill_rounded,
+                        ? AppIcons.pause
+                        : AppIcons.play,
                     color: isRec ? AppColors.statusSuccess : Colors.grey,
                     size: 26,
                   ),
@@ -252,7 +253,7 @@ class _TrafficListViewState extends State<TrafficListView> {
               );
             }),
             IconButton(
-              icon: const Icon(Icons.delete_sweep_rounded),
+              icon: const Icon(AppIcons.clearAll),
               tooltip: 'clear_records'.tr,
               onPressed: () {
                 controller.clearRecords();
@@ -274,7 +275,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                 height: 18,
                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               )
-            : const Icon(Icons.send_rounded),
+            : const Icon(AppIcons.send),
         label: Text(_isSendingTest ? 'Sending...' : 'test_request_btn'.tr),
       ),
       body: Column(
@@ -295,10 +296,10 @@ class _TrafficListViewState extends State<TrafficListView> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'search_hint_http'.tr,
-                    prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                    prefixIcon: const Icon(AppIcons.search, size: 20),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 18),
+                            icon: const Icon(AppIcons.clear, size: 18),
                             onPressed: () {
                               _searchController.clear();
                               controller.setSearchQuery('');
@@ -340,7 +341,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.network_check_rounded,
+                          AppIcons.networkCheck,
                           size: 64,
                           color: theme.colorScheme.primary.withValues(alpha: 0.4),
                         ),
@@ -358,7 +359,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                         const SizedBox(height: 20),
                         FilledButton.tonalIcon(
                           onPressed: _showTestRequestsBottomSheet,
-                          icon: const Icon(Icons.play_arrow_rounded),
+                          icon: const Icon(AppIcons.start),
                           label: Text('test_request_btn'.tr),
                         ),
                       ],
@@ -548,7 +549,7 @@ class _TrafficListViewState extends State<TrafficListView> {
               ],
             ),
             const SizedBox(width: 4),
-            const Icon(Icons.chevron_right_rounded, size: 18, color: Colors.grey),
+            const Icon(AppIcons.chevronRight, size: 18, color: Colors.grey),
           ],
         ),
       ),

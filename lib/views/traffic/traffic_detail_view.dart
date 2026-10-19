@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import '../../constants/icons.dart';
 import '../../models/traffic_record.dart';
 import '../../theme/app_colors.dart';
 import '../widgets/json_viewer_widget.dart';
@@ -103,7 +104,7 @@ class TrafficDetailView extends StatelessWidget {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.terminal_rounded),
+              icon: const Icon(AppIcons.terminal),
               tooltip: 'copy_curl'.tr,
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: record.toCurlCommand()));
@@ -119,10 +120,10 @@ class TrafficDetailView extends StatelessWidget {
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             tabs: [
-              Tab(icon: const Icon(Icons.info_outline_rounded), text: 'overview'.tr),
-              Tab(icon: const Icon(Icons.upload_rounded), text: 'request'.tr),
-              Tab(icon: const Icon(Icons.download_rounded), text: 'response'.tr),
-              Tab(icon: const Icon(Icons.terminal_rounded), text: 'curl'.tr),
+              Tab(icon: const Icon(AppIcons.overview), text: 'overview'.tr),
+              Tab(icon: const Icon(AppIcons.requestUpload), text: 'request'.tr),
+              Tab(icon: const Icon(AppIcons.responseDownload), text: 'response'.tr),
+              Tab(icon: const Icon(AppIcons.terminal), text: 'curl'.tr),
             ],
           ),
         ),
@@ -272,7 +273,7 @@ class TrafficDetailView extends StatelessWidget {
               snackPosition: SnackPosition.BOTTOM,
             );
           },
-          icon: const Icon(Icons.copy_rounded),
+          icon: const Icon(AppIcons.copy),
           label: Text('copy_curl'.tr),
         ),
       ],
@@ -304,7 +305,7 @@ class TrafficDetailView extends StatelessWidget {
                 ),
                 if (canCopy)
                   IconButton(
-                    icon: const Icon(Icons.copy_rounded, size: 16),
+                    icon: const Icon(AppIcons.copy, size: 16),
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: content));
                       Get.rawSnackbar(

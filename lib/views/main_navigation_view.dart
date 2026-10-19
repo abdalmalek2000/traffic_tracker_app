@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../constants/icons.dart';
 import '../controllers/navigation_controller.dart';
 import '../theme/app_colors.dart';
 import 'traffic/traffic_list_view.dart';
@@ -29,13 +30,13 @@ class MainNavigationView extends StatelessWidget {
           onDestinationSelected: (index) => navController.changeIndex(index),
           destinations: [
             NavigationDestination(
-              icon: const Icon(Icons.http_rounded),
-              selectedIcon: const Icon(Icons.http_rounded, color: AppColors.protocolHttp),
+              icon: const Icon(AppIcons.http),
+              selectedIcon: const Icon(AppIcons.http, color: AppColors.protocolHttp),
               label: 'tab_api_inspector'.tr,
             ),
             NavigationDestination(
-              icon: const Icon(Icons.security_rounded),
-              selectedIcon: const Icon(Icons.security_rounded, color: AppColors.protocolTcp),
+              icon: const Icon(AppIcons.vpnSecurity),
+              selectedIcon: const Icon(AppIcons.vpnSecurity, color: AppColors.protocolTcp),
               label: 'tab_system_vpn'.tr,
             ),
           ],

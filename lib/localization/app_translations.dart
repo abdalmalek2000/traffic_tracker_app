@@ -15,6 +15,7 @@ class AppTranslations extends Translations {
     'tab_system_vpn': 'System VPN',
 
     // In-App HTTP Inspector
+    'traffic_tracker': 'Traffic Tracker',
     'network_inspector': 'Network Inspector',
     'monitoring_active': 'Inspection Active',
     'monitoring_paused': 'Inspection Paused',

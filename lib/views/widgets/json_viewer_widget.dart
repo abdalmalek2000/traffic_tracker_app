@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import '../../constants/icons.dart';
 
 /// ويدجت منسق لعرض أكواد JSON والـ Payloads مع زر نسخ سريع
 class JsonViewerWidget extends StatelessWidget {
@@ -61,7 +62,7 @@ class JsonViewerWidget extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.copy_rounded, size: 18),
+                  icon: const Icon(AppIcons.copy, size: 18),
                   tooltip: 'نسخ المحتوى',
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: content));

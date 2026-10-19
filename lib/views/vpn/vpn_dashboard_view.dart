@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import '../../constants/icons.dart';
 import '../../controllers/vpn_controller.dart';
 import '../../models/captured_connection.dart';
 import '../../theme/app_colors.dart';
@@ -31,7 +32,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
       AlertDialog(
         title: Row(
           children: [
-            const Icon(Icons.file_present_rounded, color: AppColors.protocolHttp),
+            const Icon(AppIcons.file, color: AppColors.protocolHttp),
             const SizedBox(width: 8),
             Text('pcap_export_title'.tr),
           ],
@@ -65,7 +66,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
           ),
           if (pcapPath != null)
             FilledButton.icon(
-              icon: const Icon(Icons.copy_rounded, size: 16),
+              icon: const Icon(AppIcons.copy, size: 16),
               label: Text('copy_file_path'.tr),
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: pcapPath));
@@ -105,17 +106,17 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.tune_rounded),
+            icon: const Icon(AppIcons.filter),
             tooltip: 'select_target_apps'.tr,
             onPressed: () => Get.to(() => const AppFilterView()),
           ),
           IconButton(
-            icon: const Icon(Icons.download_rounded),
+            icon: const Icon(AppIcons.pcapExport),
             tooltip: 'pcap_export_title'.tr,
             onPressed: () => _showPcapExportDialog(controller.currentPcapPath.value),
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline_rounded),
+            icon: const Icon(AppIcons.delete),
             tooltip: 'clear_records'.tr,
             onPressed: () => controller.clearConnections(),
           ),
@@ -176,7 +177,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.apps_rounded,
+                              Icon(AppIcons.apps,
                                   size: 14, color: theme.colorScheme.primary),
                               const SizedBox(width: 4),
                               Text(
@@ -205,19 +206,19 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                         context,
                         title: 'packets_captured'.tr,
                         value: '${controller.totalPackets.value}',
-                        icon: Icons.layers_rounded,
+                        icon: AppIcons.layers,
                       ),
                       _buildMetric(
                         context,
                         title: 'data_volume'.tr,
                         value: controller.formattedTotalBytes,
-                        icon: Icons.data_usage_rounded,
+                        icon: AppIcons.dataUsage,
                       ),
                       _buildMetric(
                         context,
                         title: 'live_connections'.tr,
                         value: '${filteredList.length}',
-                        icon: Icons.hub_rounded,
+                        icon: AppIcons.connections,
                       ),
                     ],
                   ),
@@ -237,7 +238,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                             borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () => controller.toggleVpn(),
-                      icon: Icon(isRunning ? Icons.stop_rounded : Icons.play_arrow_rounded),
+                      icon: Icon(isRunning ? AppIcons.stop : AppIcons.play),
                       label: Text(
                         isRunning ? 'stop_inspection'.tr : 'start_inspection'.tr,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -262,7 +263,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.filter_alt_rounded,
+                    const Icon(AppIcons.filterActive,
                         size: 18, color: AppColors.statusSuccess),
                     const SizedBox(width: 8),
                     Expanded(
@@ -298,10 +299,10 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'search_vpn_hint'.tr,
-                  prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                  prefixIcon: const Icon(AppIcons.search, size: 20),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear_rounded, size: 18),
+                          icon: const Icon(AppIcons.clear, size: 18),
                           onPressed: () {
                             _searchController.clear();
                             controller.setSearchQuery('');
@@ -391,7 +392,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.security_rounded,
+                              AppIcons.vpnSecurity,
                               size: 54,
                               color: theme.colorScheme.primary.withValues(alpha: 0.3),
                             ),
@@ -543,7 +544,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
               ],
             ),
             const SizedBox(width: 4),
-            const Icon(Icons.chevron_right_rounded, size: 18, color: Colors.grey),
+            const Icon(AppIcons.chevronRight, size: 18, color: Colors.grey),
           ],
         ),
       ),

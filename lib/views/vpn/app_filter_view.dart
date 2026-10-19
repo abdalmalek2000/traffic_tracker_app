@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../constants/icons.dart';
 import '../../controllers/vpn_controller.dart';
 import '../../theme/app_colors.dart';
 
@@ -38,7 +39,7 @@ class _AppFilterViewState extends State<AppFilterView> {
         actions: [
           PopupMenuButton<String>(
             tooltip: 'Options',
-            icon: const Icon(Icons.more_vert_rounded),
+            icon: const Icon(AppIcons.moreVert),
             onSelected: (val) {
               if (val == 'clear') {
                 controller.clearSelection();
@@ -49,7 +50,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                 value: 'clear',
                 child: Row(
                   children: [
-                    const Icon(Icons.clear_all_rounded, color: AppColors.statusServerError),
+                    const Icon(AppIcons.deselectAll, color: AppColors.statusServerError),
                     const SizedBox(width: 8),
                     Text('deselect_all_menu'.tr),
                   ],
@@ -92,10 +93,10 @@ class _AppFilterViewState extends State<AppFilterView> {
                       hintText: currentTab == AppViewTab.selectedOnly
                           ? 'search_selected_hint'.tr
                           : 'search_apps_hint'.tr,
-                      prefixIcon: const Icon(Icons.search_rounded),
+                      prefixIcon: const Icon(AppIcons.search),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.clear_rounded, size: 18),
+                              icon: const Icon(AppIcons.clear, size: 18),
                               onPressed: () {
                                 _searchController.clear();
                                 controller.setAppSearchQuery('');
@@ -206,7 +207,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                 color: AppColors.statusSuccess.withValues(alpha: 0.12),
                 child: Row(
                   children: [
-                    const Icon(Icons.sync_rounded, size: 16, color: AppColors.statusSuccess),
+                    const Icon(AppIcons.sync, size: 16, color: AppColors.statusSuccess),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
@@ -232,8 +233,8 @@ class _AppFilterViewState extends State<AppFilterView> {
                           children: [
                             Icon(
                               currentTab == AppViewTab.selectedOnly
-                                  ? Icons.check_box_outline_blank_rounded
-                                  : Icons.search_off_rounded,
+                                  ? AppIcons.checkboxBlank
+                                  : AppIcons.searchEmpty,
                               size: 48,
                               color: Colors.grey,
                             ),
@@ -270,7 +271,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                                     fit: BoxFit.cover,
                                   ),
                                 )
-                              : const Icon(Icons.android_rounded,
+                              : const Icon(AppIcons.android,
                                   size: 36, color: AppColors.statusSuccess),
                           title: Text(
                             app.appName,
