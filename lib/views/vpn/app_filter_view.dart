@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../constants/icons.dart';
 import '../../controllers/vpn_controller.dart';
-import '../../theme/app_colors.dart';
+import '../../constants/colors.dart';
 
 /// Target Applications Selector View
 class AppFilterView extends StatefulWidget {

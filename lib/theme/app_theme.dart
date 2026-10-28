@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
+import '../constants/colors.dart';
 
 /// App theme configurations for Light and Dark modes.
 class AppTheme {

@@ -7,6 +7,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.VpnService
 import android.os.Build
 import android.os.Handler
@@ -31,6 +33,7 @@ class TrafficVpnService : VpnService() {
     private var isThreadRunning = false
     private var vpnThread: Thread? = null
     private var pcapOutputStream: FileOutputStream? = null
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
 
     companion object {
         const val ACTION_START = "com.am.traffic_tracker_app.START"
@@ -69,6 +72,12 @@ class TrafficVpnService : VpnService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.action
         if (action == ACTION_STOP) {
+            stopVpn()
+            return START_NOT_STICKY
+        }
+
+        // Verify device has active Wi-Fi or Mobile Data before starting VPN
+        if (!NetworkUtils.isNetworkConnected(this)) {
             stopVpn()
             return START_NOT_STICKY
         }
@@ -112,8 +121,43 @@ class TrafficVpnService : VpnService() {
         return if (dnsList.isNotEmpty()) dnsList else listOf("8.8.8.8", "1.1.1.1")
     }
 
+    private fun registerNetworkCallback() {
+        try {
+            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return
+            val request = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build()
+
+            networkCallback = object : ConnectivityManager.NetworkCallback() {
+                override fun onLost(network: android.net.Network) {
+                    super.onLost(network)
+                    if (!NetworkUtils.isNetworkConnected(this@TrafficVpnService)) {
+                        stopVpn()
+                    }
+                }
+            }
+            cm.registerNetworkCallback(request, networkCallback!!)
+        } catch (_: Exception) {}
+    }
+
+    private fun unregisterNetworkCallback() {
+        try {
+            if (networkCallback != null) {
+                val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+                cm?.unregisterNetworkCallback(networkCallback!!)
+                networkCallback = null
+            }
+        } catch (_: Exception) {}
+    }
+
     private fun startVpn(allowedPackages: List<String>?) {
         if (isRunning) return
+
+        // Verify device has active Wi-Fi or Mobile Data
+        if (!NetworkUtils.isNetworkConnected(this)) {
+            stopVpn()
+            return
+        }
 
         startForegroundNotification()
 
@@ -159,6 +203,7 @@ class TrafficVpnService : VpnService() {
             )
 
             initPcapFile()
+            registerNetworkCallback()
 
             isRunning = true
             isThreadRunning = true
@@ -494,6 +539,8 @@ class TrafficVpnService : VpnService() {
     }
 
     private fun stopVpn() {
+        unregisterNetworkCallback()
+
         isThreadRunning = false
         isRunning = false
 

@@ -4,7 +4,7 @@ import '../../constants/icons.dart';
 import '../../controllers/traffic_controller.dart';
 import '../../models/traffic_record.dart';
 import '../../services/test_request_service.dart';
-import '../../theme/app_colors.dart';
+import '../../constants/colors.dart';
 import 'traffic_detail_view.dart';
 
 /// In-App HTTP/HTTPS Traffic Inspector View
@@ -278,111 +278,134 @@ class _TrafficListViewState extends State<TrafficListView> {
             : const Icon(AppIcons.send),
         label: Text(_isSendingTest ? 'Sending...' : 'test_request_btn'.tr),
       ),
-      body: Column(
-        children: [
-          // Search & Filter Bar
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              border: Border(
-                bottom: BorderSide(
-                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4)),
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Column(
+          children: [
+            // Search & Filter Bar
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                border: Border(
+                  bottom: BorderSide(
+                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4)),
+                ),
+              ),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'search_hint_http'.tr,
+                      prefixIcon: const Icon(AppIcons.search, size: 20),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(AppIcons.clear, size: 18),
+                              onPressed: () {
+                                _searchController.clear();
+                                controller.setSearchQuery('');
+                                setState(() {});
+                              },
+                            )
+                          : null,
+                      isDense: true,
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      filled: true,
+                      fillColor: theme.colorScheme.surface,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
+                      ),
+                    ),
+                    onChanged: (val) {
+                      controller.setSearchQuery(val);
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _buildFilterChips(),
+                ],
               ),
             ),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'search_hint_http'.tr,
-                    prefixIcon: const Icon(AppIcons.search, size: 20),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(AppIcons.clear, size: 18),
-                            onPressed: () {
-                              _searchController.clear();
-                              controller.setSearchQuery('');
-                              setState(() {});
-                            },
-                          )
-                        : null,
-                    isDense: true,
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    filled: true,
-                    fillColor: theme.colorScheme.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
-                    ),
+
+            // Main List
+            Expanded(
+              child: Obx(() {
+                final records = controller.filteredRecords;
+
+                if (records.isEmpty) {
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        child: ConstrainedBox(
+                          constraints:
+                              BoxConstraints(minHeight: constraints.maxHeight),
+                          child: IntrinsicHeight(
+                            child: Padding(
+                              padding: const EdgeInsets.all(28.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    AppIcons.networkCheck,
+                                    size: 64,
+                                    color: theme.colorScheme.primary
+                                        .withValues(alpha: 0.4),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'no_records_title'.tr,
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'no_records_desc'.tr,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                        fontSize: 13, color: Colors.grey),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  FilledButton.tonalIcon(
+                                    onPressed: _showTestRequestsBottomSheet,
+                                    icon: const Icon(AppIcons.start),
+                                    label: Text('test_request_btn'.tr),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
+
+                return ListView.separated(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  itemCount: records.length,
+                  separatorBuilder: (_, _) => Divider(
+                    height: 1,
+                    thickness: 0.5,
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
                   ),
-                  onChanged: (val) {
-                    controller.setSearchQuery(val);
-                    setState(() {});
+                  itemBuilder: (context, index) {
+                    final item = records[index];
+                    return _buildTrafficItemTile(context, item);
                   },
-                ),
-                const SizedBox(height: 8),
-                _buildFilterChips(),
-              ],
-            ),
-          ),
-
-          // Main List
-          Expanded(
-            child: Obx(() {
-              final records = controller.filteredRecords;
-
-              if (records.isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(28.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          AppIcons.networkCheck,
-                          size: 64,
-                          color: theme.colorScheme.primary.withValues(alpha: 0.4),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'no_records_title'.tr,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'no_records_desc'.tr,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 13, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 20),
-                        FilledButton.tonalIcon(
-                          onPressed: _showTestRequestsBottomSheet,
-                          icon: const Icon(AppIcons.start),
-                          label: Text('test_request_btn'.tr),
-                        ),
-                      ],
-                    ),
-                  ),
                 );
-              }
-
-              return ListView.separated(
-                itemCount: records.length,
-                separatorBuilder: (_, _) => Divider(
-                  height: 1,
-                  thickness: 0.5,
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-                ),
-                itemBuilder: (context, index) {
-                  final item = records[index];
-                  return _buildTrafficItemTile(context, item);
-                },
-              );
-            }),
-          ),
-        ],
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../constants/colors.dart';
 import '../constants/icons.dart';
 import '../controllers/navigation_controller.dart';
-import '../theme/app_colors.dart';
 import 'traffic/traffic_list_view.dart';
 import 'vpn/vpn_dashboard_view.dart';
 

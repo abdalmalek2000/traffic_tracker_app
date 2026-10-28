@@ -8,6 +8,17 @@ class VpnNativeBridge {
   static const EventChannel _streamChannel =
       EventChannel('traffic_tracker/vpn_stream');
 
+  /// التحقق من توفر اتصال فعلي بشبكة الإنترنت (Wi-Fi أو بيانات الهاتف)
+  static Future<bool> isNetworkAvailable() async {
+    try {
+      final available =
+          await _controlChannel.invokeMethod<bool>('isNetworkAvailable');
+      return available ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// بدء تشغيل خدمة الـ VPN مع قائمة الحزم المسموحة
   static Future<bool> startVpn({List<String>? allowedPackages}) async {
     try {
@@ -15,6 +26,8 @@ class VpnNativeBridge {
         'allowedPackages': allowedPackages,
       });
       return result ?? false;
+    } on PlatformException {
+      rethrow;
     } catch (_) {
       return false;
     }
@@ -68,6 +81,7 @@ class VpnNativeBridge {
   }
 
   /// الاستماع إلى تيار أحداث الـ VPN المباشرة
-  static Stream<dynamic> get vpnEventStream =>
-      _streamChannel.receiveBroadcastStream();
+  static Stream<dynamic> get vpnEventStream {
+    return _streamChannel.receiveBroadcastStream();
+  }
 }

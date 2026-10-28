@@ -34,6 +34,11 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, VPN_CONTROL_CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "startVpn" -> {
+                    if (!NetworkUtils.isNetworkConnected(this)) {
+                        result.error("NO_INTERNET", "No active Wi-Fi or Mobile Data connection.", null)
+                        return@setMethodCallHandler
+                    }
+
                     val allowed = call.argument<List<String>>("allowedPackages")
                     pendingAllowedPackages = if (allowed != null) ArrayList(allowed) else null
 
@@ -56,6 +61,9 @@ class MainActivity : FlutterActivity() {
                 }
                 "isVpnRunning" -> {
                     result.success(TrafficVpnService.isRunning)
+                }
+                "isNetworkAvailable" -> {
+                    result.success(NetworkUtils.isNetworkConnected(this))
                 }
                 "getPcapPath" -> {
                     result.success(TrafficVpnService.pcapFilePath)
@@ -108,6 +116,11 @@ class MainActivity : FlutterActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == VPN_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
+                if (!NetworkUtils.isNetworkConnected(this)) {
+                    pendingVpnResult?.error("NO_INTERNET", "No active Wi-Fi or Mobile Data connection.", null)
+                    pendingVpnResult = null
+                    return
+                }
                 startVpnServiceInternal()
                 pendingVpnResult?.success(true)
             } else {

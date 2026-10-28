@@ -6,6 +6,8 @@ class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'en_US': enUS,
+        'ar_SA': arAR,
+        'ar': arAR,
       };
 
   static const Map<String, String> enUS = {
@@ -81,6 +83,8 @@ class AppTranslations extends Translations {
     'target_mode_active_banner':
         'Target Mode Active: Inspecting only traffic from @count selected app(s).',
     'live_feed': 'LIVE',
+    'download_pcap': 'Download PCAP',
+    'delete_records': 'Delete Records',
     'pcap_export_title': 'PCAP Capture File',
     'pcap_export_desc':
         'All captured raw network packets are recorded into a standard PCAP file for Wireshark inspection:',
@@ -126,5 +130,127 @@ class AppTranslations extends Translations {
     'protocol': 'Protocol',
     'copy_ip': 'Copy IP',
     'copy_domain': 'Copy Domain',
+
+    // Network Connection Requirement
+    'no_internet_title': 'No Network Connection',
+    'no_internet_message':
+        'Please connect to Wi-Fi or turn on Mobile Data before starting VPN inspection.',
+  };
+
+  static const Map<String, String> arAR = {
+    // Navigation
+    'app_title': 'راصد حركة الشبكة',
+    'tab_api_inspector': 'فاحص الـ API',
+    'tab_system_vpn': 'مراقب شبكة الجهاز',
+
+    // In-App HTTP Inspector
+    'traffic_tracker': 'راصد الشبكة',
+    'network_inspector': 'فاحص حركة الشبكة',
+    'monitoring_active': 'المراقبة نشطة',
+    'monitoring_paused': 'المراقبة متوقفة',
+    'clear_records': 'مسح السجلات',
+    'records_cleared': 'تم مسح جميع السجلات بنجاح',
+    'search_hint_http': 'ابحث عن رابط أو كود حالة...',
+    'filter_all': 'الكل',
+    'filter_2xx': '2xx ناجح',
+    'filter_3xx': '3xx تحويل',
+    'filter_4xx': '4xx خطأ عميل',
+    'filter_5xx': '5xx خطأ خادم',
+    'no_records_title': 'لا توجد طلبات شبكة بعد',
+    'no_records_desc': 'أي طلب شبكة صادر سيظهر هنا فوراً مع تفاصيل الترويسة والبيانات.',
+    'test_request_btn': 'إرسال طلب تجريبي',
+    'test_requests_title': 'إرسال طلبات تجريبية',
+    'test_requests_subtitle': 'اختر طلباً نموذجياً لاختبار الفحص المباشر:',
+    'send_custom_request': 'إرسال طلب مخصص',
+    'url_label': 'الرابط (URL)',
+    'method_label': 'نوع الطلب',
+    'body_label': 'محتوى الطلب (JSON / نص)',
+    'cancel': 'إلغاء',
+    'send_and_inspect': 'إرسال وفحص',
+
+    // HTTP Request Details
+    'overview': 'نظرة عامة',
+    'request': 'الطلب',
+    'response': 'الاستجابة',
+    'curl': 'cURL',
+    'full_url': 'الرابط الكامل',
+    'host': 'المضيف',
+    'path': 'المسار',
+    'status': 'الحالة',
+    'duration': 'المدة',
+    'req_size': 'حجم الطلب',
+    'res_size': 'حجم الاستجابة',
+    'timestamp': 'الوقت',
+    'query_params': 'معاملات الاستعلام',
+    'req_headers': 'ترويسات الطلب',
+    'res_headers': 'ترويسات الاستجابة',
+    'no_headers': 'لا توجد ترويسات',
+    'empty_body': 'المحتوى فارغ',
+    'copied_to_clipboard': 'تم النسخ إلى الحافظة',
+    'copy_curl': 'نسخ أمر cURL بالكامل',
+    'curl_instruction': 'أمر cURL جاهز للتشغيل في الطرفية أو الاستيراد في أدوات مثل Postman:',
+
+    // System VPN Monitor
+    'system_vpn_title': 'مراقب شبكة الجهاز',
+    'vpn_active': 'الفحص نشط (VPN يعمل)',
+    'vpn_stopped': 'الفحص متوقف',
+    'all_apps': 'كافة التطبيقات',
+    'target_apps_selected': 'تم تحديد @count تطبيقات',
+    'packets_captured': 'الحزم',
+    'data_volume': 'حجم البيانات',
+    'live_connections': 'الاتصالات',
+    'start_inspection': 'بدء فحص ومراقبة شبكة الجهاز',
+    'stop_inspection': 'إيقاف الفحص',
+    'search_vpn_hint': 'ابحث بالنطاق أو IP أو التطبيق أو المنفذ...',
+    'mode_target_only': 'تطبيقات محددة فقط',
+    'mode_all_traffic': 'حركة مرور كافة التطبيقات',
+    'target_mode_active_banner': 'وضع التحديد نشط: يتم فحص حركة المرور لـ @count تطبيق محدد فقط.',
+    'live_feed': 'مباشر',
+    'download_pcap': 'تحميل PCAP',
+    'delete_records': 'حذف السجلات',
+    'pcap_export_title': 'ملف التقاط PCAP',
+    'pcap_export_desc': 'يتم تسجيل جميع حزم الشبكة الخام في ملف PCAP قياسي لتحليلها ببرنامج Wireshark:',
+    'copy_file_path': 'نسخ مسار الملف',
+    'close': 'إغلاق',
+    'no_connections_active': 'المراقبة نشطة! افتح أي تطبيق في جهازك لتبدأ حزم الشبكة بالظهور مباشرة هنا.',
+    'no_connections_idle': 'اضغط على "بدء فحص ومراقبة شبكة الجهاز" أعلاه للبدء بالتقاط حزم IP و TLS و DNS.',
+    'no_connections_search': 'لا توجد اتصالات مطابقة لبحثك "@query".',
+
+    // App Selection & Filter
+    'select_target_apps': 'التطبيقات المستهدفة',
+    'filter_all_apps': 'الكل',
+    'filter_selected_only': 'المحددة فقط',
+    'filter_user_apps': 'تطبيقات المستخدم',
+    'filter_system_apps': 'تطبيقات النظام',
+    'search_apps_hint': 'ابحث باسم التطبيق أو الحزمة...',
+    'search_selected_hint': 'ابحث داخل التطبيقات المحددة فقط...',
+    'select_all_visible': 'تحديد كافة الظاهرة (@count)',
+    'deselect_all_visible': 'إلغاء تحديد الظاهرة',
+    'deselect_all_menu': 'إلغاء تحديد كافة التطبيقات',
+    'mode_monitoring_all': 'الوضع: التقاط حركة المرور من جميع تطبيقات الجهاز',
+    'mode_monitoring_selected': 'الوضع: حصر الالتقاط على @count تطبيق محدد فقط',
+    'system_badge': 'نظام',
+    'no_apps_found': 'لا توجد تطبيقات مطابقة لبحثك.',
+    'no_selected_apps': 'لم يتم تحديد أي تطبيق بعد.\nانتقل إلى تبويب "الكل" لاختيار التطبيقات المراد فحصها.',
+    'live_sync_notice': 'المراقبة نشطة: تنطبق التغييرات في الاختيار فوراً على تيار الحزم المباشر.',
+    'loading_apps': 'جاري فحص وتحميل تطبيقات الجهاز المكتشفة...',
+
+    // Connection Details
+    'connection_details': 'تفاصيل الاتصال',
+    'destination_host': 'المضيف الوجهة',
+    'application': 'التطبيق',
+    'package_name': 'اسم الحزمة',
+    'remote_address': 'الطرف البعيد',
+    'local_address': 'الطرف المحلي',
+    'service_type': 'الخدمة / المنفذ',
+    'packet_length': 'حجم الحزمة',
+    'protocol': 'البروتوكول',
+    'copy_ip': 'نسخ الـ IP',
+    'copy_domain': 'نسخ النطاق',
+
+    // Network Connection Requirement
+    'no_internet_title': 'لا يوجد اتصال بالشبكة',
+    'no_internet_message':
+        'يرجى التأكد من الاتصال بشبكة Wi-Fi أو تشغيل بيانات الهاتف قبل تفعيل مراقبة الشبكة.',
   };
 }

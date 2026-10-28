@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../constants/icons.dart';
 import '../../models/captured_connection.dart';
-import '../../theme/app_colors.dart';
+import '../../constants/colors.dart';
 
 /// Modal / BottomSheet displaying deep details of a captured connection.
 class ConnectionDetailView extends StatelessWidget {

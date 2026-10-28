@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../constants/icons.dart';
 import '../../models/traffic_record.dart';
-import '../../theme/app_colors.dart';
+import '../../constants/colors.dart';
 import '../widgets/json_viewer_widget.dart';
 
 /// Deep HTTP request & response detail inspection view.

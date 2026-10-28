@@ -1,10 +1,12 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../models/app_info.dart';
 import '../models/captured_connection.dart';
 import '../models/traffic_record.dart';
 import '../services/vpn_native_bridge.dart';
+import '../constants/colors.dart';
 
 /// تبويبات تصنيف تطبيقات الجهاز في شاشة الاختيار
 enum AppViewTab {
@@ -39,23 +41,28 @@ class VpnController extends GetxController {
   /// قائمة الاتصالات الحية المفلترة بحسب البحث والتطبيقات المحددة
   List<CapturedConnection> get filteredConnections {
     final query = searchQuery.value.trim().toLowerCase();
-    final onlySelected = filterBySelectedAppsOnly.value || selectedPackages.isNotEmpty;
+    final onlySelected =
+        filterBySelectedAppsOnly.value || selectedPackages.isNotEmpty;
 
     return connections.where((conn) {
       // 1. تصفية بحسب التطبيقات المحددة
       if (onlySelected && selectedPackages.isNotEmpty) {
-        if (conn.packageName != null && !selectedPackages.contains(conn.packageName)) {
+        if (conn.packageName != null &&
+            !selectedPackages.contains(conn.packageName)) {
           return false;
         }
       }
 
       // 2. تصفية بحسب نص البحث
       if (query.isNotEmpty) {
-        final matchesDomain = conn.domain?.toLowerCase().contains(query) ?? false;
+        final matchesDomain =
+            conn.domain?.toLowerCase().contains(query) ?? false;
         final matchesDstIp = conn.dstIp.toLowerCase().contains(query);
         final matchesSrcIp = conn.srcIp.toLowerCase().contains(query);
-        final matchesApp = conn.appName?.toLowerCase().contains(query) ?? false;
-        final matchesPkg = conn.packageName?.toLowerCase().contains(query) ?? false;
+        final matchesApp =
+            conn.appName?.toLowerCase().contains(query) ?? false;
+        final matchesPkg =
+            conn.packageName?.toLowerCase().contains(query) ?? false;
         final matchesProto = conn.protocol.toLowerCase().contains(query);
         final matchesPort = conn.dstPort.toString().contains(query) ||
             conn.srcPort.toString().contains(query);
@@ -126,8 +133,10 @@ class VpnController extends GetxController {
               if (connections.length > 500) {
                 connections.removeLast();
               }
-              totalPackets.value = event['totalPackets'] as int? ?? (totalPackets.value + 1);
-              totalBytes.value = event['totalBytes'] as int? ?? (totalBytes.value + conn.length);
+              totalPackets.value =
+                  event['totalPackets'] as int? ?? (totalPackets.value + 1);
+              totalBytes.value =
+                  event['totalBytes'] as int? ?? (totalBytes.value + conn.length);
             }
           }
         },
@@ -146,10 +155,48 @@ class VpnController extends GetxController {
   }
 
   Future<bool> startVpn() async {
-    final allowed = selectedPackages.isNotEmpty ? selectedPackages.toList() : null;
-    final success = await VpnNativeBridge.startVpn(allowedPackages: allowed);
-    isVpnRunning.value = success;
-    return success;
+    // 1. التحقق المسبق من وجود اتصال نشط بشبكة Wi-Fi أو بيانات الجوال
+    final isConnected = await VpnNativeBridge.isNetworkAvailable();
+    if (!isConnected) {
+      Get.snackbar(
+        'no_internet_title'.tr,
+        'no_internet_message'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.statusServerError,
+        colorText: Colors.white,
+        icon: const Icon(Icons.wifi_off_rounded, color: Colors.white),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 4),
+      );
+      isVpnRunning.value = false;
+      return false;
+    }
+
+    try {
+      final allowed =
+          selectedPackages.isNotEmpty ? selectedPackages.toList() : null;
+      final success = await VpnNativeBridge.startVpn(allowedPackages: allowed);
+      isVpnRunning.value = success;
+      return success;
+    } on PlatformException catch (e) {
+      if (e.code == 'NO_INTERNET') {
+        Get.snackbar(
+          'no_internet_title'.tr,
+          'no_internet_message'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.statusServerError,
+          colorText: Colors.white,
+          icon: const Icon(Icons.wifi_off_rounded, color: Colors.white),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 4),
+        );
+      }
+      isVpnRunning.value = false;
+      return false;
+    } catch (_) {
+      isVpnRunning.value = false;
+      return false;
+    }
   }
 
   Future<bool> stopVpn() async {
@@ -172,7 +219,8 @@ class VpnController extends GetxController {
     try {
       final rawApps = await VpnNativeBridge.getInstalledApps();
       if (rawApps != null) {
-        installedApps.value = rawApps.map((a) => AppInfo.fromMap(a as Map)).toList();
+        installedApps.value =
+            rawApps.map((a) => AppInfo.fromMap(a as Map)).toList();
       }
     } finally {
       isLoadingApps.value = false;
@@ -199,7 +247,8 @@ class VpnController extends GetxController {
   }
 
   void _syncPackagesToNative() {
-    final allowed = selectedPackages.isNotEmpty ? selectedPackages.toList() : null;
+    final allowed =
+        selectedPackages.isNotEmpty ? selectedPackages.toList() : null;
     VpnNativeBridge.updateAllowedPackages(allowed);
   }
 

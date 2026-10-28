@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import '../../constants/colors.dart';
 import '../../constants/icons.dart';
 
 /// ويدجت منسق لعرض أكواد JSON والـ Payloads مع زر نسخ سريع
@@ -36,7 +37,7 @@ class JsonViewerWidget extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFF4F5F8),
+        color: isDark ? AppColors.jsonBackgroundDark : AppColors.jsonBackgroundLight,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
@@ -48,7 +49,7 @@ class JsonViewerWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF181825) : const Color(0xFFE9ECEF),
+              color: isDark ? AppColors.jsonHeaderDark : AppColors.jsonHeaderLight,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             ),
             child: Row(
@@ -58,18 +59,18 @@ class JsonViewerWidget extends StatelessWidget {
                   title ?? 'Payload',
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(AppIcons.copy, size: 18),
+                  icon: const Icon(AppIcons.copy, size: 16),
                   tooltip: 'نسخ المحتوى',
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: content));
-                    Get.rawSnackbar(
-                      message: 'تم نسخ البيانات إلى الحافظة',
-                      duration: const Duration(seconds: 1),
+                    Get.snackbar(
+                      'تم النسخ',
+                      'تم نسخ النص إلى الحافظة بنجاح',
                       snackPosition: SnackPosition.BOTTOM,
+                      duration: const Duration(seconds: 2),
                     );
                   },
                 ),
@@ -80,9 +81,10 @@ class JsonViewerWidget extends StatelessWidget {
             padding: const EdgeInsets.all(14.0),
             child: SelectableText(
               content,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 12.5,
+                color: theme.colorScheme.onSurface,
                 height: 1.45,
               ),
             ),
