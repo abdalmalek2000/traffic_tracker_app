@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../constants/icons.dart';
 import '../../models/captured_connection.dart';
 import '../../constants/colors.dart';
+import '../../constants/spacing.dart';
 
 /// Modal / BottomSheet displaying deep details of a captured connection.
 class ConnectionDetailView extends StatelessWidget {
@@ -31,10 +32,17 @@ class ConnectionDetailView extends StatelessWidget {
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.base,
+        AppSpacing.lg,
+        AppSpacing.xl,
+      ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(
+          top: AppSpacing.radiusCircularXxl,
+        ),
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -45,10 +53,10 @@ class ConnectionDetailView extends StatelessWidget {
               child: Container(
                 width: 40,
                 height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
+                margin: const EdgeInsets.only(bottom: AppSpacing.base),
                 decoration: BoxDecoration(
                   color: Colors.grey.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: AppSpacing.borderRadiusXs,
                 ),
               ),
             ),
@@ -57,10 +65,13 @@ class ConnectionDetailView extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space8,
+                    vertical: AppSpacing.xs,
+                  ),
                   decoration: BoxDecoration(
                     color: protocolColor,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppSpacing.borderRadiusMd,
                   ),
                   child: Text(
                     connection.protocol,
@@ -71,7 +82,7 @@ class ConnectionDetailView extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                AppSpacing.horizontalMd,
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,9 +112,9 @@ class ConnectionDetailView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            AppSpacing.verticalBase,
             const Divider(),
-            const SizedBox(height: 12),
+            AppSpacing.verticalMd,
 
             // Detailed Sections
             _buildDetailCard(
@@ -115,7 +126,7 @@ class ConnectionDetailView extends StatelessWidget {
               canCopy: connection.packageName != null,
               copyText: connection.packageName,
             ),
-            const SizedBox(height: 10),
+            AppSpacing.vertical10,
 
             _buildDetailCard(
               context,
@@ -126,7 +137,7 @@ class ConnectionDetailView extends StatelessWidget {
               canCopy: true,
               copyText: connection.domain ?? connection.dstIp,
             ),
-            const SizedBox(height: 10),
+            AppSpacing.vertical10,
 
             _buildDetailCard(
               context,
@@ -134,7 +145,7 @@ class ConnectionDetailView extends StatelessWidget {
               value: '${connection.srcIp}:${connection.srcPort}',
               icon: AppIcons.device,
             ),
-            const SizedBox(height: 10),
+            AppSpacing.vertical10,
 
             Row(
               children: [
@@ -146,7 +157,7 @@ class ConnectionDetailView extends StatelessWidget {
                     icon: AppIcons.dataUsage,
                   ),
                 ),
-                const SizedBox(width: 10),
+                AppSpacing.horizontal10,
                 Expanded(
                   child: _buildDetailCard(
                     context,
@@ -157,7 +168,7 @@ class ConnectionDetailView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            AppSpacing.verticalLg,
 
             // Action: Close
             FilledButton.tonal(
@@ -182,10 +193,10 @@ class ConnectionDetailView extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: AppSpacing.paddingAllMd,
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppSpacing.borderRadiusLg,
         border: Border.all(
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
@@ -193,8 +204,8 @@ class ConnectionDetailView extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: theme.colorScheme.primary),
-          const SizedBox(width: 10),
+          Icon(icon, size: AppSpacing.iconMd, color: theme.colorScheme.primary),
+          AppSpacing.horizontal10,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,7 +218,7 @@ class ConnectionDetailView extends StatelessWidget {
                     color: Colors.grey.shade600,
                   ),
                 ),
-                const SizedBox(height: 2),
+                AppSpacing.verticalXxs,
                 SelectableText(
                   value,
                   style: const TextStyle(
@@ -216,7 +227,7 @@ class ConnectionDetailView extends StatelessWidget {
                   ),
                 ),
                 if (subtitle != null && subtitle.isNotEmpty) ...[
-                  const SizedBox(height: 2),
+                  AppSpacing.verticalXxs,
                   SelectableText(
                     subtitle,
                     style: TextStyle(
@@ -231,7 +242,7 @@ class ConnectionDetailView extends StatelessWidget {
           ),
           if (canCopy)
             IconButton(
-              icon: const Icon(AppIcons.copy, size: 16),
+              icon: const Icon(AppIcons.copy, size: AppSpacing.iconXs),
               tooltip: 'Copy',
               onPressed: () {
                 final txt = copyText ?? value;

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../constants/icons.dart';
 import '../../models/traffic_record.dart';
 import '../../constants/colors.dart';
+import '../../constants/spacing.dart';
 import '../widgets/json_viewer_widget.dart';
 
 /// Deep HTTP request & response detail inspection view.
@@ -60,10 +61,13 @@ class TrafficDetailView extends StatelessWidget {
           title: Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
                 decoration: BoxDecoration(
                   color: methodColor,
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: AppSpacing.borderRadiusSm,
                 ),
                 child: Text(
                   record.method.toUpperCase(),
@@ -74,13 +78,16 @@ class TrafficDetailView extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              AppSpacing.horizontalSm,
               if (record.statusCode != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: AppSpacing.borderRadiusSm,
                     border: Border.all(color: statusColor, width: 1),
                   ),
                   child: Text(
@@ -92,7 +99,7 @@ class TrafficDetailView extends StatelessWidget {
                     ),
                   ),
                 ),
-              const SizedBox(width: 10),
+              AppSpacing.horizontal10,
               Expanded(
                 child: Text(
                   record.path,
@@ -141,7 +148,7 @@ class TrafficDetailView extends StatelessWidget {
 
   Widget _buildOverviewTab(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: AppSpacing.paddingCard,
       children: [
         _buildInfoCard(
           context,
@@ -149,15 +156,15 @@ class TrafficDetailView extends StatelessWidget {
           content: record.url,
           canCopy: true,
         ),
-        const SizedBox(height: 12),
+        AppSpacing.verticalMd,
         Card(
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppSpacing.borderRadiusLg,
             side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppSpacing.paddingCard,
             child: Column(
               children: [
                 _buildRow('host'.tr, record.host),
@@ -189,12 +196,12 @@ class TrafficDetailView extends StatelessWidget {
           ),
         ),
         if (record.queryParameters.isNotEmpty) ...[
-          const SizedBox(height: 16),
+          AppSpacing.verticalBase,
           Text(
             'query_params'.tr,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          AppSpacing.verticalSm,
           _buildHeadersCard(context, record.queryParameters),
         ],
       ],
@@ -203,15 +210,15 @@ class TrafficDetailView extends StatelessWidget {
 
   Widget _buildRequestTab(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: AppSpacing.paddingCard,
       children: [
         Text(
           'req_headers'.tr,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 8),
+        AppSpacing.verticalSm,
         _buildHeadersCard(context, record.requestHeaders),
-        const SizedBox(height: 16),
+        AppSpacing.verticalBase,
         Text(
           'request'.tr,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
@@ -228,15 +235,15 @@ class TrafficDetailView extends StatelessWidget {
     final resHeaders = record.responseHeaders ?? {};
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: AppSpacing.paddingCard,
       children: [
         Text(
           'res_headers'.tr,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 8),
+        AppSpacing.verticalSm,
         _buildHeadersCard(context, resHeaders),
-        const SizedBox(height: 16),
+        AppSpacing.verticalBase,
         Text(
           'response'.tr,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
@@ -252,18 +259,18 @@ class TrafficDetailView extends StatelessWidget {
   Widget _buildCurlTab(BuildContext context) {
     final curl = record.toCurlCommand();
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: AppSpacing.paddingCard,
       children: [
         Text(
           'curl_instruction'.tr,
           style: const TextStyle(fontSize: 13),
         ),
-        const SizedBox(height: 12),
+        AppSpacing.verticalMd,
         JsonViewerWidget(
           content: curl,
           title: 'cURL Command',
         ),
-        const SizedBox(height: 16),
+        AppSpacing.verticalBase,
         FilledButton.icon(
           onPressed: () {
             Clipboard.setData(ClipboardData(text: curl));
@@ -285,11 +292,11 @@ class TrafficDetailView extends StatelessWidget {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppSpacing.borderRadiusLg,
         side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppSpacing.space14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -305,7 +312,7 @@ class TrafficDetailView extends StatelessWidget {
                 ),
                 if (canCopy)
                   IconButton(
-                    icon: const Icon(AppIcons.copy, size: 16),
+                    icon: const Icon(AppIcons.copy, size: AppSpacing.iconXs),
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: content));
                       Get.rawSnackbar(
@@ -317,7 +324,7 @@ class TrafficDetailView extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 4),
+            AppSpacing.verticalXs,
             SelectableText(
               content,
               style: const TextStyle(fontSize: 13, height: 1.3),
@@ -333,11 +340,11 @@ class TrafficDetailView extends StatelessWidget {
       return Card(
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppSpacing.borderRadiusLg,
           side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.paddingCard,
           child: Text('no_headers'.tr, style: const TextStyle(color: Colors.grey)),
         ),
       );
@@ -346,15 +353,15 @@ class TrafficDetailView extends StatelessWidget {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppSpacing.borderRadiusLg,
         side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: AppSpacing.paddingAllMd,
         child: Column(
           children: headers.entries.map((entry) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
+              padding: AppSpacing.paddingVXs,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

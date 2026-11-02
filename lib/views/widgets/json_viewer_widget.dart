@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../constants/colors.dart';
 import '../../constants/icons.dart';
+import '../../constants/spacing.dart';
 
 /// ويدجت منسق لعرض أكواد JSON والـ Payloads مع زر نسخ سريع
 class JsonViewerWidget extends StatelessWidget {
@@ -23,7 +24,7 @@ class JsonViewerWidget extends StatelessWidget {
     if (content.trim().isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: AppSpacing.paddingAllXl,
           child: Text(
             'لا توجد بيانات (Empty Body)',
             style: TextStyle(
@@ -35,10 +36,10 @@ class JsonViewerWidget extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: AppSpacing.paddingVSm,
       decoration: BoxDecoration(
         color: isDark ? AppColors.jsonBackgroundDark : AppColors.jsonBackgroundLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppSpacing.borderRadiusLg,
         border: Border.all(
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
@@ -47,10 +48,15 @@ class JsonViewerWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space14,
+              vertical: AppSpacing.sm,
+            ),
             decoration: BoxDecoration(
               color: isDark ? AppColors.jsonHeaderDark : AppColors.jsonHeaderLight,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius: const BorderRadius.vertical(
+                top: AppSpacing.radiusCircularLg,
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -62,7 +68,7 @@ class JsonViewerWidget extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(AppIcons.copy, size: 16),
+                  icon: const Icon(AppIcons.copy, size: AppSpacing.iconXs),
                   tooltip: 'نسخ المحتوى',
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: content));
@@ -78,7 +84,7 @@ class JsonViewerWidget extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(14.0),
+            padding: const EdgeInsets.all(AppSpacing.space14),
             child: SelectableText(
               content,
               style: TextStyle(

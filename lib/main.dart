@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controllers/navigation_controller.dart';
+import 'controllers/settings_controller.dart';
 import 'controllers/traffic_controller.dart';
 import 'controllers/vpn_controller.dart';
 import 'localization/app_translations.dart';
@@ -12,6 +13,7 @@ void main() {
 
   // Centralized MVC Controllers injection
   Get.put(NavigationController());
+  Get.put(SettingsController());
   Get.put(TrafficController());
   Get.put(VpnController());
 

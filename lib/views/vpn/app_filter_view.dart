@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../constants/icons.dart';
 import '../../controllers/vpn_controller.dart';
 import '../../constants/colors.dart';
+import '../../constants/spacing.dart';
 
 /// Target Applications Selector View
 class AppFilterView extends StatefulWidget {
@@ -51,7 +52,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                 child: Row(
                   children: [
                     const Icon(AppIcons.deselectAll, color: AppColors.statusServerError),
-                    const SizedBox(width: 8),
+                    AppSpacing.horizontalSm,
                     Text('deselect_all_menu'.tr),
                   ],
                 ),
@@ -67,7 +68,7 @@ class _AppFilterViewState extends State<AppFilterView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const CircularProgressIndicator(),
-                const SizedBox(height: 16),
+                AppSpacing.verticalBase,
                 Text('loading_apps'.tr),
               ],
             ),
@@ -83,7 +84,12 @@ class _AppFilterViewState extends State<AppFilterView> {
           children: [
             // Search & Filter Header
             Container(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.base,
+                AppSpacing.md,
+                AppSpacing.base,
+                AppSpacing.sm,
+              ),
               color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
               child: Column(
                 children: [
@@ -96,7 +102,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                       prefixIcon: const Icon(AppIcons.search),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(AppIcons.clear, size: 18),
+                              icon: const Icon(AppIcons.clear, size: AppSpacing.iconSm),
                               onPressed: () {
                                 _searchController.clear();
                                 controller.setAppSearchQuery('');
@@ -108,7 +114,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                       filled: true,
                       fillColor: theme.colorScheme.surface,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: AppSpacing.borderRadiusBase,
                         borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
                       ),
                     ),
@@ -117,7 +123,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                       setState(() {});
                     },
                   ),
-                  const SizedBox(height: 10),
+                  AppSpacing.vertical10,
 
                   // Filter Chips
                   SingleChildScrollView(
@@ -129,20 +135,20 @@ class _AppFilterViewState extends State<AppFilterView> {
                           isSelected: currentTab == AppViewTab.all,
                           onSelected: () => controller.setAppTab(AppViewTab.all),
                         ),
-                        const SizedBox(width: 6),
+                        AppSpacing.horizontal6,
                         _buildFilterChip(
                           label: '${'filter_selected_only'.tr} ($selectedCount)',
                           color: AppColors.statusSuccess,
                           isSelected: currentTab == AppViewTab.selectedOnly,
                           onSelected: () => controller.setAppTab(AppViewTab.selectedOnly),
                         ),
-                        const SizedBox(width: 6),
+                        AppSpacing.horizontal6,
                         _buildFilterChip(
                           label: 'filter_user_apps'.tr,
                           isSelected: currentTab == AppViewTab.userApps,
                           onSelected: () => controller.setAppTab(AppViewTab.userApps),
                         ),
-                        const SizedBox(width: 6),
+                        AppSpacing.horizontal6,
                         _buildFilterChip(
                           label: 'filter_system_apps'.tr,
                           isSelected: currentTab == AppViewTab.systemApps,
@@ -151,7 +157,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  AppSpacing.verticalSm,
 
                   // Summary & Quick Selection Action
                   Row(
@@ -203,12 +209,15 @@ class _AppFilterViewState extends State<AppFilterView> {
             if (controller.isVpnRunning.value)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.base,
+                  vertical: AppSpacing.space6,
+                ),
                 color: AppColors.statusSuccess.withValues(alpha: 0.12),
                 child: Row(
                   children: [
-                    const Icon(AppIcons.sync, size: 16, color: AppColors.statusSuccess),
-                    const SizedBox(width: 6),
+                    const Icon(AppIcons.sync, size: AppSpacing.iconXs, color: AppColors.statusSuccess),
+                    AppSpacing.horizontal6,
                     Expanded(
                       child: Text(
                         'live_sync_notice'.tr,
@@ -227,7 +236,7 @@ class _AppFilterViewState extends State<AppFilterView> {
               child: visibleApps.isEmpty
                   ? Center(
                       child: Padding(
-                        padding: const EdgeInsets.all(24.0),
+                        padding: AppSpacing.paddingAllXl,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -238,7 +247,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                               size: 48,
                               color: Colors.grey,
                             ),
-                            const SizedBox(height: 12),
+                            AppSpacing.verticalMd,
                             Text(
                               currentTab == AppViewTab.selectedOnly
                                   ? 'no_selected_apps'.tr
@@ -263,7 +272,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                           onChanged: (_) => controller.togglePackage(app.packageName),
                           secondary: app.iconBytes != null
                               ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: AppSpacing.borderRadiusMd,
                                   child: Image.memory(
                                     app.iconBytes!,
                                     width: 40,
@@ -282,12 +291,12 @@ class _AppFilterViewState extends State<AppFilterView> {
                             children: [
                               if (app.isSystemApp)
                                 Container(
-                                  margin: const EdgeInsets.only(right: 6),
+                                  margin: const EdgeInsets.only(right: AppSpacing.space6),
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 5, vertical: 1.5),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: AppSpacing.borderRadiusXs,
                                   ),
                                   child: Text(
                                     'system_badge'.tr,
@@ -335,7 +344,7 @@ class _AppFilterViewState extends State<AppFilterView> {
       backgroundColor: Colors.transparent,
       selectedColor: color ?? Theme.of(context).colorScheme.primary,
       checkmarkColor: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: AppSpacing.paddingHXs,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }

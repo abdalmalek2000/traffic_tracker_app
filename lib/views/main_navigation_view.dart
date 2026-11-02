@@ -14,30 +14,35 @@ class MainNavigationView extends StatelessWidget {
   Widget build(BuildContext context) {
     final navController = NavigationController.to;
 
-    final screens = const [
-      TrafficListView(),
-      VpnDashboardView(),
-    ];
+    final screens = const [VpnDashboardView(), TrafficListView()];
 
     return Scaffold(
-      body: Obx(() => IndexedStack(
-            index: navController.currentIndex.value,
-            children: screens,
-          )),
+      body: Obx(
+        () => IndexedStack(
+          index: navController.currentIndex.value,
+          children: screens,
+        ),
+      ),
       bottomNavigationBar: Obx(
         () => NavigationBar(
           selectedIndex: navController.currentIndex.value,
           onDestinationSelected: (index) => navController.changeIndex(index),
           destinations: [
             NavigationDestination(
-              icon: const Icon(AppIcons.http),
-              selectedIcon: const Icon(AppIcons.http, color: AppColors.protocolHttp),
-              label: 'tab_api_inspector'.tr,
+              icon: const Icon(AppIcons.vpnSecurity),
+              selectedIcon: const Icon(
+                AppIcons.vpnSecurity,
+                color: AppColors.protocolTcp,
+              ),
+              label: 'tab_system_vpn'.tr,
             ),
             NavigationDestination(
-              icon: const Icon(AppIcons.vpnSecurity),
-              selectedIcon: const Icon(AppIcons.vpnSecurity, color: AppColors.protocolTcp),
-              label: 'tab_system_vpn'.tr,
+              icon: const Icon(AppIcons.http),
+              selectedIcon: const Icon(
+                AppIcons.http,
+                color: AppColors.protocolHttp,
+              ),
+              label: 'tab_api_inspector'.tr,
             ),
           ],
         ),

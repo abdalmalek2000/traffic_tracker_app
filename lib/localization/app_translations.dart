@@ -5,10 +5,10 @@ import 'package:get/get.dart';
 class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
-        'en_US': enUS,
-        'ar_SA': arAR,
-        'ar': arAR,
-      };
+    'en_US': enUS,
+    'ar_SA': arAR,
+    'ar': arAR,
+  };
 
   static const Map<String, String> enUS = {
     // Navigation
@@ -135,6 +135,36 @@ class AppTranslations extends Translations {
     'no_internet_title': 'No Network Connection',
     'no_internet_message':
         'Please connect to Wi-Fi or turn on Mobile Data before starting VPN inspection.',
+
+    // Settings
+    'settings_title': 'Settings',
+    'general_section': 'General Preferences',
+    'about_section': 'Application Info',
+    'language_option': 'Language',
+    'language_subtitle': 'Choose application display language',
+    'theme_option': 'Appearance & Theme',
+    'theme_subtitle': 'Switch between light, dark or system theme',
+    'about_option': 'About App',
+    'about_subtitle': 'Application version, details & info',
+    'select_language': 'Select Language',
+    'select_theme': 'Select Theme Mode',
+    'theme_system': 'System Default',
+    'theme_light': 'Light Mode',
+    'theme_dark': 'Dark Mode',
+    'lang_arabic': 'العربية (Arabic)',
+    'lang_english': 'English (US)',
+    'about_app_title': 'About Traffic Tracker',
+    'app_version': 'Version 1.0.0',
+    'app_description':
+        'A high-performance real-time network and HTTP traffic inspection app, designed by Abdulmalek Moh.',
+    'features_heading': 'Key Capabilities',
+    'feature_in_app_inspection':
+        'In-App HTTP/HTTPS inspection with cURL export & payload viewer',
+    'feature_vpn_capture':
+        'Device-wide packet monitoring with real-time socket detection',
+    'feature_app_filtering': 'Targeted application filtering & isolation',
+    'feature_pcap_export':
+        'Raw PCAP file capture for Wireshark & security analysis',
   };
 
   static const Map<String, String> arAR = {
@@ -157,7 +187,8 @@ class AppTranslations extends Translations {
     'filter_4xx': '4xx خطأ عميل',
     'filter_5xx': '5xx خطأ خادم',
     'no_records_title': 'لا توجد طلبات شبكة بعد',
-    'no_records_desc': 'أي طلب شبكة صادر سيظهر هنا فوراً مع تفاصيل الترويسة والبيانات.',
+    'no_records_desc':
+        'أي طلب شبكة صادر سيظهر هنا فوراً مع تفاصيل الترويسة والبيانات.',
     'test_request_btn': 'إرسال طلب تجريبي',
     'test_requests_title': 'إرسال طلبات تجريبية',
     'test_requests_subtitle': 'اختر طلباً نموذجياً لاختبار الفحص المباشر:',
@@ -188,7 +219,8 @@ class AppTranslations extends Translations {
     'empty_body': 'المحتوى فارغ',
     'copied_to_clipboard': 'تم النسخ إلى الحافظة',
     'copy_curl': 'نسخ أمر cURL بالكامل',
-    'curl_instruction': 'أمر cURL جاهز للتشغيل في الطرفية أو الاستيراد في أدوات مثل Postman:',
+    'curl_instruction':
+        'أمر cURL جاهز للتشغيل في الطرفية أو الاستيراد في أدوات مثل Postman:',
 
     // System VPN Monitor
     'system_vpn_title': 'مراقب شبكة الجهاز',
@@ -204,16 +236,20 @@ class AppTranslations extends Translations {
     'search_vpn_hint': 'ابحث بالنطاق أو IP أو التطبيق أو المنفذ...',
     'mode_target_only': 'تطبيقات محددة فقط',
     'mode_all_traffic': 'حركة مرور كافة التطبيقات',
-    'target_mode_active_banner': 'وضع التحديد نشط: يتم فحص حركة المرور لـ @count تطبيق محدد فقط.',
+    'target_mode_active_banner':
+        'وضع التحديد نشط: يتم فحص حركة المرور لـ @count تطبيق محدد فقط.',
     'live_feed': 'مباشر',
     'download_pcap': 'تحميل PCAP',
     'delete_records': 'حذف السجلات',
     'pcap_export_title': 'ملف التقاط PCAP',
-    'pcap_export_desc': 'يتم تسجيل جميع حزم الشبكة الخام في ملف PCAP قياسي لتحليلها ببرنامج Wireshark:',
+    'pcap_export_desc':
+        'يتم تسجيل جميع حزم الشبكة الخام في ملف PCAP قياسي لتحليلها ببرنامج Wireshark:',
     'copy_file_path': 'نسخ مسار الملف',
     'close': 'إغلاق',
-    'no_connections_active': 'المراقبة نشطة! افتح أي تطبيق في جهازك لتبدأ حزم الشبكة بالظهور مباشرة هنا.',
-    'no_connections_idle': 'اضغط على "بدء فحص ومراقبة شبكة الجهاز" أعلاه للبدء بالتقاط حزم IP و TLS و DNS.',
+    'no_connections_active':
+        'المراقبة نشطة! افتح أي تطبيق في جهازك لتبدأ حزم الشبكة بالظهور مباشرة هنا.',
+    'no_connections_idle':
+        'اضغط على "بدء فحص ومراقبة شبكة الجهاز" أعلاه للبدء بالتقاط حزم IP و TLS و DNS.',
     'no_connections_search': 'لا توجد اتصالات مطابقة لبحثك "@query".',
 
     // App Selection & Filter
@@ -231,8 +267,10 @@ class AppTranslations extends Translations {
     'mode_monitoring_selected': 'الوضع: حصر الالتقاط على @count تطبيق محدد فقط',
     'system_badge': 'نظام',
     'no_apps_found': 'لا توجد تطبيقات مطابقة لبحثك.',
-    'no_selected_apps': 'لم يتم تحديد أي تطبيق بعد.\nانتقل إلى تبويب "الكل" لاختيار التطبيقات المراد فحصها.',
-    'live_sync_notice': 'المراقبة نشطة: تنطبق التغييرات في الاختيار فوراً على تيار الحزم المباشر.',
+    'no_selected_apps':
+        'لم يتم تحديد أي تطبيق بعد.\nانتقل إلى تبويب "الكل" لاختيار التطبيقات المراد فحصها.',
+    'live_sync_notice':
+        'المراقبة نشطة: تنطبق التغييرات في الاختيار فوراً على تيار الحزم المباشر.',
     'loading_apps': 'جاري فحص وتحميل تطبيقات الجهاز المكتشفة...',
 
     // Connection Details
@@ -252,5 +290,35 @@ class AppTranslations extends Translations {
     'no_internet_title': 'لا يوجد اتصال بالشبكة',
     'no_internet_message':
         'يرجى التأكد من الاتصال بشبكة Wi-Fi أو تشغيل بيانات الهاتف قبل تفعيل مراقبة الشبكة.',
+
+    // Settings
+    'settings_title': 'الإعدادات',
+    'general_section': 'التفضيلات العامة',
+    'about_section': 'معلومات التطبيق',
+    'language_option': 'اللغة',
+    'language_subtitle': 'تحديد لغة واجهة التطبيق',
+    'theme_option': 'المظهر والثيم',
+    'theme_subtitle': 'التبديل بين الوضع الفاتح، الداكن، أو حسب النظام',
+    'about_option': 'حول التطبيق',
+    'about_subtitle': 'إصدار التطبيق ومعلومات المطور والمميزات',
+    'select_language': 'اختيار اللغة',
+    'select_theme': 'اختيار المظهر',
+    'theme_system': 'تلقائي (حسب النظام)',
+    'theme_light': 'الوضع الفاتح',
+    'theme_dark': 'الوضع الداكن',
+    'lang_arabic': 'العربية (Arabic)',
+    'lang_english': 'الإنجليزية (English)',
+    'about_app_title': 'حول راصد حركة الشبكة',
+    'app_version': 'الإصدار 1.0.0',
+    'app_description':
+        'تطبيق متقدم وعالي الأداء لمراقبة وفحص حركة مرور الشبكة وحزم البيانات لحظياً، تم تصميمه بواسطة عبدالملك محمد',
+    'features_heading': 'أهم المميزات والقدرات',
+    'feature_in_app_inspection':
+        'فحص طلبات HTTP/HTTPS الصادرة مع تصدير cURL وعارض حمولة البيانات',
+    'feature_vpn_capture':
+        'مراقبة حزم كافة تطبيقات الجهاز مع كشف المقابس الحية',
+    'feature_app_filtering': 'حصر الفحص والالتقاط على تطبيقات محددة بدقة',
+    'feature_pcap_export':
+        'تصدير حزم الشبكة الخام بصيغة PCAP للتحليل عبر Wireshark',
   };
 }

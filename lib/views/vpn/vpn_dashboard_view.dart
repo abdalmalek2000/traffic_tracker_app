@@ -5,6 +5,8 @@ import '../../constants/icons.dart';
 import '../../controllers/vpn_controller.dart';
 import '../../models/captured_connection.dart';
 import '../../constants/colors.dart';
+import '../../constants/spacing.dart';
+import '../settings/settings_view.dart';
 import 'app_filter_view.dart';
 import 'connection_detail_view.dart';
 
@@ -33,7 +35,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
         title: Row(
           children: [
             const Icon(AppIcons.file, color: AppColors.protocolHttp),
-            const SizedBox(width: 8),
+            AppSpacing.horizontalSm,
             Text('pcap_export_title'.tr),
           ],
         ),
@@ -42,12 +44,12 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('pcap_export_desc'.tr, style: const TextStyle(fontSize: 13)),
-            const SizedBox(height: 12),
+            AppSpacing.verticalMd,
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: AppSpacing.paddingAll10,
               decoration: BoxDecoration(
                 color: Colors.grey.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppSpacing.borderRadiusMd,
               ),
               child: SelectableText(
                 pcapPath ?? 'No capture session active',
@@ -60,7 +62,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
           TextButton(onPressed: () => Get.back(), child: Text('close'.tr)),
           if (pcapPath != null)
             FilledButton.icon(
-              icon: const Icon(AppIcons.copy, size: 16),
+              icon: const Icon(AppIcons.copy, size: AppSpacing.iconXs),
               label: Text('copy_file_path'.tr),
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: pcapPath));
@@ -86,29 +88,36 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
         title: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppSpacing.borderRadiusSm,
               child: Image.asset(
                 'assets/images/app_logo.png',
-                width: 26,
-                height: 26,
+                width: AppSpacing.appLogoSize,
+                height: AppSpacing.appLogoSize,
                 fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(width: 8),
-            Expanded(child: Text('system_vpn_title'.tr)),
+            AppSpacing.horizontalSm,
+            Expanded(
+              child: Text(
+                'system_vpn_title'.tr,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
           ],
         ),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(AppIcons.moreVert),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppSpacing.borderRadiusLg,
             ),
             onSelected: (val) {
               if (val == 'pcap') {
                 _showPcapExportDialog(controller.currentPcapPath.value);
               } else if (val == 'clear') {
                 controller.clearConnections();
+              } else if (val == 'settings') {
+                Get.to(() => const SettingsView());
               }
             },
             itemBuilder: (context) => [
@@ -118,10 +127,10 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                   children: [
                     Icon(
                       AppIcons.pcapExport,
-                      size: 20,
+                      size: AppSpacing.iconMd,
                       color: theme.colorScheme.primary,
                     ),
-                    const SizedBox(width: 10),
+                    AppSpacing.horizontal10,
                     Text('download_pcap'.tr),
                   ],
                 ),
@@ -132,11 +141,25 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                   children: [
                     const Icon(
                       AppIcons.delete,
-                      size: 20,
+                      size: AppSpacing.iconMd,
                       color: AppColors.statusServerError,
                     ),
-                    const SizedBox(width: 10),
+                    AppSpacing.horizontal10,
                     Text('delete_records'.tr),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(
+                      AppIcons.settings,
+                      size: AppSpacing.iconMd,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    AppSpacing.horizontal10,
+                    Text('settings_title'.tr),
                   ],
                 ),
               ),
@@ -162,15 +185,22 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                   children: [
                     // Top Dashboard Status & Metric Card
                     Container(
-                      margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.fromLTRB(
+                        AppSpacing.base,
+                        AppSpacing.md,
+                        AppSpacing.base,
+                        AppSpacing.sm,
+                      ),
+                      padding: AppSpacing.paddingCard,
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: AppSpacing.borderRadiusXl,
                         border: Border.all(
                           color: isRunning
                               ? AppColors.statusSuccess.withValues(alpha: 0.6)
-                              : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                              : theme.colorScheme.outlineVariant.withValues(
+                                  alpha: 0.5,
+                                ),
                           width: isRunning ? 1.5 : 1,
                         ),
                       ),
@@ -179,8 +209,8 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                           Row(
                             children: [
                               Container(
-                                width: 12,
-                                height: 12,
+                                width: AppSpacing.md,
+                                height: AppSpacing.md,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: isRunning
@@ -188,11 +218,13 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                                       : Colors.grey,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              AppSpacing.horizontalSm,
                               Expanded(
                                 flex: 3,
                                 child: Text(
-                                  isRunning ? 'vpn_active'.tr : 'vpn_stopped'.tr,
+                                  isRunning
+                                      ? 'vpn_active'.tr
+                                      : 'vpn_stopped'.tr,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: isRunning
@@ -204,18 +236,18 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                               const Spacer(),
                               // Target Apps Pill button
                               InkWell(
-                                onTap: () => Get.to(() => const AppFilterView()),
-                                borderRadius: BorderRadius.circular(20),
+                                onTap: () =>
+                                    Get.to(() => const AppFilterView()),
+                                borderRadius: AppSpacing.borderRadiusXxl,
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
+                                    horizontal: AppSpacing.space10,
+                                    vertical: AppSpacing.xs,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: theme.colorScheme.secondary.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(20),
+                                    color: theme.colorScheme.secondary
+                                        .withValues(alpha: 0.1),
+                                    borderRadius: AppSpacing.borderRadiusXxl,
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -225,7 +257,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                                         size: 14,
                                         color: theme.colorScheme.primary,
                                       ),
-                                      const SizedBox(width: 4),
+                                      AppSpacing.horizontalXs,
                                       Text(
                                         selectedCount == 0
                                             ? 'all_apps'.tr
@@ -244,7 +276,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 14),
+                          AppSpacing.vertical14,
 
                           // Metrics Row
                           Row(
@@ -270,12 +302,12 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 14),
+                          AppSpacing.vertical14,
 
                           // Big Toggle Button
                           SizedBox(
                             width: double.infinity,
-                            height: 46,
+                            height: AppSpacing.buttonHeight,
                             child: FilledButton.icon(
                               style: FilledButton.styleFrom(
                                 backgroundColor: isRunning
@@ -283,11 +315,13 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                                     : theme.colorScheme.primary,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: AppSpacing.borderRadiusLg,
                                 ),
                               ),
                               onPressed: () => controller.toggleVpn(),
-                              icon: Icon(isRunning ? AppIcons.stop : AppIcons.play),
+                              icon: Icon(
+                                isRunning ? AppIcons.stop : AppIcons.play,
+                              ),
                               label: Text(
                                 isRunning
                                     ? 'stop_inspection'.tr
@@ -306,26 +340,33 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                     // Target Mode Active Notice Banner (if apps are selected)
                     if (selectedCount > 0)
                       Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.base,
+                          vertical: AppSpacing.xs,
+                        ),
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
+                          horizontal: AppSpacing.space14,
+                          vertical: AppSpacing.sm,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.statusSuccess.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.statusSuccess.withValues(
+                            alpha: 0.12,
+                          ),
+                          borderRadius: AppSpacing.borderRadiusBase,
                           border: Border.all(
-                            color: AppColors.statusSuccess.withValues(alpha: 0.4),
+                            color: AppColors.statusSuccess.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
                         ),
                         child: Row(
                           children: [
                             const Icon(
                               AppIcons.filterActive,
-                              size: 18,
+                              size: AppSpacing.iconSm,
                               color: AppColors.statusSuccess,
                             ),
-                            const SizedBox(width: 8),
+                            AppSpacing.horizontalSm,
                             Expanded(
                               child: Text(
                                 'target_mode_active_banner'.trParams({
@@ -356,15 +397,18 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
 
                     // Search Bar in Dashboard
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.base,
+                        vertical: AppSpacing.xs,
+                      ),
                       child: TextField(
                         controller: _searchController,
                         decoration: InputDecoration(
                           hintText: 'search_vpn_hint'.tr,
-                          prefixIcon: const Icon(AppIcons.search, size: 20),
+                          prefixIcon: const Icon(AppIcons.search, size: AppSpacing.iconMd),
                           suffixIcon: _searchController.text.isNotEmpty
                               ? IconButton(
-                                  icon: const Icon(AppIcons.clear, size: 18),
+                                  icon: const Icon(AppIcons.clear, size: AppSpacing.iconSm),
                                   onPressed: () {
                                     _searchController.clear();
                                     controller.setSearchQuery('');
@@ -374,13 +418,13 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                               : null,
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.sm,
                           ),
                           filled: true,
                           fillColor: theme.colorScheme.surface,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: AppSpacing.borderRadiusBase,
                             borderSide: BorderSide(
                               color: theme.colorScheme.outlineVariant,
                             ),
@@ -395,7 +439,10 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
 
                     // Filter toggles & Header
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 4,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -413,31 +460,36 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color: controller.filterBySelectedAppsOnly.value
+                                  color:
+                                      controller.filterBySelectedAppsOnly.value
                                       ? Colors.white
                                       : null,
                                 ),
                               ),
-                              selected: controller.filterBySelectedAppsOnly.value,
+                              selected:
+                                  controller.filterBySelectedAppsOnly.value,
                               selectedColor: AppColors.statusSuccess,
                               checkmarkColor: Colors.white,
                               onSelected: (val) =>
                                   controller.setFilterBySelectedAppsOnly(val),
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
                             ),
                           if (isRunning)
                             Row(
                               children: [
                                 Container(
-                                  width: 8,
-                                  height: 8,
+                                  width: AppSpacing.sm,
+                                  height: AppSpacing.sm,
                                   decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: AppColors.statusSuccess,
                                   ),
                                 ),
-                                const SizedBox(width: 4),
+                                AppSpacing.horizontalXs,
                                 Text(
                                   'live_feed'.tr,
                                   style: const TextStyle(
@@ -461,7 +513,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                   hasScrollBody: false,
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(24.0),
+                      padding: AppSpacing.paddingAllXl,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -472,14 +524,14 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                               alpha: 0.3,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          AppSpacing.verticalMd,
                           Text(
                             isRunning
                                 ? (_searchController.text.isNotEmpty
-                                    ? 'no_connections_search'.trParams({
-                                        'query': _searchController.text,
-                                      })
-                                    : 'no_connections_active'.tr)
+                                      ? 'no_connections_search'.trParams({
+                                          'query': _searchController.text,
+                                        })
+                                      : 'no_connections_active'.tr)
                                 : 'no_connections_idle'.tr,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
@@ -511,8 +563,8 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
           ),
         );
       }),
-  );
-}
+    );
+  }
 
   Widget _buildMetric(
     BuildContext context, {
@@ -522,8 +574,8 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
   }) {
     return Column(
       children: [
-        Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(height: 4),
+        Icon(icon, size: AppSpacing.iconMd, color: Theme.of(context).colorScheme.primary),
+        AppSpacing.verticalXs,
         Text(
           value,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5),
@@ -545,15 +597,21 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
         ConnectionDetailView.show(item);
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.base,
+          vertical: AppSpacing.space10,
+        ),
         child: Row(
           children: [
             // Theme-independent vibrant Protocol Badge
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 7,
+                vertical: AppSpacing.xs,
+              ),
               decoration: BoxDecoration(
                 color: protocolColor,
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppSpacing.borderRadiusSm,
               ),
               child: Text(
                 item.protocol,
@@ -564,7 +622,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            AppSpacing.horizontalMd,
 
             // App Name Badge, Primary Host, and Intuitive Subtitle
             Expanded(
@@ -579,12 +637,12 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                             horizontal: 5,
                             vertical: 1.5,
                           ),
-                          margin: const EdgeInsets.only(right: 6),
+                          margin: const EdgeInsets.only(right: AppSpacing.space6),
                           decoration: BoxDecoration(
                             color: AppColors.protocolHttp.withValues(
                               alpha: 0.15,
                             ),
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: AppSpacing.borderRadiusXs,
                           ),
                           child: Text(
                             item.appName!,
@@ -608,7 +666,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 3),
+                  AppSpacing.verticalXxs,
                   // Clear, intuitive destination & service subtitle
                   Text(
                     item.readableSubtitle,
@@ -620,7 +678,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            AppSpacing.horizontalSm,
 
             // Packet size & formatted time
             Column(
@@ -639,8 +697,8 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 ),
               ],
             ),
-            const SizedBox(width: 4),
-            const Icon(AppIcons.chevronRight, size: 18, color: Colors.grey),
+            AppSpacing.horizontalXs,
+            const Icon(AppIcons.chevronRight, size: AppSpacing.iconSm, color: Colors.grey),
           ],
         ),
       ),

@@ -26,6 +26,14 @@ class AppIcons {
   static const IconData sync = HugeIcons.strokeRoundedReload;
   static const IconData moreVert = HugeIcons.strokeRoundedMoreVerticalCircle01;
   static const IconData chevronRight = HugeIcons.strokeRoundedArrowRight01;
+  static const IconData chevronLeft = HugeIcons.strokeRoundedArrowLeft01;
+  static const IconData settings = HugeIcons.strokeRoundedSettings02;
+  static const IconData language = HugeIcons.strokeRoundedTranslate;
+  static const IconData theme = HugeIcons.strokeRoundedPaintBoard;
+  static const IconData sun = HugeIcons.strokeRoundedSun01;
+  static const IconData moon = HugeIcons.strokeRoundedMoon02;
+  static const IconData checkCircle = HugeIcons.strokeRoundedCheckmarkCircle02;
+  static const IconData info = HugeIcons.strokeRoundedInformationCircle;
 
   // Search & Filters
   static const IconData search = HugeIcons.strokeRoundedSearch01;

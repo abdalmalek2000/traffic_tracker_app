@@ -5,6 +5,8 @@ import '../../controllers/traffic_controller.dart';
 import '../../models/traffic_record.dart';
 import '../../services/test_request_service.dart';
 import '../../constants/colors.dart';
+import '../../constants/spacing.dart';
+import '../settings/settings_view.dart';
 import 'traffic_detail_view.dart';
 
 /// In-App HTTP/HTTPS Traffic Inspector View
@@ -42,10 +44,12 @@ class _TrafficListViewState extends State<TrafficListView> {
   void _showTestRequestsBottomSheet() {
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.all(20),
+        padding: AppSpacing.paddingBottomSheet,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(
+            top: AppSpacing.radiusCircularXxl,
+          ),
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -57,7 +61,10 @@ class _TrafficListViewState extends State<TrafficListView> {
                 children: [
                   Text(
                     'test_requests_title'.tr,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(AppIcons.close),
@@ -65,18 +72,21 @@ class _TrafficListViewState extends State<TrafficListView> {
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
+              AppSpacing.vertical6,
               Text(
                 'test_requests_subtitle'.tr,
                 style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
-              const SizedBox(height: 16),
+              AppSpacing.verticalBase,
               ListTile(
-                leading: _buildMethodBadge('GET', AppColors.getProtocolColor('HTTP')),
+                leading: _buildMethodBadge(
+                  'GET',
+                  AppColors.getProtocolColor('HTTP'),
+                ),
                 title: const Text('GET Request (200 OK)'),
                 subtitle: const Text('jsonplaceholder.typicode.com/posts/1'),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: AppSpacing.borderRadiusBase,
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
                 onTap: () {
@@ -84,13 +94,13 @@ class _TrafficListViewState extends State<TrafficListView> {
                   _triggerSampleRequest(_testService.sendSampleGet);
                 },
               ),
-              const SizedBox(height: 8),
+              AppSpacing.verticalSm,
               ListTile(
                 leading: _buildMethodBadge('POST', AppColors.statusSuccess),
                 title: const Text('POST Request with JSON (201 Created)'),
                 subtitle: const Text('Includes payload & auth bearer header'),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: AppSpacing.borderRadiusBase,
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
                 onTap: () {
@@ -98,13 +108,16 @@ class _TrafficListViewState extends State<TrafficListView> {
                   _triggerSampleRequest(_testService.sendSamplePost);
                 },
               ),
-              const SizedBox(height: 8),
+              AppSpacing.verticalSm,
               ListTile(
-                leading: _buildMethodBadge('GET', AppColors.getProtocolColor('HTTP')),
+                leading: _buildMethodBadge(
+                  'GET',
+                  AppColors.getProtocolColor('HTTP'),
+                ),
                 title: const Text('Client Error (404 Not Found)'),
                 subtitle: const Text('Test non-existent API route handling'),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: AppSpacing.borderRadiusBase,
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
                 onTap: () {
@@ -112,13 +125,16 @@ class _TrafficListViewState extends State<TrafficListView> {
                   _triggerSampleRequest(_testService.sendSampleClientError);
                 },
               ),
-              const SizedBox(height: 8),
+              AppSpacing.verticalSm,
               ListTile(
-                leading: _buildMethodBadge('GET', AppColors.getProtocolColor('HTTP')),
+                leading: _buildMethodBadge(
+                  'GET',
+                  AppColors.getProtocolColor('HTTP'),
+                ),
                 title: const Text('Server Error (500 Error)'),
                 subtitle: const Text('Test internal server crash simulation'),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: AppSpacing.borderRadiusBase,
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
                 onTap: () {
@@ -126,7 +142,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                   _triggerSampleRequest(_testService.sendSampleServerError);
                 },
               ),
-              const SizedBox(height: 12),
+              AppSpacing.verticalMd,
               OutlinedButton.icon(
                 icon: const Icon(AppIcons.edit),
                 label: Text('send_custom_request'.tr),
@@ -144,8 +160,9 @@ class _TrafficListViewState extends State<TrafficListView> {
   }
 
   void _showCustomRequestDialog() {
-    final urlController =
-        TextEditingController(text: 'https://jsonplaceholder.typicode.com/todos/1');
+    final urlController = TextEditingController(
+      text: 'https://jsonplaceholder.typicode.com/todos/1',
+    );
     String selectedMethod = 'GET';
     final bodyController = TextEditingController();
 
@@ -165,16 +182,18 @@ class _TrafficListViewState extends State<TrafficListView> {
                         .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                         .toList(),
                     onChanged: (val) {
-                      if (val != null) setDialogState(() => selectedMethod = val);
+                      if (val != null) {
+                        setDialogState(() => selectedMethod = val);
+                      }
                     },
                   ),
-                  const SizedBox(height: 10),
+                  AppSpacing.vertical10,
                   TextField(
                     controller: urlController,
                     decoration: InputDecoration(labelText: 'url_label'.tr),
                   ),
                   if (selectedMethod != 'GET') ...[
-                    const SizedBox(height: 10),
+                    AppSpacing.vertical10,
                     TextField(
                       controller: bodyController,
                       maxLines: 4,
@@ -188,22 +207,21 @@ class _TrafficListViewState extends State<TrafficListView> {
               ),
             ),
             actions: [
-              TextButton(
-                onPressed: () => Get.back(),
-                child: Text('cancel'.tr),
-              ),
+              TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
               FilledButton(
                 onPressed: () {
                   final url = urlController.text.trim();
                   if (url.isNotEmpty) {
                     Get.back();
-                    _triggerSampleRequest(() => _testService.sendCustomRequest(
-                          url: url,
-                          method: selectedMethod,
-                          body: bodyController.text.isNotEmpty
-                              ? bodyController.text
-                              : null,
-                        ));
+                    _triggerSampleRequest(
+                      () => _testService.sendCustomRequest(
+                        url: url,
+                        method: selectedMethod,
+                        body: bodyController.text.isNotEmpty
+                            ? bodyController.text
+                            : null,
+                      ),
+                    );
                   }
                 },
                 child: Text('send_and_inspect'.tr),
@@ -224,27 +242,32 @@ class _TrafficListViewState extends State<TrafficListView> {
         title: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppSpacing.borderRadiusSm,
               child: Image.asset(
                 'assets/images/app_logo.png',
-                width: 26,
-                height: 26,
+                width: AppSpacing.appLogoSize,
+                height: AppSpacing.appLogoSize,
                 fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(width: 8),
-            Text('network_inspector'.tr,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            AppSpacing.horizontalSm,
+            Expanded(
+              flex: 12,
+              child: Text(
+                'network_inspector'.tr,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
             const Spacer(),
             Obx(() {
               final isRec = controller.isRecording.value;
               return Tooltip(
-                message: isRec ? 'monitoring_active'.tr : 'monitoring_paused'.tr,
+                message: isRec
+                    ? 'monitoring_active'.tr
+                    : 'monitoring_paused'.tr,
                 child: IconButton(
                   icon: Icon(
-                    isRec
-                        ? AppIcons.pause
-                        : AppIcons.play,
+                    isRec ? AppIcons.pause : AppIcons.play,
                     color: isRec ? AppColors.statusSuccess : Colors.grey,
                     size: 26,
                   ),
@@ -252,17 +275,53 @@ class _TrafficListViewState extends State<TrafficListView> {
                 ),
               );
             }),
-            IconButton(
-              icon: const Icon(AppIcons.clearAll),
-              tooltip: 'clear_records'.tr,
-              onPressed: () {
-                controller.clearRecords();
-                Get.rawSnackbar(
-                  message: 'records_cleared'.tr,
-                  duration: const Duration(seconds: 1),
-                  snackPosition: SnackPosition.BOTTOM,
-                );
+            PopupMenuButton<String>(
+              icon: const Icon(AppIcons.moreVert),
+              shape: RoundedRectangleBorder(
+                borderRadius: AppSpacing.borderRadiusLg,
+              ),
+              onSelected: (val) {
+                if (val == 'clear') {
+                  controller.clearRecords();
+                  Get.rawSnackbar(
+                    message: 'records_cleared'.tr,
+                    duration: const Duration(seconds: 1),
+                    snackPosition: SnackPosition.BOTTOM,
+                  );
+                } else if (val == 'settings') {
+                  Get.to(() => const SettingsView());
+                }
               },
+              itemBuilder: (context) => [
+                PopupMenuItem<String>(
+                  value: 'clear',
+                  child: Row(
+                    children: [
+                      const Icon(
+                        AppIcons.delete,
+                        size: AppSpacing.iconMd,
+                        color: AppColors.statusServerError,
+                      ),
+                      AppSpacing.horizontal10,
+                      Text('clear_records'.tr),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'settings',
+                  child: Row(
+                    children: [
+                      Icon(
+                        AppIcons.settings,
+                        size: AppSpacing.iconMd,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                      AppSpacing.horizontal10,
+                      Text('settings_title'.tr),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -273,7 +332,10 @@ class _TrafficListViewState extends State<TrafficListView> {
             ? const SizedBox(
                 width: 18,
                 height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               )
             : const Icon(AppIcons.send),
         label: Text(_isSendingTest ? 'Sending...' : 'test_request_btn'.tr),
@@ -285,47 +347,59 @@ class _TrafficListViewState extends State<TrafficListView> {
           children: [
             // Search & Filter Bar
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: AppSpacing.paddingVSm,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
                 border: Border(
                   bottom: BorderSide(
-                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4)),
+                    color: theme.colorScheme.outlineVariant.withValues(
+                      alpha: 0.4,
+                    ),
+                  ),
                 ),
               ),
               child: Column(
                 children: [
-                  TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'search_hint_http'.tr,
-                      prefixIcon: const Icon(AppIcons.search, size: 20),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(AppIcons.clear, size: 18),
-                              onPressed: () {
-                                _searchController.clear();
-                                controller.setSearchQuery('');
-                                setState(() {});
-                              },
-                            )
-                          : null,
-                      isDense: true,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      filled: true,
-                      fillColor: theme.colorScheme.surface,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
+                  Padding(
+                    padding: AppSpacing.paddingHMd,
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'search_hint_http'.tr,
+                        prefixIcon: const Icon(AppIcons.search, size: AppSpacing.iconMd),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(AppIcons.clear, size: AppSpacing.iconSm),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  controller.setSearchQuery('');
+                                  setState(() {});
+                                },
+                              )
+                            : null,
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.space10,
+                        ),
+                        filled: true,
+                        fillColor: theme.colorScheme.surface,
+                        border: OutlineInputBorder(
+                          borderRadius: AppSpacing.borderRadiusBase,
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.outlineVariant,
+                          ),
+                        ),
                       ),
+                      onChanged: (val) {
+                        controller.setSearchQuery(val);
+                        setState(() {});
+                      },
                     ),
-                    onChanged: (val) {
-                      controller.setSearchQuery(val);
-                      setState(() {});
-                    },
                   ),
-                  const SizedBox(height: 8),
+                  AppSpacing.verticalSm,
                   _buildFilterChips(),
                 ],
               ),
@@ -344,8 +418,9 @@ class _TrafficListViewState extends State<TrafficListView> {
                         keyboardDismissBehavior:
                             ScrollViewKeyboardDismissBehavior.onDrag,
                         child: ConstrainedBox(
-                          constraints:
-                              BoxConstraints(minHeight: constraints.maxHeight),
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
                           child: IntrinsicHeight(
                             child: Padding(
                               padding: const EdgeInsets.all(28.0),
@@ -355,24 +430,28 @@ class _TrafficListViewState extends State<TrafficListView> {
                                   Icon(
                                     AppIcons.networkCheck,
                                     size: 64,
-                                    color: theme.colorScheme.primary
-                                        .withValues(alpha: 0.4),
+                                    color: theme.colorScheme.primary.withValues(
+                                      alpha: 0.4,
+                                    ),
                                   ),
-                                  const SizedBox(height: 16),
+                                  AppSpacing.verticalBase,
                                   Text(
                                     'no_records_title'.tr,
                                     style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                  const SizedBox(height: 8),
+                                  AppSpacing.verticalSm,
                                   Text(
                                     'no_records_desc'.tr,
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
-                                        fontSize: 13, color: Colors.grey),
+                                      fontSize: 13,
+                                      color: Colors.grey,
+                                    ),
                                   ),
-                                  const SizedBox(height: 20),
+                                  AppSpacing.verticalLg,
                                   FilledButton.tonalIcon(
                                     onPressed: _showTestRequestsBottomSheet,
                                     icon: const Icon(AppIcons.start),
@@ -395,7 +474,9 @@ class _TrafficListViewState extends State<TrafficListView> {
                   separatorBuilder: (_, _) => Divider(
                     height: 1,
                     thickness: 0.5,
-                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                    color: theme.colorScheme.outlineVariant.withValues(
+                      alpha: 0.4,
+                    ),
                   ),
                   itemBuilder: (context, index) {
                     final item = records[index];
@@ -419,39 +500,45 @@ class _TrafficListViewState extends State<TrafficListView> {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
+            AppSpacing.horizontalMd,
             _buildChip(
               label: '${'filter_all'.tr} ($total)',
               isSelected: active == TrafficFilter.all,
               onSelected: () => controller.setActiveFilter(TrafficFilter.all),
             ),
-            const SizedBox(width: 6),
+            AppSpacing.horizontal6,
             _buildChip(
               label: 'filter_2xx'.tr,
               color: AppColors.statusSuccess,
               isSelected: active == TrafficFilter.success,
-              onSelected: () => controller.setActiveFilter(TrafficFilter.success),
+              onSelected: () =>
+                  controller.setActiveFilter(TrafficFilter.success),
             ),
-            const SizedBox(width: 6),
+            AppSpacing.horizontal6,
             _buildChip(
               label: 'filter_3xx'.tr,
               color: AppColors.statusRedirect,
               isSelected: active == TrafficFilter.redirect,
-              onSelected: () => controller.setActiveFilter(TrafficFilter.redirect),
+              onSelected: () =>
+                  controller.setActiveFilter(TrafficFilter.redirect),
             ),
-            const SizedBox(width: 6),
+            AppSpacing.horizontal6,
             _buildChip(
               label: 'filter_4xx'.tr,
               color: AppColors.statusClientError,
               isSelected: active == TrafficFilter.clientError,
-              onSelected: () => controller.setActiveFilter(TrafficFilter.clientError),
+              onSelected: () =>
+                  controller.setActiveFilter(TrafficFilter.clientError),
             ),
-            const SizedBox(width: 6),
+            AppSpacing.horizontal6,
             _buildChip(
               label: 'filter_5xx'.tr,
               color: AppColors.statusServerError,
               isSelected: active == TrafficFilter.serverError,
-              onSelected: () => controller.setActiveFilter(TrafficFilter.serverError),
+              onSelected: () =>
+                  controller.setActiveFilter(TrafficFilter.serverError),
             ),
+            AppSpacing.horizontalMd,
           ],
         ),
       );
@@ -478,13 +565,16 @@ class _TrafficListViewState extends State<TrafficListView> {
       backgroundColor: Colors.transparent,
       selectedColor: color ?? Theme.of(context).colorScheme.primary,
       checkmarkColor: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: AppSpacing.paddingHXs,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 
   Widget _buildTrafficItemTile(BuildContext context, TrafficRecord item) {
-    final statusColor = AppColors.getStatusCategoryColor(item.statusCode, isPending: item.isPending);
+    final statusColor = AppColors.getStatusCategoryColor(
+      item.statusCode,
+      isPending: item.isPending,
+    );
     final methodColor = TrafficDetailView.getMethodColor(item.method);
 
     return InkWell(
@@ -492,26 +582,33 @@ class _TrafficListViewState extends State<TrafficListView> {
         Get.to(() => TrafficDetailView(record: item));
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space14,
+          vertical: AppSpacing.md,
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: AppSpacing.minTouchTarget,
+              height: AppSpacing.minTouchTarget,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: statusColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: AppSpacing.borderRadiusBase,
                 border: Border.all(
-                    color: statusColor.withValues(alpha: 0.6), width: 1.2),
+                  color: statusColor.withValues(alpha: 0.6),
+                  width: 1.2,
+                ),
               ),
               child: item.isPending
                   ? SizedBox(
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: statusColor),
+                        strokeWidth: 2,
+                        color: statusColor,
+                      ),
                     )
                   : Text(
                       item.statusCode?.toString() ?? 'ERR',
@@ -522,7 +619,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                       ),
                     ),
             ),
-            const SizedBox(width: 12),
+            AppSpacing.horizontalMd,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -530,18 +627,20 @@ class _TrafficListViewState extends State<TrafficListView> {
                   Row(
                     children: [
                       _buildMethodBadge(item.method, methodColor),
-                      const SizedBox(width: 8),
+                      AppSpacing.horizontalSm,
                       Expanded(
                         child: Text(
                           item.path,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 13.5),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13.5,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 3),
+                  AppSpacing.verticalXxs,
                   Text(
                     item.host,
                     overflow: TextOverflow.ellipsis,
@@ -550,7 +649,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            AppSpacing.horizontalSm,
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -561,18 +660,15 @@ class _TrafficListViewState extends State<TrafficListView> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 2),
+                AppSpacing.verticalXxs,
                 Text(
                   item.formattedResponseSize,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey.shade500,
-                  ),
+                  style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
                 ),
               ],
             ),
-            const SizedBox(width: 4),
-            const Icon(AppIcons.chevronRight, size: 18, color: Colors.grey),
+            AppSpacing.horizontalXs,
+            const Icon(AppIcons.chevronRight, size: AppSpacing.iconSm, color: Colors.grey),
           ],
         ),
       ),
@@ -581,10 +677,13 @@ class _TrafficListViewState extends State<TrafficListView> {
 
   Widget _buildMethodBadge(String method, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space6,
+        vertical: AppSpacing.xxs,
+      ),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: AppSpacing.borderRadiusXs,
       ),
       child: Text(
         method.toUpperCase(),

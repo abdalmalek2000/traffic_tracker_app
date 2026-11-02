@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
+import '../constants/spacing.dart';
 
 /// App theme configurations for Light and Dark modes.
 class AppTheme {
@@ -39,7 +40,7 @@ class AppTheme {
         color: AppColors.lightSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppSpacing.borderRadiusLg,
           side: const BorderSide(color: AppColors.lightBorder),
         ),
       ),
@@ -80,7 +81,7 @@ class AppTheme {
         color: AppColors.darkSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppSpacing.borderRadiusLg,
           side: const BorderSide(color: AppColors.darkBorder),
         ),
       ),
