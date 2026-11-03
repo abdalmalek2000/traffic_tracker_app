@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../constants/api_endpoints.dart';
 import 'traffic_client.dart';
 
@@ -72,10 +73,14 @@ class TestRequestService {
   /// Redirect Request (302 Found)
   Future<void> sendSampleRedirect() async {
     try {
-      await _client.get(
+      final request = http.Request(
+        'GET',
         Uri.parse(ApiEndpoints.httpbinRedirect302),
-        headers: {'Accept': 'application/json'},
       );
+      // Disable auto-following redirects so the 302 Found response itself is captured
+      request.followRedirects = false;
+      request.headers['Accept'] = 'application/json';
+      await _client.send(request);
     } catch (_) {}
   }
 
@@ -105,28 +110,18 @@ class TestRequestService {
     required String method,
     Map<String, String>? headers,
     String? body,
+    bool followRedirects = true,
   }) async {
     final uri = Uri.parse(url);
     final reqHeaders = headers ?? {};
 
-    switch (method.toUpperCase()) {
-      case 'GET':
-        await _client.get(uri, headers: reqHeaders);
-        break;
-      case 'POST':
-        await _client.post(uri, headers: reqHeaders, body: body);
-        break;
-      case 'PUT':
-        await _client.put(uri, headers: reqHeaders, body: body);
-        break;
-      case 'DELETE':
-        await _client.delete(uri, headers: reqHeaders, body: body);
-        break;
-      case 'PATCH':
-        await _client.patch(uri, headers: reqHeaders, body: body);
-        break;
-      default:
-        await _client.get(uri, headers: reqHeaders);
+    final request = http.Request(method.toUpperCase(), uri);
+    request.followRedirects = followRedirects;
+    request.headers.addAll(reqHeaders);
+    if (body != null && body.isNotEmpty) {
+      request.body = body;
     }
+
+    await _client.send(request);
   }
 }

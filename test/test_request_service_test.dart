@@ -37,6 +37,11 @@ void main() {
         url: 'https://httpbin.org/get',
         method: 'GET',
       );
+      await service.sendCustomRequest(
+        url: 'https://httpbin.org/status/302',
+        method: 'GET',
+        followRedirects: false,
+      );
     });
   });
 }

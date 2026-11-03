@@ -204,6 +204,7 @@ class _TrafficListViewState extends State<TrafficListView> {
 
   void _showCustomRequestDialog() {
     String selectedMethod = 'GET';
+    bool followRedirects = true;
     final urlController = TextEditingController(
       text: ApiEndpoints.httpbinGet,
     );
@@ -252,6 +253,24 @@ class _TrafficListViewState extends State<TrafficListView> {
                       ),
                     ),
                   ],
+                  AppSpacing.verticalSm,
+                  CheckboxListTile(
+                    value: followRedirects,
+                    title: Text(
+                      'follow_redirects'.tr,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      'follow_redirects_desc'.tr,
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    onChanged: (val) {
+                      setDialogState(() => followRedirects = val ?? true);
+                    },
+                  ),
                 ],
               ),
             ),
@@ -269,6 +288,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                         body: bodyController.text.isNotEmpty
                             ? bodyController.text
                             : null,
+                        followRedirects: followRedirects,
                       ),
                     );
                   }

@@ -47,6 +47,8 @@ class AppTranslations extends Translations {
     'url_label': 'URL',
     'method_label': 'Method',
     'body_label': 'Request Body (JSON / Text)',
+    'follow_redirects': 'Follow Redirects',
+    'follow_redirects_desc': 'Disable to inspect 3xx redirect status code directly',
     'cancel': 'Cancel',
     'send_and_inspect': 'Send & Inspect',
 
@@ -210,6 +212,8 @@ class AppTranslations extends Translations {
     'url_label': 'الرابط (URL)',
     'method_label': 'نوع الطلب',
     'body_label': 'محتوى الطلب (JSON / نص)',
+    'follow_redirects': 'متابعة إعادة التوجيه تلقائياً',
+    'follow_redirects_desc': 'عطّل الخيار لفحص رمز استجابة التحويل 3xx مباشرة',
     'cancel': 'إلغاء',
     'send_and_inspect': 'إرسال وفحص',
 
