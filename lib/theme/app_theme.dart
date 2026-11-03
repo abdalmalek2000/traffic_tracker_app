@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_palettes.dart';
 import '../constants/colors.dart';
 import '../constants/spacing.dart';
+import '../constants/typography.dart';
 
 /// App theme configurations for Light and Dark modes.
 /// Supports both Android 12+ Material You Dynamic Color schemes
@@ -14,6 +15,7 @@ class AppTheme {
     Color? dynamicSeedColor,
     ColorScheme? dynamicScheme,
     AppColorPalette palette = AppPalettes.forestGreen,
+    String fontFamily = AppTypography.primaryFont,
   }) {
     final ColorScheme baseScheme = dynamicScheme ??
         ColorScheme.fromSeed(
@@ -37,11 +39,12 @@ class AppTheme {
       brightness: Brightness.light,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.lightBackground,
-      textTheme: const TextTheme(
-        bodyLarge: TextStyle(color: AppColors.lightTextPrimary),
-        bodyMedium: TextStyle(color: AppColors.lightTextPrimary),
-        bodySmall: TextStyle(color: AppColors.lightTextSecondary),
-        labelSmall: TextStyle(color: AppColors.lightTextMuted),
+      fontFamily: fontFamily,
+      textTheme: AppTypography.buildTextTheme(
+        primaryColor: AppColors.lightTextPrimary,
+        secondaryColor: AppColors.lightTextSecondary,
+        mutedColor: AppColors.lightTextMuted,
+        fontFamily: fontFamily,
       ),
       appBarTheme: AppBarTheme(
         elevation: 0,
@@ -75,6 +78,7 @@ class AppTheme {
     Color? dynamicSeedColor,
     ColorScheme? dynamicScheme,
     AppColorPalette palette = AppPalettes.forestGreen,
+    String fontFamily = AppTypography.primaryFont,
   }) {
     final ColorScheme baseScheme = dynamicScheme ??
         ColorScheme.fromSeed(
@@ -97,11 +101,12 @@ class AppTheme {
       brightness: Brightness.dark,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.darkBackground,
-      textTheme: const TextTheme(
-        bodyLarge: TextStyle(color: AppColors.darkTextPrimary),
-        bodyMedium: TextStyle(color: AppColors.darkTextPrimary),
-        bodySmall: TextStyle(color: AppColors.darkTextSecondary),
-        labelSmall: TextStyle(color: AppColors.darkTextMuted),
+      fontFamily: fontFamily,
+      textTheme: AppTypography.buildTextTheme(
+        primaryColor: AppColors.darkTextPrimary,
+        secondaryColor: AppColors.darkTextSecondary,
+        mutedColor: AppColors.darkTextMuted,
+        fontFamily: fontFamily,
       ),
       appBarTheme: AppBarTheme(
         elevation: 0,

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:traffic_tracker_app/constants/app_palettes.dart';
+import 'package:traffic_tracker_app/constants/colors.dart';
 import 'package:traffic_tracker_app/constants/icons.dart';
+import 'package:traffic_tracker_app/constants/typography.dart';
 import 'package:traffic_tracker_app/controllers/settings_controller.dart';
 import 'package:traffic_tracker_app/localization/app_translations.dart';
 import 'package:traffic_tracker_app/views/settings/settings_view.dart';
@@ -63,6 +65,20 @@ void main() {
 
       final unknown = AppPalettes.findById('non_existent');
       expect(unknown.id, AppPalettes.defaultPaletteId);
+    });
+
+    test('AppTypography resolves fonts correctly', () {
+      expect(AppTypography.primaryFont, 'ReadexPro');
+      expect(AppTypography.resolveFontFamily(isArabic: true), 'ReadexPro');
+      expect(AppTypography.resolveFontFamily(isArabic: false), 'ReadexPro');
+
+      final textTheme = AppTypography.buildTextTheme(
+        primaryColor: AppColors.lightTextPrimary,
+        secondaryColor: AppColors.lightTextSecondary,
+        mutedColor: AppColors.lightTextMuted,
+      );
+      expect(textTheme.bodyLarge?.fontFamily, 'ReadexPro');
+      expect(textTheme.bodySmall?.color, AppColors.lightTextSecondary);
     });
   });
 

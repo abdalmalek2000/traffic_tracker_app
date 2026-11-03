@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'constants/typography.dart';
 import 'controllers/navigation_controller.dart';
 import 'controllers/settings_controller.dart';
 import 'controllers/traffic_controller.dart';
@@ -32,6 +33,9 @@ class TrafficTrackerApp extends StatelessWidget {
       final dynamicColor =
           isDynamic ? settingsController.systemAccentColor.value : null;
       final palette = settingsController.activePalette;
+      final fontFamily = AppTypography.resolveFontFamily(
+        isArabic: settingsController.isArabic,
+      );
 
       return GetMaterialApp(
         title: 'Traffic Tracker',
@@ -40,10 +44,12 @@ class TrafficTrackerApp extends StatelessWidget {
         theme: AppTheme.buildLightTheme(
           dynamicSeedColor: dynamicColor,
           palette: palette,
+          fontFamily: fontFamily,
         ),
         darkTheme: AppTheme.buildDarkTheme(
           dynamicSeedColor: dynamicColor,
           palette: palette,
+          fontFamily: fontFamily,
         ),
         translations: AppTranslations(),
         locale: const Locale('en', 'US'),
