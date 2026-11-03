@@ -76,7 +76,7 @@ class _TrafficListViewState extends State<TrafficListView> {
               AppSpacing.vertical6,
               Text(
                 'test_requests_subtitle'.tr,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context)),
               ),
               AppSpacing.verticalBase,
               ListTile(
@@ -262,7 +262,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                     ),
                     subtitle: Text(
                       'follow_redirects_desc'.tr,
-                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                      style: TextStyle(fontSize: 11, color: AppColors.textSecondary(context)),
                     ),
                     contentPadding: EdgeInsets.zero,
                     dense: true,
@@ -407,7 +407,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                 ),
               )
             : const Icon(AppIcons.send),
-        label: Text(_isSendingTest ? 'Sending...' : 'test_request_btn'.tr),
+        label: Text(_isSendingTest ? 'sending'.tr : 'test_request_btn'.tr),
       ),
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -515,9 +515,9 @@ class _TrafficListViewState extends State<TrafficListView> {
                                   Text(
                                     'no_records_desc'.tr,
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
-                                      color: Colors.grey,
+                                      color: AppColors.textSecondary(context),
                                     ),
                                   ),
                                   AppSpacing.verticalLg,
@@ -713,7 +713,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                   Text(
                     item.host,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context)),
                   ),
                 ],
               ),
@@ -732,12 +732,12 @@ class _TrafficListViewState extends State<TrafficListView> {
                 AppSpacing.verticalXxs,
                 Text(
                   item.formattedResponseSize,
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                  style: TextStyle(fontSize: 11, color: AppColors.textMuted(context)),
                 ),
               ],
             ),
             AppSpacing.horizontalXs,
-            const Icon(AppIcons.chevronRight, size: AppSpacing.iconSm, color: Colors.grey),
+            Icon(AppIcons.chevronRight, size: AppSpacing.iconSm, color: AppColors.textMuted(context)),
           ],
         ),
       ),

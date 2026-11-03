@@ -14,6 +14,7 @@ class AppColors {
   static const Color lightSurface = Color(0xFFFFFFFF);
   static const Color lightTextPrimary = Color(0xFF1E1F1E);
   static const Color lightTextSecondary = Color(0xFF6B7280);
+  static const Color lightTextMuted = Color(0xFF9CA3AF);
   static const Color lightBorder = Color(0xFFE5E7EB);
 
   // ==========================================
@@ -25,7 +26,42 @@ class AppColors {
   static const Color darkSurface = Color(0xFF262826);
   static const Color darkTextPrimary = Color(0xFFF9FAFB);
   static const Color darkTextSecondary = Color(0xFF9CA3AF);
+  static const Color darkTextMuted = Color(0xFF6B7280);
   static const Color darkBorder = Color(0xFF374151);
+
+  // ==========================================
+  // DYNAMIC TEXT & ELEMENT COLOR RESOLVERS
+  // Single source of truth for text across the whole app.
+  // Modifying colors above will automatically reflect everywhere.
+  // ==========================================
+
+  /// Primary text color adapting to light/dark brightness
+  static Color textPrimary(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkTextPrimary
+        : lightTextPrimary;
+  }
+
+  /// Secondary text color (for subtitles, descriptions, section hints)
+  static Color textSecondary(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkTextSecondary
+        : lightTextSecondary;
+  }
+
+  /// Muted/caption text color (for timestamps, tiny sizes, subtle chevrons)
+  static Color textMuted(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkTextMuted
+        : lightTextMuted;
+  }
+
+  /// Adaptive border/divider color
+  static Color border(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? darkBorder
+        : lightBorder;
+  }
 
   // ==========================================
   // PROTOCOL BADGES (Theme-Independent Constants)

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
+import 'package:traffic_tracker_app/constants/app_palettes.dart';
 import 'package:traffic_tracker_app/constants/icons.dart';
 import 'package:traffic_tracker_app/controllers/settings_controller.dart';
 import 'package:traffic_tracker_app/localization/app_translations.dart';
 import 'package:traffic_tracker_app/views/settings/settings_view.dart';
 import 'package:traffic_tracker_app/views/settings/widgets/about_app_sheet.dart';
 import 'package:traffic_tracker_app/views/settings/widgets/language_selector_sheet.dart';
+import 'package:traffic_tracker_app/views/settings/widgets/palette_selector_sheet.dart';
 import 'package:traffic_tracker_app/views/settings/widgets/theme_selector_sheet.dart';
 
 void main() {
@@ -20,6 +22,8 @@ void main() {
 
     test('Initial settings values default correctly', () {
       expect(controller.themeMode.value, ThemeMode.system);
+      expect(controller.useDynamicColor.value, isTrue);
+      expect(controller.selectedPaletteId.value, 'forest_green');
     });
 
     test('Changing theme mode updates reactive state', () {
@@ -33,12 +37,32 @@ void main() {
       expect(controller.themeMode.value, ThemeMode.system);
     });
 
+    test('Changing dynamic color and palette updates reactive state', () {
+      controller.setUseDynamicColor(false);
+      expect(controller.useDynamicColor.value, isFalse);
+
+      controller.setPalette('crimson_red');
+      expect(controller.selectedPaletteId.value, 'crimson_red');
+      expect(controller.activePalette.seedColor, AppPalettes.crimsonRed.primaryColor);
+
+      controller.setUseDynamicColor(true);
+      expect(controller.useDynamicColor.value, isTrue);
+    });
+
     test('RTL flag reflects active locale', () {
       controller.currentLocale.value = const Locale('ar', 'SA');
       expect(controller.isArabic, isTrue);
 
       controller.currentLocale.value = const Locale('en', 'US');
       expect(controller.isArabic, isFalse);
+    });
+
+    test('AppPalettes findById returns correct palette or fallback', () {
+      final blue = AppPalettes.findById('ocean_blue');
+      expect(blue.id, 'ocean_blue');
+
+      final unknown = AppPalettes.findById('non_existent');
+      expect(unknown.id, AppPalettes.defaultPaletteId);
     });
   });
 
@@ -61,9 +85,10 @@ void main() {
       // Verify Header
       expect(find.text('Settings'), findsOneWidget);
 
-      // Verify requested options: Language, Theme, About App
+      // Verify requested options: Language, Theme, Color Scheme, About App
       expect(find.text('Language'), findsOneWidget);
       expect(find.text('Appearance & Theme'), findsOneWidget);
+      expect(find.text('App Color & Theme Scheme'), findsOneWidget);
       expect(find.text('About App'), findsOneWidget);
 
       // 1. Open Language bottom sheet
@@ -86,7 +111,24 @@ void main() {
       await tester.tap(find.byIcon(AppIcons.close));
       await tester.pumpAndSettle();
 
-      // 3. Open About App bottom sheet
+      // 3. Open Color Scheme bottom sheet
+      await tester.tap(find.text('App Color & Theme Scheme'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PaletteSelectorSheet), findsOneWidget);
+      expect(find.text('Select Color Scheme'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(PaletteSelectorSheet),
+          matching: find.text('Material You (System Dynamic)'),
+        ),
+        findsOneWidget,
+      );
+
+      // Close Color Scheme sheet
+      await tester.tap(find.byIcon(AppIcons.close));
+      await tester.pumpAndSettle();
+
+      // 4. Open About App bottom sheet
       await tester.tap(find.text('About App'));
       await tester.pumpAndSettle();
       expect(find.byType(AboutAppSheet), findsOneWidget);

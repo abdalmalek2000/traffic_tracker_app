@@ -51,7 +51,10 @@ class _AppFilterViewState extends State<AppFilterView> {
                 value: 'clear',
                 child: Row(
                   children: [
-                    const Icon(AppIcons.deselectAll, color: AppColors.statusServerError),
+                    const Icon(
+                      AppIcons.deselectAll,
+                      color: AppColors.statusServerError,
+                    ),
                     AppSpacing.horizontalSm,
                     Text('deselect_all_menu'.tr),
                   ],
@@ -84,122 +87,157 @@ class _AppFilterViewState extends State<AppFilterView> {
           children: [
             // Search & Filter Header
             Container(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.base,
-                AppSpacing.md,
-                AppSpacing.base,
-                AppSpacing.sm,
+              // padding: const EdgeInsets.fromLTRB(
+              //   AppSpacing.base,
+              //   AppSpacing.md,
+              //   AppSpacing.base,
+              //   AppSpacing.sm,
+              // ),
+              color: theme.colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.3,
               ),
-              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
               child: Column(
                 children: [
-                  TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: currentTab == AppViewTab.selectedOnly
-                          ? 'search_selected_hint'.tr
-                          : 'search_apps_hint'.tr,
-                      prefixIcon: const Icon(AppIcons.search),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(AppIcons.clear, size: AppSpacing.iconSm),
-                              onPressed: () {
-                                _searchController.clear();
-                                controller.setAppSearchQuery('');
-                                setState(() {});
-                              },
-                            )
-                          : null,
-                      isDense: true,
-                      filled: true,
-                      fillColor: theme.colorScheme.surface,
-                      border: OutlineInputBorder(
-                        borderRadius: AppSpacing.borderRadiusBase,
-                        borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.base,
+                      AppSpacing.md,
+                      AppSpacing.base,
+                      AppSpacing.sm,
                     ),
-                    onChanged: (val) {
-                      controller.setAppSearchQuery(val);
-                      setState(() {});
-                    },
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: currentTab == AppViewTab.selectedOnly
+                            ? 'search_selected_hint'.tr
+                            : 'search_apps_hint'.tr,
+                        prefixIcon: const Icon(AppIcons.search),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(
+                                  AppIcons.clear,
+                                  size: AppSpacing.iconSm,
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  controller.setAppSearchQuery('');
+                                  setState(() {});
+                                },
+                              )
+                            : null,
+                        isDense: true,
+                        filled: true,
+                        fillColor: theme.colorScheme.surface,
+                        border: OutlineInputBorder(
+                          borderRadius: AppSpacing.borderRadiusBase,
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.outlineVariant,
+                          ),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        controller.setAppSearchQuery(val);
+                        setState(() {});
+                      },
+                    ),
                   ),
-                  AppSpacing.vertical10,
 
                   // Filter Chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
+                        AppSpacing.horizontalBase,
                         _buildFilterChip(
                           label: '${'filter_all_apps'.tr} ($totalAppsCount)',
                           isSelected: currentTab == AppViewTab.all,
-                          onSelected: () => controller.setAppTab(AppViewTab.all),
+                          onSelected: () =>
+                              controller.setAppTab(AppViewTab.all),
                         ),
                         AppSpacing.horizontal6,
                         _buildFilterChip(
-                          label: '${'filter_selected_only'.tr} ($selectedCount)',
+                          label:
+                              '${'filter_selected_only'.tr} ($selectedCount)',
                           color: AppColors.statusSuccess,
                           isSelected: currentTab == AppViewTab.selectedOnly,
-                          onSelected: () => controller.setAppTab(AppViewTab.selectedOnly),
+                          onSelected: () =>
+                              controller.setAppTab(AppViewTab.selectedOnly),
                         ),
                         AppSpacing.horizontal6,
                         _buildFilterChip(
                           label: 'filter_user_apps'.tr,
                           isSelected: currentTab == AppViewTab.userApps,
-                          onSelected: () => controller.setAppTab(AppViewTab.userApps),
+                          onSelected: () =>
+                              controller.setAppTab(AppViewTab.userApps),
                         ),
                         AppSpacing.horizontal6,
                         _buildFilterChip(
                           label: 'filter_system_apps'.tr,
                           isSelected: currentTab == AppViewTab.systemApps,
-                          onSelected: () => controller.setAppTab(AppViewTab.systemApps),
+                          onSelected: () =>
+                              controller.setAppTab(AppViewTab.systemApps),
                         ),
+                        AppSpacing.horizontalBase,
                       ],
                     ),
                   ),
                   AppSpacing.verticalSm,
 
                   // Summary & Quick Selection Action
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          selectedCount == 0
-                              ? 'mode_monitoring_all'.tr
-                              : 'mode_monitoring_selected'.trParams({'count': '$selectedCount'}),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: selectedCount == 0
-                                ? theme.colorScheme.primary
-                                : AppColors.statusSuccess,
-                          ),
-                        ),
-                      ),
-                      if (visibleApps.isNotEmpty && currentTab != AppViewTab.selectedOnly)
-                        TextButton(
-                          onPressed: () {
-                            final visiblePkgs = visibleApps.map((a) => a.packageName);
-                            final allSelected = visiblePkgs
-                                .every((p) => controller.selectedPackages.contains(p));
-                            if (allSelected) {
-                              for (final p in visiblePkgs) {
-                                controller.togglePackage(p);
-                              }
-                            } else {
-                              controller.selectAll(visiblePkgs);
-                            }
-                          },
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.base),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
                           child: Text(
-                            visibleApps.every(
-                                    (a) => controller.selectedPackages.contains(a.packageName))
-                                ? 'deselect_all_visible'.tr
-                                : 'select_all_visible'.trParams({'count': '${visibleApps.length}'}),
-                            style: const TextStyle(fontSize: 12),
+                            selectedCount == 0
+                                ? 'mode_monitoring_all'.tr
+                                : 'mode_monitoring_selected'.trParams({
+                                    'count': '$selectedCount',
+                                  }),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: selectedCount == 0
+                                  ? theme.colorScheme.primary
+                                  : AppColors.statusSuccess,
+                            ),
                           ),
                         ),
-                    ],
+                        if (visibleApps.isNotEmpty &&
+                            currentTab != AppViewTab.selectedOnly)
+                          TextButton(
+                            onPressed: () {
+                              final visiblePkgs = visibleApps.map(
+                                (a) => a.packageName,
+                              );
+                              final allSelected = visiblePkgs.every(
+                                (p) => controller.selectedPackages.contains(p),
+                              );
+                              if (allSelected) {
+                                for (final p in visiblePkgs) {
+                                  controller.togglePackage(p);
+                                }
+                              } else {
+                                controller.selectAll(visiblePkgs);
+                              }
+                            },
+                            child: Text(
+                              visibleApps.every(
+                                    (a) => controller.selectedPackages.contains(
+                                      a.packageName,
+                                    ),
+                                  )
+                                  ? 'deselect_all_visible'.tr
+                                  : 'select_all_visible'.trParams({
+                                      'count': '${visibleApps.length}',
+                                    }),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -216,15 +254,20 @@ class _AppFilterViewState extends State<AppFilterView> {
                 color: AppColors.statusSuccess.withValues(alpha: 0.12),
                 child: Row(
                   children: [
-                    const Icon(AppIcons.sync, size: AppSpacing.iconXs, color: AppColors.statusSuccess),
+                    const Icon(
+                      AppIcons.sync,
+                      size: AppSpacing.iconXs,
+                      color: AppColors.statusSuccess,
+                    ),
                     AppSpacing.horizontal6,
                     Expanded(
                       child: Text(
                         'live_sync_notice'.tr,
                         style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.statusSuccess,
-                            fontWeight: FontWeight.bold),
+                          fontSize: 11,
+                          color: AppColors.statusSuccess,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -245,7 +288,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                                   ? AppIcons.checkboxBlank
                                   : AppIcons.searchEmpty,
                               size: 48,
-                              color: Colors.grey,
+                              color: AppColors.textMuted(context),
                             ),
                             AppSpacing.verticalMd,
                             Text(
@@ -253,7 +296,10 @@ class _AppFilterViewState extends State<AppFilterView> {
                                   ? 'no_selected_apps'.tr
                                   : 'no_apps_found'.tr,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.grey, fontSize: 13),
+                              style: TextStyle(
+                                color: AppColors.textSecondary(context),
+                                fontSize: 13,
+                              ),
                             ),
                           ],
                         ),
@@ -263,13 +309,15 @@ class _AppFilterViewState extends State<AppFilterView> {
                       itemCount: visibleApps.length,
                       itemBuilder: (context, index) {
                         final app = visibleApps[index];
-                        final isSelected =
-                            controller.selectedPackages.contains(app.packageName);
+                        final isSelected = controller.selectedPackages.contains(
+                          app.packageName,
+                        );
 
                         return CheckboxListTile(
                           value: isSelected,
                           activeColor: AppColors.statusSuccess,
-                          onChanged: (_) => controller.togglePackage(app.packageName),
+                          onChanged: (_) =>
+                              controller.togglePackage(app.packageName),
                           secondary: app.iconBytes != null
                               ? ClipRRect(
                                   borderRadius: AppSpacing.borderRadiusMd,
@@ -280,28 +328,41 @@ class _AppFilterViewState extends State<AppFilterView> {
                                     fit: BoxFit.cover,
                                   ),
                                 )
-                              : const Icon(AppIcons.android,
-                                  size: 36, color: AppColors.statusSuccess),
+                              : const Icon(
+                                  AppIcons.android,
+                                  size: 36,
+                                  color: AppColors.statusSuccess,
+                                ),
                           title: Text(
                             app.appName,
                             style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                           ),
                           subtitle: Row(
                             children: [
                               if (app.isSystemApp)
                                 Container(
-                                  margin: const EdgeInsets.only(right: AppSpacing.space6),
+                                  margin: const EdgeInsets.only(
+                                    right: AppSpacing.space6,
+                                  ),
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 5, vertical: 1.5),
+                                    horizontal: 5,
+                                    vertical: 1.5,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.withValues(alpha: 0.15),
+                                    color: AppColors.border(
+                                      context,
+                                    ).withValues(alpha: 0.3),
                                     borderRadius: AppSpacing.borderRadiusXs,
                                   ),
                                   child: Text(
                                     'system_badge'.tr,
-                                    style: const TextStyle(
-                                        fontSize: 9.5, color: Colors.grey),
+                                    style: TextStyle(
+                                      fontSize: 9.5,
+                                      color: AppColors.textMuted(context),
+                                    ),
                                   ),
                                 ),
                               Expanded(
@@ -309,7 +370,9 @@ class _AppFilterViewState extends State<AppFilterView> {
                                   app.packageName,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                      fontSize: 11.5, color: Colors.grey.shade600),
+                                    fontSize: 11.5,
+                                    color: AppColors.textSecondary(context),
+                                  ),
                                 ),
                               ),
                             ],

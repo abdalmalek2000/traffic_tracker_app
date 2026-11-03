@@ -345,7 +345,7 @@ class TrafficDetailView extends StatelessWidget {
         ),
         child: Padding(
           padding: AppSpacing.paddingCard,
-          child: Text('no_headers'.tr, style: const TextStyle(color: Colors.grey)),
+          child: Text('no_headers'.tr, style: TextStyle(color: AppColors.textSecondary(context))),
         ),
       );
     }

@@ -215,7 +215,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                                   shape: BoxShape.circle,
                                   color: isRunning
                                       ? AppColors.statusSuccess
-                                      : Colors.grey,
+                                      : AppColors.textMuted(context),
                                 ),
                               ),
                               AppSpacing.horizontalSm,
@@ -229,7 +229,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                                     fontWeight: FontWeight.bold,
                                     color: isRunning
                                         ? AppColors.statusSuccess
-                                        : Colors.grey.shade600,
+                                        : AppColors.textSecondary(context),
                                   ),
                                 ),
                               ),
@@ -534,8 +534,8 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                                       : 'no_connections_active'.tr)
                                 : 'no_connections_idle'.tr,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.grey,
+                            style: TextStyle(
+                              color: AppColors.textSecondary(context),
                               fontSize: 13,
                             ),
                           ),
@@ -582,7 +582,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
         ),
         Text(
           title,
-          style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+          style: TextStyle(fontSize: 11, color: AppColors.textSecondary(context)),
         ),
       ],
     );
@@ -672,7 +672,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                     item.readableSubtitle,
                     style: TextStyle(
                       fontSize: 11.5,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary(context),
                     ),
                   ),
                 ],
@@ -693,12 +693,12 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 ),
                 Text(
                   item.formattedTime,
-                  style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500),
+                  style: TextStyle(fontSize: 10.5, color: AppColors.textMuted(context)),
                 ),
               ],
             ),
             AppSpacing.horizontalXs,
-            const Icon(AppIcons.chevronRight, size: AppSpacing.iconSm, color: Colors.grey),
+            Icon(AppIcons.chevronRight, size: AppSpacing.iconSm, color: AppColors.textMuted(context)),
           ],
         ),
       ),

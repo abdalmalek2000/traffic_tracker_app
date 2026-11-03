@@ -95,6 +95,25 @@ class MainActivity : FlutterActivity() {
                 }
             }
         )
+
+        // Native Material You / Dynamic Colors Channel (Android 12+)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "traffic_tracker/system_theme").setMethodCallHandler { call, result ->
+            when (call.method) {
+                "getDynamicAccentColor" -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        try {
+                            val colorInt = resources.getColor(android.R.color.system_accent1_600, null)
+                            result.success(colorInt)
+                        } catch (e: Exception) {
+                            result.success(null)
+                        }
+                    } else {
+                        result.success(null)
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
     }
 
     private fun startVpnServiceInternal() {

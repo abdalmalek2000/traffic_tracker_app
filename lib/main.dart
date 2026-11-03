@@ -25,16 +25,31 @@ class TrafficTrackerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Traffic Tracker',
-      debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.system,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      translations: AppTranslations(),
-      locale: const Locale('en', 'US'),
-      fallbackLocale: const Locale('en', 'US'),
-      home: const MainNavigationView(),
-    );
+    return Obx(() {
+      final settingsController = SettingsController.to;
+      final themeMode = settingsController.themeMode.value;
+      final isDynamic = settingsController.useDynamicColor.value;
+      final dynamicColor =
+          isDynamic ? settingsController.systemAccentColor.value : null;
+      final palette = settingsController.activePalette;
+
+      return GetMaterialApp(
+        title: 'Traffic Tracker',
+        debugShowCheckedModeBanner: false,
+        themeMode: themeMode,
+        theme: AppTheme.buildLightTheme(
+          dynamicSeedColor: dynamicColor,
+          palette: palette,
+        ),
+        darkTheme: AppTheme.buildDarkTheme(
+          dynamicSeedColor: dynamicColor,
+          palette: palette,
+        ),
+        translations: AppTranslations(),
+        locale: const Locale('en', 'US'),
+        fallbackLocale: const Locale('en', 'US'),
+        home: const MainNavigationView(),
+      );
+    });
   }
 }

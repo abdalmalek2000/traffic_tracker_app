@@ -51,6 +51,8 @@ class AppTranslations extends Translations {
     'follow_redirects_desc': 'Disable to inspect 3xx redirect status code directly',
     'cancel': 'Cancel',
     'send_and_inspect': 'Send & Inspect',
+    'sending': 'Sending...',
+
 
     // HTTP Request Details
     'overview': 'Overview',
@@ -153,6 +155,18 @@ class AppTranslations extends Translations {
     'language_subtitle': 'Choose application display language',
     'theme_option': 'Appearance & Theme',
     'theme_subtitle': 'Switch between light, dark or system theme',
+    'color_scheme_option': 'App Color & Theme Scheme',
+    'color_scheme_subtitle': 'Choose between system dynamic color or static palettes',
+    'select_color_scheme': 'Select Color Scheme',
+    'color_dynamic_system': 'Material You (System Dynamic)',
+    'color_dynamic_system_desc': 'Match wallpaper and system theme colors (Android 12+)',
+    'static_colors_heading': 'Static Color Palettes',
+    'palette_forest_green': 'Forest Green (Default)',
+    'palette_crimson_red': 'Crimson Red',
+    'palette_ocean_blue': 'Ocean Blue',
+    'palette_royal_purple': 'Royal Purple',
+    'palette_sunset_orange': 'Sunset Orange',
+    'palette_emerald_teal': 'Emerald Teal',
     'about_option': 'About App',
     'about_subtitle': 'Application version, details & info',
     'select_language': 'Select Language',
@@ -175,6 +189,16 @@ class AppTranslations extends Translations {
     'feature_pcap_export':
         'Raw PCAP file capture for Wireshark & security analysis',
   };
+
+
+
+  /*
+  ##################################################
+
+  ===================== Arabic =====================
+
+  ##################################################
+   */
 
   static const Map<String, String> arAR = {
     // Navigation
@@ -216,6 +240,7 @@ class AppTranslations extends Translations {
     'follow_redirects_desc': 'عطّل الخيار لفحص رمز استجابة التحويل 3xx مباشرة',
     'cancel': 'إلغاء',
     'send_and_inspect': 'إرسال وفحص',
+    'sending': 'يرسل...',
 
     // HTTP Request Details
     'overview': 'نظرة عامة',
@@ -317,6 +342,18 @@ class AppTranslations extends Translations {
     'language_subtitle': 'تحديد لغة واجهة التطبيق',
     'theme_option': 'المظهر والثيم',
     'theme_subtitle': 'التبديل بين الوضع الفاتح، الداكن، أو حسب النظام',
+    'color_scheme_option': 'ألوان التطبيق والسمة',
+    'color_scheme_subtitle': 'الاختيار بين ألوان النظام الديناميكية أو الألوان الثابتة',
+    'select_color_scheme': 'اختيار السمة اللونية',
+    'color_dynamic_system': 'ألوان النظام الديناميكية (Material You)',
+    'color_dynamic_system_desc': 'استخراج الألوان تلقائياً من خلفية وثيم جهازك (Android 12+)',
+    'static_colors_heading': 'الألوان الثابتة',
+    'palette_forest_green': 'الأخضر الغابي (الافتراضي)',
+    'palette_crimson_red': 'الأحمر القرمزي',
+    'palette_ocean_blue': 'الأزرق المحيطي',
+    'palette_royal_purple': 'البنفسجي الملكي',
+    'palette_sunset_orange': 'البرتقالي الدافئ',
+    'palette_emerald_teal': 'الزمردي (Teal)',
     'about_option': 'حول التطبيق',
     'about_subtitle': 'إصدار التطبيق ومعلومات المطور والمميزات',
     'select_language': 'اختيار اللغة',

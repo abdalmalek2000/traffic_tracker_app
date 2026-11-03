@@ -30,6 +30,7 @@ class AppIcons {
   static const IconData settings = HugeIcons.strokeRoundedSettings02;
   static const IconData language = HugeIcons.strokeRoundedTranslate;
   static const IconData theme = HugeIcons.strokeRoundedPaintBoard;
+  static const IconData palette = HugeIcons.strokeRoundedColors;
   static const IconData sun = HugeIcons.strokeRoundedSun01;
   static const IconData moon = HugeIcons.strokeRoundedMoon02;
   static const IconData checkCircle = HugeIcons.strokeRoundedCheckmarkCircle02;

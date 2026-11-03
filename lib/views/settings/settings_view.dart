@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../constants/colors.dart';
 import '../../constants/icons.dart';
 import '../../constants/spacing.dart';
 import '../../controllers/settings_controller.dart';
 import 'widgets/about_app_sheet.dart';
 import 'widgets/language_selector_sheet.dart';
+import 'widgets/palette_selector_sheet.dart';
 import 'widgets/settings_section.dart';
 import 'widgets/settings_tile.dart';
 import 'widgets/theme_selector_sheet.dart';
@@ -54,11 +56,21 @@ class SettingsView extends StatelessWidget {
                 // Theme Setting
                 SettingsTile(
                   icon: currentThemeIcon,
-                  iconColor: theme.colorScheme.secondary,
+                  iconColor: theme.colorScheme.primary,
                   title: 'theme_option'.tr,
                   subtitle: 'theme_subtitle'.tr,
                   value: currentTheme,
                   onTap: () => ThemeSelectorSheet.show(context),
+                ),
+
+                // Color Scheme (Material You / Dynamic Colors & Static Palettes)
+                SettingsTile(
+                  icon: AppIcons.palette,
+                  iconColor: theme.colorScheme.primary,
+                  title: 'color_scheme_option'.tr,
+                  subtitle: 'color_scheme_subtitle'.tr,
+                  value: settingsController.colorSchemeSummaryName,
+                  onTap: () => PaletteSelectorSheet.show(context),
                 ),
               ],
             ),
@@ -74,7 +86,7 @@ class SettingsView extends StatelessWidget {
                 // About App
                 SettingsTile(
                   icon: AppIcons.info,
-                  iconColor: theme.colorScheme.tertiary,
+                  iconColor: theme.colorScheme.primary,
                   title: 'about_option'.tr,
                   subtitle: 'about_subtitle'.tr,
                   onTap: () => AboutAppSheet.show(context),
@@ -89,9 +101,7 @@ class SettingsView extends StatelessWidget {
               child: Text(
                 '${'app_title'.tr} • ${'app_version'.tr}',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant.withValues(
-                    alpha: 0.6,
-                  ),
+                  color: AppColors.textMuted(context),
                 ),
               ),
             ),

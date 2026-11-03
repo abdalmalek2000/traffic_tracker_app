@@ -55,7 +55,7 @@ class ConnectionDetailView extends StatelessWidget {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: AppSpacing.base),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.3),
+                  color: AppColors.border(context),
                   borderRadius: AppSpacing.borderRadiusXs,
                 ),
               ),
@@ -215,7 +215,7 @@ class ConnectionDetailView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade600,
+                    color: AppColors.textSecondary(context),
                   ),
                 ),
                 AppSpacing.verticalXxs,
@@ -232,7 +232,7 @@ class ConnectionDetailView extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 11.5,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary(context),
                       fontFamily: 'monospace',
                     ),
                   ),

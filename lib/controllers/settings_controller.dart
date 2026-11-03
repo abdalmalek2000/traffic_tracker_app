@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../constants/app_palettes.dart';
 import '../constants/icons.dart';
+import '../services/system_theme_service.dart';
 
 /// Controller managing application settings such as theme, locale,
-/// and future configurable settings.
+/// dynamic Material You colors, and static color palettes.
 class SettingsController extends GetxController {
   static SettingsController get to => Get.find<SettingsController>();
 
@@ -13,6 +15,15 @@ class SettingsController extends GetxController {
   /// Currently active locale
   final Rx<Locale> currentLocale = (Get.locale ?? const Locale('en', 'US')).obs;
 
+  /// Whether Material You dynamic system colors are enabled (Android 12+)
+  final RxBool useDynamicColor = true.obs;
+
+  /// Selected static color palette ID (used when dynamic colors are off or unavailable)
+  final RxString selectedPaletteId = AppPalettes.forestGreen.id.obs;
+
+  /// System dynamic accent color extracted from Android 12+ (Material You)
+  final Rx<Color?> systemAccentColor = Rx<Color?>(null);
+
   @override
   void onInit() {
     super.onInit();
@@ -20,6 +31,12 @@ class SettingsController extends GetxController {
     if (Get.locale != null) {
       currentLocale.value = Get.locale!;
     }
+    loadSystemAccentColor();
+  }
+
+  /// Query native Android 12+ dynamic accent color
+  Future<void> loadSystemAccentColor() async {
+    systemAccentColor.value = await SystemThemeService.getDynamicAccentColor();
   }
 
   /// Change theme mode dynamically across the entire app
@@ -33,6 +50,20 @@ class SettingsController extends GetxController {
     currentLocale.value = locale;
     Get.updateLocale(locale);
   }
+
+  /// Toggle or set whether dynamic color is enabled
+  void setUseDynamicColor(bool value) {
+    useDynamicColor.value = value;
+  }
+
+  /// Select a static color palette and turn off dynamic color override
+  void setPalette(String paletteId) {
+    selectedPaletteId.value = paletteId;
+    useDynamicColor.value = false;
+  }
+
+  /// Get the currently active static palette
+  AppColorPalette get activePalette => AppPalettes.findById(selectedPaletteId.value);
 
   /// Human-readable label for current theme
   String get themeModeName {
@@ -56,6 +87,14 @@ class SettingsController extends GetxController {
       case ThemeMode.system:
         return AppIcons.theme;
     }
+  }
+
+  /// Human-readable summary for current color scheme in settings
+  String get colorSchemeSummaryName {
+    if (useDynamicColor.value) {
+      return 'color_dynamic_system'.tr;
+    }
+    return activePalette.localizedName;
   }
 
   /// Human-readable label for current language
