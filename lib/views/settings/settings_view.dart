@@ -69,7 +69,7 @@ class SettingsView extends StatelessWidget {
                   iconColor: theme.colorScheme.primary,
                   title: 'color_scheme_option'.tr,
                   subtitle: 'color_scheme_subtitle'.tr,
-                  value: settingsController.colorSchemeSummaryName,
+                  //value: settingsController.colorSchemeSummaryName,
                   onTap: () => PaletteSelectorSheet.show(context),
                 ),
               ],

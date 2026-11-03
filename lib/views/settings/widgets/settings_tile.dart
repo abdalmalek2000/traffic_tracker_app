@@ -38,11 +38,11 @@ class SettingsTile extends StatelessWidget {
 
     Widget? leadingWidget;
     if (icon != null) {
-      final effectiveIconColor = iconColor ??
-          (isDestructive
-              ? theme.colorScheme.error
-              : theme.colorScheme.primary);
-      final effectiveBgColor = iconBackgroundColor ??
+      final effectiveIconColor =
+          iconColor ??
+          (isDestructive ? theme.colorScheme.error : theme.colorScheme.primary);
+      final effectiveBgColor =
+          iconBackgroundColor ??
           (isDestructive
               ? theme.colorScheme.error.withValues(alpha: 0.12)
               : effectiveIconColor.withValues(alpha: isDark ? 0.18 : 0.1));
@@ -55,11 +55,7 @@ class SettingsTile extends StatelessWidget {
           borderRadius: AppSpacing.borderRadiusBase,
         ),
         alignment: Alignment.center,
-        child: Icon(
-          icon,
-          size: AppSpacing.iconMd,
-          color: effectiveIconColor,
-        ),
+        child: Icon(icon, size: AppSpacing.iconMd, color: effectiveIconColor),
       );
     }
 
