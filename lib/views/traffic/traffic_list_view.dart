@@ -4,6 +4,7 @@ import '../../constants/icons.dart';
 import '../../controllers/traffic_controller.dart';
 import '../../models/traffic_record.dart';
 import '../../services/test_request_service.dart';
+import '../../constants/api_endpoints.dart';
 import '../../constants/colors.dart';
 import '../../constants/spacing.dart';
 import '../settings/settings_view.dart';
@@ -83,8 +84,8 @@ class _TrafficListViewState extends State<TrafficListView> {
                   'GET',
                   AppColors.getProtocolColor('HTTP'),
                 ),
-                title: const Text('GET Request (200 OK)'),
-                subtitle: const Text('jsonplaceholder.typicode.com/posts/1'),
+                title: Text('test_get_title'.tr),
+                subtitle: const Text('httpbin.org/get'),
                 shape: RoundedRectangleBorder(
                   borderRadius: AppSpacing.borderRadiusBase,
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
@@ -97,8 +98,8 @@ class _TrafficListViewState extends State<TrafficListView> {
               AppSpacing.verticalSm,
               ListTile(
                 leading: _buildMethodBadge('POST', AppColors.statusSuccess),
-                title: const Text('POST Request with JSON (201 Created)'),
-                subtitle: const Text('Includes payload & auth bearer header'),
+                title: Text('test_post_title'.tr),
+                subtitle: const Text('httpbin.org/post • Payload & Bearer header'),
                 shape: RoundedRectangleBorder(
                   borderRadius: AppSpacing.borderRadiusBase,
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
@@ -110,12 +111,54 @@ class _TrafficListViewState extends State<TrafficListView> {
               ),
               AppSpacing.verticalSm,
               ListTile(
-                leading: _buildMethodBadge(
-                  'GET',
-                  AppColors.getProtocolColor('HTTP'),
+                leading: _buildMethodBadge('PUT', AppColors.statusRedirect),
+                title: Text('test_put_title'.tr),
+                subtitle: const Text('httpbin.org/put • Test data update payload'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppSpacing.borderRadiusBase,
+                  side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
-                title: const Text('Client Error (404 Not Found)'),
-                subtitle: const Text('Test non-existent API route handling'),
+                onTap: () {
+                  Get.back();
+                  _triggerSampleRequest(_testService.sendSamplePut);
+                },
+              ),
+              AppSpacing.verticalSm,
+              ListTile(
+                leading: _buildMethodBadge('DELETE', AppColors.statusServerError),
+                title: Text('test_delete_title'.tr),
+                subtitle: const Text('httpbin.org/delete • Test resource removal'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppSpacing.borderRadiusBase,
+                  side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+                ),
+                onTap: () {
+                  Get.back();
+                  _triggerSampleRequest(_testService.sendSampleDelete);
+                },
+              ),
+              AppSpacing.verticalSm,
+              ListTile(
+                leading: _buildMethodBadge('302', AppColors.statusRedirect),
+                title: Text('test_redirect_title'.tr),
+                subtitle: const Text('httpbin.org/status/302 • Redirect simulation'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppSpacing.borderRadiusBase,
+                  side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+                ),
+                onTap: () {
+                  Get.back();
+                  _triggerSampleRequest(_testService.sendSampleRedirect);
+                },
+              ),
+              AppSpacing.verticalSm,
+              ListTile(
+                leading: _buildMethodBadge(
+                  '404',
+                  AppColors.statusClientError,
+                ),
+                title: Text('test_404_title'.tr),
+                subtitle: const Text('httpbin.org/status/404 • Not found error'),
                 shape: RoundedRectangleBorder(
                   borderRadius: AppSpacing.borderRadiusBase,
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
@@ -128,11 +171,11 @@ class _TrafficListViewState extends State<TrafficListView> {
               AppSpacing.verticalSm,
               ListTile(
                 leading: _buildMethodBadge(
-                  'GET',
-                  AppColors.getProtocolColor('HTTP'),
+                  '500',
+                  AppColors.statusServerError,
                 ),
-                title: const Text('Server Error (500 Error)'),
-                subtitle: const Text('Test internal server crash simulation'),
+                title: Text('test_500_title'.tr),
+                subtitle: const Text('httpbin.org/status/500 • Internal server crash'),
                 shape: RoundedRectangleBorder(
                   borderRadius: AppSpacing.borderRadiusBase,
                   side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
@@ -160,10 +203,10 @@ class _TrafficListViewState extends State<TrafficListView> {
   }
 
   void _showCustomRequestDialog() {
-    final urlController = TextEditingController(
-      text: 'https://jsonplaceholder.typicode.com/todos/1',
-    );
     String selectedMethod = 'GET';
+    final urlController = TextEditingController(
+      text: ApiEndpoints.httpbinGet,
+    );
     final bodyController = TextEditingController();
 
     Get.dialog(
@@ -183,7 +226,13 @@ class _TrafficListViewState extends State<TrafficListView> {
                         .toList(),
                     onChanged: (val) {
                       if (val != null) {
-                        setDialogState(() => selectedMethod = val);
+                        setDialogState(() {
+                          final prevMethodUrl = ApiEndpoints.getUrlForMethod(selectedMethod);
+                          if (urlController.text.trim() == prevMethodUrl) {
+                            urlController.text = ApiEndpoints.getUrlForMethod(val);
+                          }
+                          selectedMethod = val;
+                        });
                       }
                     },
                   ),
