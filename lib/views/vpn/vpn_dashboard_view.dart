@@ -36,7 +36,13 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
           children: [
             const Icon(AppIcons.file, color: AppColors.protocolHttp),
             AppSpacing.horizontalSm,
-            Text('pcap_export_title'.tr),
+            Expanded(
+              child: Text(
+                'pcap_export_title'.tr,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
           ],
         ),
         content: Column(
@@ -220,11 +226,12 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                               ),
                               AppSpacing.horizontalSm,
                               Expanded(
-                                flex: 3,
                                 child: Text(
                                   isRunning
                                       ? 'vpn_active'.tr
                                       : 'vpn_stopped'.tr,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: isRunning
@@ -233,44 +240,50 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                                   ),
                                 ),
                               ),
-                              const Spacer(),
+                              AppSpacing.horizontalSm,
                               // Target Apps Pill button
-                              InkWell(
-                                onTap: () =>
-                                    Get.to(() => const AppFilterView()),
-                                borderRadius: AppSpacing.borderRadiusXxl,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppSpacing.space10,
-                                    vertical: AppSpacing.xs,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.secondary
-                                        .withValues(alpha: 0.1),
-                                    borderRadius: AppSpacing.borderRadiusXxl,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        AppIcons.apps,
-                                        size: 14,
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                      AppSpacing.horizontalXs,
-                                      Text(
-                                        selectedCount == 0
-                                            ? 'all_apps'.tr
-                                            : 'target_apps_selected'.trParams({
-                                                'count': '$selectedCount',
-                                              }),
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
+                              Flexible(
+                                child: InkWell(
+                                  onTap: () =>
+                                      Get.to(() => const AppFilterView()),
+                                  borderRadius: AppSpacing.borderRadiusXxl,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.space10,
+                                      vertical: AppSpacing.xs,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.secondary
+                                          .withValues(alpha: 0.1),
+                                      borderRadius: AppSpacing.borderRadiusXxl,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          AppIcons.apps,
+                                          size: 14,
                                           color: theme.colorScheme.primary,
                                         ),
-                                      ),
-                                    ],
+                                        AppSpacing.horizontalXs,
+                                        Flexible(
+                                          child: Text(
+                                            selectedCount == 0
+                                                ? 'all_apps'.tr
+                                                : 'target_apps_selected'.trParams({
+                                                    'count': '$selectedCount',
+                                                  }),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: theme.colorScheme.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -282,23 +295,29 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              _buildMetric(
-                                context,
-                                title: 'packets_captured'.tr,
-                                value: '${controller.totalPackets.value}',
-                                icon: AppIcons.layers,
+                              Expanded(
+                                child: _buildMetric(
+                                  context,
+                                  title: 'packets_captured'.tr,
+                                  value: '${controller.totalPackets.value}',
+                                  icon: AppIcons.layers,
+                                ),
                               ),
-                              _buildMetric(
-                                context,
-                                title: 'data_volume'.tr,
-                                value: controller.formattedTotalBytes,
-                                icon: AppIcons.dataUsage,
+                              Expanded(
+                                child: _buildMetric(
+                                  context,
+                                  title: 'data_volume'.tr,
+                                  value: controller.formattedTotalBytes,
+                                  icon: AppIcons.dataUsage,
+                                ),
                               ),
-                              _buildMetric(
-                                context,
-                                title: 'live_connections'.tr,
-                                value: '${filteredList.length}',
-                                icon: AppIcons.connections,
+                              Expanded(
+                                child: _buildMetric(
+                                  context,
+                                  title: 'live_connections'.tr,
+                                  value: '${filteredList.length}',
+                                  icon: AppIcons.connections,
+                                ),
                               ),
                             ],
                           ),
@@ -405,10 +424,16 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                         controller: _searchController,
                         decoration: InputDecoration(
                           hintText: 'search_vpn_hint'.tr,
-                          prefixIcon: const Icon(AppIcons.search, size: AppSpacing.iconMd),
+                          prefixIcon: const Icon(
+                            AppIcons.search,
+                            size: AppSpacing.iconMd,
+                          ),
                           suffixIcon: _searchController.text.isNotEmpty
                               ? IconButton(
-                                  icon: const Icon(AppIcons.clear, size: AppSpacing.iconSm),
+                                  icon: const Icon(
+                                    AppIcons.clear,
+                                    size: AppSpacing.iconSm,
+                                  ),
                                   onPressed: () {
                                     _searchController.clear();
                                     controller.setSearchQuery('');
@@ -446,38 +471,48 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '${'live_connections'.tr} (${filteredList.length})',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
+                          Expanded(
+                            child: Text(
+                              '${'live_connections'.tr} (${filteredList.length})',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
-                          if (selectedCount > 0)
-                            FilterChip(
-                              label: Text(
-                                'mode_target_only'.tr,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      controller.filterBySelectedAppsOnly.value
-                                      ? Colors.white
-                                      : null,
+                          if (selectedCount > 0) ...[
+                            AppSpacing.horizontalSm,
+                            Flexible(
+                              child: FilterChip(
+                                label: Text(
+                                  'mode_target_only'.tr,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        controller.filterBySelectedAppsOnly.value
+                                        ? Colors.white
+                                        : null,
+                                  ),
+                                ),
+                                selected:
+                                    controller.filterBySelectedAppsOnly.value,
+                                selectedColor: AppColors.statusSuccess,
+                                checkmarkColor: Colors.white,
+                                onSelected: (val) =>
+                                    controller.setFilterBySelectedAppsOnly(val),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
                                 ),
                               ),
-                              selected:
-                                  controller.filterBySelectedAppsOnly.value,
-                              selectedColor: AppColors.statusSuccess,
-                              checkmarkColor: Colors.white,
-                              onSelected: (val) =>
-                                  controller.setFilterBySelectedAppsOnly(val),
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
                             ),
+                          ],
                           if (isRunning)
                             Row(
                               children: [
@@ -573,16 +608,30 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
     required IconData icon,
   }) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: AppSpacing.iconMd, color: Theme.of(context).colorScheme.primary),
+        Icon(
+          icon,
+          size: AppSpacing.iconMd,
+          color: Theme.of(context).colorScheme.primary,
+        ),
         AppSpacing.verticalXs,
         Text(
           value,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          textAlign: TextAlign.center,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5),
         ),
         Text(
           title,
-          style: TextStyle(fontSize: 11, color: AppColors.textSecondary(context)),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 11,
+            color: AppColors.textSecondary(context),
+          ),
         ),
       ],
     );
@@ -591,15 +640,17 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
   Widget _buildConnectionTile(BuildContext context, CapturedConnection item) {
     // Protocol badge uses theme-independent AppColors
     final protocolColor = AppColors.getProtocolColor(item.protocol);
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isNarrow = screenWidth < 360;
 
     return InkWell(
       onTap: () {
         ConnectionDetailView.show(item);
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.base,
-          vertical: AppSpacing.space10,
+        padding: EdgeInsets.symmetric(
+          horizontal: isNarrow ? AppSpacing.space8 : AppSpacing.base,
+          vertical: isNarrow ? AppSpacing.space8 : AppSpacing.space10,
         ),
         child: Row(
           children: [
@@ -622,7 +673,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 ),
               ),
             ),
-            AppSpacing.horizontalMd,
+            isNarrow ? AppSpacing.horizontalSm : AppSpacing.horizontalMd,
 
             // App Name Badge, Primary Host, and Intuitive Subtitle
             Expanded(
@@ -632,32 +683,41 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                   Row(
                     children: [
                       if (item.appName != null) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 5,
-                            vertical: 1.5,
-                          ),
-                          margin: const EdgeInsets.only(right: AppSpacing.space6),
-                          decoration: BoxDecoration(
-                            color: AppColors.protocolHttp.withValues(
-                              alpha: 0.15,
+                        Flexible(
+                          flex: 2,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 1.5,
                             ),
-                            borderRadius: AppSpacing.borderRadiusXs,
-                          ),
-                          child: Text(
-                            item.appName!,
-                            style: const TextStyle(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.protocolHttp,
+                            margin: const EdgeInsetsDirectional.only(
+                              end: AppSpacing.space6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.protocolHttp.withValues(
+                                alpha: 0.15,
+                              ),
+                              borderRadius: AppSpacing.borderRadiusXs,
+                            ),
+                            child: Text(
+                              item.appName!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.protocolHttp,
+                              ),
                             ),
                           ),
                         ),
                       ],
                       Expanded(
+                        flex: 3,
                         child: Text(
                           item.primaryTitle,
                           overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 13.5,
@@ -670,6 +730,8 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                   // Clear, intuitive destination & service subtitle
                   Text(
                     item.readableSubtitle,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                     style: TextStyle(
                       fontSize: 11.5,
                       color: AppColors.textSecondary(context),
@@ -678,7 +740,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 ],
               ),
             ),
-            AppSpacing.horizontalSm,
+            isNarrow ? AppSpacing.horizontalXs : AppSpacing.horizontalSm,
 
             // Packet size & formatted time
             Column(
@@ -693,12 +755,19 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 ),
                 Text(
                   item.formattedTime,
-                  style: TextStyle(fontSize: 10.5, color: AppColors.textMuted(context)),
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: AppColors.textMuted(context),
+                  ),
                 ),
               ],
             ),
             AppSpacing.horizontalXs,
-            Icon(AppIcons.chevronRight, size: AppSpacing.iconSm, color: AppColors.textMuted(context)),
+            Icon(
+              AppIcons.chevronRight,
+              size: AppSpacing.iconSm,
+              color: AppColors.textMuted(context),
+            ),
           ],
         ),
       ),

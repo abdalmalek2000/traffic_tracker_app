@@ -25,6 +25,7 @@ class MainNavigationView extends StatelessWidget {
       ),
       bottomNavigationBar: Obx(
         () => NavigationBar(
+          height: 60,
           selectedIndex: navController.currentIndex.value,
           onDestinationSelected: (index) => navController.changeIndex(index),
           destinations: [

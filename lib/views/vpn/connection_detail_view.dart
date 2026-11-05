@@ -89,14 +89,17 @@ class ConnectionDetailView extends StatelessWidget {
                     children: [
                       Text(
                         connection.primaryTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         connection.serviceName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 12,
                           color: theme.colorScheme.primary,

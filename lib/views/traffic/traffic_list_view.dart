@@ -60,11 +60,15 @@ class _TrafficListViewState extends State<TrafficListView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'test_requests_title'.tr,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      'test_requests_title'.tr,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   IconButton(
@@ -324,6 +328,8 @@ class _TrafficListViewState extends State<TrafficListView> {
               flex: 12,
               child: Text(
                 'network_inspector'.tr,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -395,167 +401,188 @@ class _TrafficListViewState extends State<TrafficListView> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _isSendingTest ? null : _showTestRequestsBottomSheet,
-        icon: _isSendingTest
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : const Icon(AppIcons.send),
-        label: Text(_isSendingTest ? 'sending'.tr : 'test_request_btn'.tr),
-      ),
+      floatingActionButton: MediaQuery.sizeOf(context).height < 320
+          ? null
+          : (MediaQuery.sizeOf(context).height < 450
+              ? FloatingActionButton.small(
+                  onPressed:
+                      _isSendingTest ? null : _showTestRequestsBottomSheet,
+                  tooltip: 'test_request_btn'.tr,
+                  child: _isSendingTest
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(AppIcons.send, size: 18),
+                )
+              : FloatingActionButton.extended(
+                  onPressed:
+                      _isSendingTest ? null : _showTestRequestsBottomSheet,
+                  icon: _isSendingTest
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(AppIcons.send),
+                  label: Text(
+                    _isSendingTest ? 'sending'.tr : 'test_request_btn'.tr,
+                  ),
+                )),
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => FocusScope.of(context).unfocus(),
-        child: Column(
-          children: [
-            // Search & Filter Bar
-            Container(
-              padding: AppSpacing.paddingVSm,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(
-                  alpha: 0.3,
-                ),
-                border: Border(
-                  bottom: BorderSide(
-                    color: theme.colorScheme.outlineVariant.withValues(
-                      alpha: 0.4,
+        child: Obx(() {
+          final records = controller.filteredRecords;
+
+          return CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            slivers: [
+              // Search & Filter Bar
+              SliverToBoxAdapter(
+                child: Container(
+                  padding: AppSpacing.paddingVSm,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.3,
                     ),
-                  ),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: AppSpacing.paddingHMd,
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'search_hint_http'.tr,
-                        prefixIcon: const Icon(AppIcons.search, size: AppSpacing.iconMd),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(AppIcons.clear, size: AppSpacing.iconSm),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  controller.setSearchQuery('');
-                                  setState(() {});
-                                },
-                              )
-                            : null,
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                          vertical: AppSpacing.space10,
-                        ),
-                        filled: true,
-                        fillColor: theme.colorScheme.surface,
-                        border: OutlineInputBorder(
-                          borderRadius: AppSpacing.borderRadiusBase,
-                          borderSide: BorderSide(
-                            color: theme.colorScheme.outlineVariant,
-                          ),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: theme.colorScheme.outlineVariant.withValues(
+                          alpha: 0.4,
                         ),
                       ),
-                      onChanged: (val) {
-                        controller.setSearchQuery(val);
-                        setState(() {});
-                      },
                     ),
                   ),
-                  AppSpacing.verticalSm,
-                  _buildFilterChips(),
-                ],
-              ),
-            ),
-
-            // Main List
-            Expanded(
-              child: Obx(() {
-                final records = controller.filteredRecords;
-
-                if (records.isEmpty) {
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: IntrinsicHeight(
-                            child: Padding(
-                              padding: const EdgeInsets.all(28.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    AppIcons.networkCheck,
-                                    size: 64,
-                                    color: theme.colorScheme.primary.withValues(
-                                      alpha: 0.4,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: AppSpacing.paddingHMd,
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: 'search_hint_http'.tr,
+                            prefixIcon: const Icon(
+                              AppIcons.search,
+                              size: AppSpacing.iconMd,
+                            ),
+                            suffixIcon: _searchController.text.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(
+                                      AppIcons.clear,
+                                      size: AppSpacing.iconSm,
                                     ),
-                                  ),
-                                  AppSpacing.verticalBase,
-                                  Text(
-                                    'no_records_title'.tr,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  AppSpacing.verticalSm,
-                                  Text(
-                                    'no_records_desc'.tr,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: AppColors.textSecondary(context),
-                                    ),
-                                  ),
-                                  AppSpacing.verticalLg,
-                                  FilledButton.tonalIcon(
-                                    onPressed: _showTestRequestsBottomSheet,
-                                    icon: const Icon(AppIcons.start),
-                                    label: Text('test_request_btn'.tr),
-                                  ),
-                                ],
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      controller.setSearchQuery('');
+                                      setState(() {});
+                                    },
+                                  )
+                                : null,
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: AppSpacing.space8,
+                            ),
+                            filled: true,
+                            fillColor: theme.colorScheme.surface,
+                            border: OutlineInputBorder(
+                              borderRadius: AppSpacing.borderRadiusBase,
+                              borderSide: BorderSide(
+                                color: theme.colorScheme.outlineVariant,
                               ),
                             ),
                           ),
+                          onChanged: (val) {
+                            controller.setSearchQuery(val);
+                            setState(() {});
+                          },
                         ),
-                      );
-                    },
-                  );
-                }
+                      ),
+                      AppSpacing.verticalXs,
+                      _buildFilterChips(),
+                    ],
+                  ),
+                ),
+              ),
 
-                return ListView.separated(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  itemCount: records.length,
-                  separatorBuilder: (_, _) => Divider(
-                    height: 1,
-                    thickness: 0.5,
-                    color: theme.colorScheme.outlineVariant.withValues(
-                      alpha: 0.4,
+              // Empty State or List of Records
+              if (records.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.base),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            AppIcons.networkCheck,
+                            size: 56,
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.4,
+                            ),
+                          ),
+                          AppSpacing.verticalBase,
+                          Text(
+                            'no_records_title'.tr,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          AppSpacing.verticalSm,
+                          Text(
+                            'no_records_desc'.tr,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary(context),
+                            ),
+                          ),
+                          AppSpacing.verticalLg,
+                          FilledButton.tonalIcon(
+                            onPressed: _showTestRequestsBottomSheet,
+                            icon: const Icon(AppIcons.start),
+                            label: Text('test_request_btn'.tr),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  itemBuilder: (context, index) {
-                    final item = records[index];
-                    return _buildTrafficItemTile(context, item);
-                  },
-                );
-              }),
-            ),
-          ],
-        ),
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final itemIndex = index ~/ 2;
+                      if (index.isOdd) {
+                        return Divider(
+                          height: 1,
+                          thickness: 0.5,
+                          color: theme.colorScheme.outlineVariant.withValues(
+                            alpha: 0.4,
+                          ),
+                        );
+                      }
+                      final item = records[itemIndex];
+                      return _buildTrafficItemTile(context, item);
+                    },
+                    childCount: records.isEmpty ? 0 : (records.length * 2) - 1,
+                  ),
+                ),
+            ],
+          );
+        }),
       ),
     );
   }
@@ -645,22 +672,24 @@ class _TrafficListViewState extends State<TrafficListView> {
       isPending: item.isPending,
     );
     final methodColor = TrafficDetailView.getMethodColor(item.method);
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isNarrow = screenWidth < 360;
 
     return InkWell(
       onTap: () {
         Get.to(() => TrafficDetailView(record: item));
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space14,
-          vertical: AppSpacing.md,
+        padding: EdgeInsets.symmetric(
+          horizontal: isNarrow ? AppSpacing.space8 : AppSpacing.space14,
+          vertical: isNarrow ? AppSpacing.space10 : AppSpacing.md,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: AppSpacing.minTouchTarget,
-              height: AppSpacing.minTouchTarget,
+              width: isNarrow ? 38 : AppSpacing.minTouchTarget,
+              height: isNarrow ? 38 : AppSpacing.minTouchTarget,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: statusColor.withValues(alpha: 0.12),
@@ -688,7 +717,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                       ),
                     ),
             ),
-            AppSpacing.horizontalMd,
+            isNarrow ? AppSpacing.horizontalSm : AppSpacing.horizontalMd,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -701,6 +730,7 @@ class _TrafficListViewState extends State<TrafficListView> {
                         child: Text(
                           item.path,
                           overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 13.5,
@@ -713,12 +743,13 @@ class _TrafficListViewState extends State<TrafficListView> {
                   Text(
                     item.host,
                     overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                     style: TextStyle(fontSize: 12, color: AppColors.textSecondary(context)),
                   ),
                 ],
               ),
             ),
-            AppSpacing.horizontalSm,
+            isNarrow ? AppSpacing.horizontalXs : AppSpacing.horizontalSm,
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [

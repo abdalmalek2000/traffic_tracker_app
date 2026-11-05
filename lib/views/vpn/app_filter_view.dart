@@ -196,6 +196,8 @@ class _AppFilterViewState extends State<AppFilterView> {
                                 : 'mode_monitoring_selected'.trParams({
                                     'count': '$selectedCount',
                                   }),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -206,36 +208,43 @@ class _AppFilterViewState extends State<AppFilterView> {
                           ),
                         ),
                         if (visibleApps.isNotEmpty &&
-                            currentTab != AppViewTab.selectedOnly)
-                          TextButton(
-                            onPressed: () {
-                              final visiblePkgs = visibleApps.map(
-                                (a) => a.packageName,
-                              );
-                              final allSelected = visiblePkgs.every(
-                                (p) => controller.selectedPackages.contains(p),
-                              );
-                              if (allSelected) {
-                                for (final p in visiblePkgs) {
-                                  controller.togglePackage(p);
+                            currentTab != AppViewTab.selectedOnly) ...[
+                          AppSpacing.horizontalSm,
+                          Flexible(
+                            flex: 0,
+                            child: TextButton(
+                              onPressed: () {
+                                final visiblePkgs = visibleApps.map(
+                                  (a) => a.packageName,
+                                );
+                                final allSelected = visiblePkgs.every(
+                                  (p) => controller.selectedPackages.contains(p),
+                                );
+                                if (allSelected) {
+                                  for (final p in visiblePkgs) {
+                                    controller.togglePackage(p);
+                                  }
+                                } else {
+                                  controller.selectAll(visiblePkgs);
                                 }
-                              } else {
-                                controller.selectAll(visiblePkgs);
-                              }
-                            },
-                            child: Text(
-                              visibleApps.every(
-                                    (a) => controller.selectedPackages.contains(
-                                      a.packageName,
-                                    ),
-                                  )
-                                  ? 'deselect_all_visible'.tr
-                                  : 'select_all_visible'.trParams({
-                                      'count': '${visibleApps.length}',
-                                    }),
-                              style: const TextStyle(fontSize: 12),
+                              },
+                              child: Text(
+                                visibleApps.every(
+                                      (a) => controller.selectedPackages.contains(
+                                        a.packageName,
+                                      ),
+                                    )
+                                    ? 'deselect_all_visible'.tr
+                                    : 'select_all_visible'.trParams({
+                                        'count': '${visibleApps.length}',
+                                      }),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(fontSize: 12),
+                              ),
                             ),
                           ),
+                        ],
                       ],
                     ),
                   ),
@@ -335,6 +344,8 @@ class _AppFilterViewState extends State<AppFilterView> {
                                 ),
                           title: Text(
                             app.appName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -344,8 +355,8 @@ class _AppFilterViewState extends State<AppFilterView> {
                             children: [
                               if (app.isSystemApp)
                                 Container(
-                                  margin: const EdgeInsets.only(
-                                    right: AppSpacing.space6,
+                                  margin: const EdgeInsetsDirectional.only(
+                                    end: AppSpacing.space6,
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 5,
@@ -368,6 +379,7 @@ class _AppFilterViewState extends State<AppFilterView> {
                               Expanded(
                                 child: Text(
                                   app.packageName,
+                                  maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 11.5,

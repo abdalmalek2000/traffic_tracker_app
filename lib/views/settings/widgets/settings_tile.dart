@@ -65,11 +65,15 @@ class SettingsTile extends StatelessWidget {
 
       if (value != null && value!.isNotEmpty) {
         trailingChildren.add(
-          Text(
-            value!,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
+          Flexible(
+            child: Text(
+              value!,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         );
@@ -91,6 +95,7 @@ class SettingsTile extends StatelessWidget {
       if (trailingChildren.isNotEmpty) {
         effectiveTrailing = Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: trailingChildren,
         );
       }
@@ -109,13 +114,17 @@ class SettingsTile extends StatelessWidget {
               leadingWidget,
               AppSpacing.horizontalBase,
             ],
+            // Title & Subtitle column: takes dynamic flexible space
             Expanded(
+              flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     title,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: isDestructive
@@ -127,6 +136,8 @@ class SettingsTile extends StatelessWidget {
                     AppSpacing.verticalXxs,
                     Text(
                       subtitle!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -137,7 +148,12 @@ class SettingsTile extends StatelessWidget {
             ),
             if (effectiveTrailing != null) ...[
               AppSpacing.horizontalSm,
-              effectiveTrailing,
+              // Value next to arrow - dynamic flex (replaces hardcoded 45% constraint)
+              Flexible(
+                flex: 2,
+                fit: FlexFit.loose,
+                child: effectiveTrailing,
+              ),
             ],
           ],
         ),

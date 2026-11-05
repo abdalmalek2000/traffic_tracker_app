@@ -55,6 +55,22 @@ class TrafficTrackerApp extends StatelessWidget {
         locale: const Locale('en', 'US'),
         fallbackLocale: const Locale('en', 'US'),
         home: const MainNavigationView(),
+        builder: (context, child) {
+          final mediaQuery = MediaQuery.of(context);
+          final fluidScale = AppTypography.getResponsiveFontScale(
+            mediaQuery.size.width,
+          );
+          // Combine dynamic fluid scale with device accessibility text scale within safe clamp
+          final systemFactor = mediaQuery.textScaler.scale(1.0);
+          final combinedScale = (fluidScale * systemFactor).clamp(0.82, 1.22);
+
+          return MediaQuery(
+            data: mediaQuery.copyWith(
+              textScaler: TextScaler.linear(combinedScale),
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
       );
     });
   }

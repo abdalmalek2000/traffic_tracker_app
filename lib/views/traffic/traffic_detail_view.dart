@@ -104,6 +104,7 @@ class TrafficDetailView extends StatelessWidget {
                 child: Text(
                   record.path,
                   overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: const TextStyle(fontSize: 14),
                 ),
               ),
@@ -303,12 +304,16 @@ class TrafficDetailView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                Expanded(
+                  child: Text(
+                    title,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                  ),
                 ),
                 if (canCopy)
                   IconButton(
