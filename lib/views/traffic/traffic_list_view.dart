@@ -44,19 +44,19 @@ class _TrafficListViewState extends State<TrafficListView> {
 
   void _showTestRequestsBottomSheet() {
     Get.bottomSheet(
-      Container(
-        padding: AppSpacing.paddingBottomSheet,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: AppSpacing.radiusCircularXxl,
-          ),
+      Material(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(
+          top: AppSpacing.radiusCircularXxl,
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          padding: AppSpacing.paddingBottomSheet,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -202,8 +202,9 @@ class _TrafficListViewState extends State<TrafficListView> {
           ),
         ),
       ),
-      isScrollControlled: true,
-    );
+    ),
+    isScrollControlled: true,
+  );
   }
 
   void _showCustomRequestDialog() {

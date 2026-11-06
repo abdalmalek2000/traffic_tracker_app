@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../constants/icons.dart';
 import '../../../constants/spacing.dart';
+import '../../../constants/typography.dart';
 
 /// Highly reusable and adaptable tile for settings items.
 /// Supports leading icons, titles, subtitles, current value indicators,
-/// custom trailing widgets, and tap interactions.
+/// custom trailing widgets, dynamic responsive text scaling, and tap interactions.
 class SettingsTile extends StatelessWidget {
   final IconData? icon;
   final Color? iconColor;
@@ -59,47 +60,19 @@ class SettingsTile extends StatelessWidget {
       );
     }
 
-    Widget? effectiveTrailing = trailing;
-    if (effectiveTrailing == null) {
-      final List<Widget> trailingChildren = [];
-
-      if (value != null && value!.isNotEmpty) {
-        trailingChildren.add(
-          Flexible(
-            child: Text(
-              value!,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        );
-      }
-
-      if (showChevron && onTap != null) {
-        if (trailingChildren.isNotEmpty) {
-          trailingChildren.add(AppSpacing.horizontalXs);
-        }
-        trailingChildren.add(
-          Icon(
-            AppIcons.chevronRight,
-            size: AppSpacing.iconSm,
-            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-          ),
-        );
-      }
-
-      if (trailingChildren.isNotEmpty) {
-        effectiveTrailing = Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: trailingChildren,
-        );
-      }
+    // Trailing icon/widget (fixed width slot for consistent alignment across all rows)
+    Widget? trailingIconWidget;
+    if (trailing != null) {
+      trailingIconWidget = trailing;
+    } else if (showChevron && onTap != null) {
+      trailingIconWidget = Icon(
+        AppIcons.chevronRight,
+        size: AppSpacing.iconSm,
+        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+      );
     }
+
+    final hasValue = value != null && value!.isNotEmpty;
 
     return InkWell(
       onTap: onTap,
@@ -110,49 +83,108 @@ class SettingsTile extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // Leading Icon (Fixed size)
             if (leadingWidget != null) ...[
               leadingWidget,
               AppSpacing.horizontalBase,
             ],
-            // Title & Subtitle column: takes dynamic flexible space
-            Expanded(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: isDestructive
-                          ? theme.colorScheme.error
-                          : theme.colorScheme.onSurface,
-                    ),
-                  ),
-                  if (subtitle != null && subtitle!.isNotEmpty) ...[
-                    AppSpacing.verticalXxs,
+
+            // Content Area:
+            // When value exists: splits 2/3 for Title/Subtitle and 1/3 for Value
+            if (hasValue) ...[
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     Text(
-                      subtitle!,
+                      title,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: AppTypography.responsiveFontSize(context, 16.0),
+                        fontWeight: FontWeight.w600,
+                        color: isDestructive
+                            ? theme.colorScheme.error
+                            : theme.colorScheme.onSurface,
                       ),
                     ),
+                    if (subtitle != null && subtitle!.isNotEmpty) ...[
+                      AppSpacing.verticalXxs,
+                      Text(
+                        subtitle!,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontSize: AppTypography.responsiveFontSize(context, 12.0),
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-            if (effectiveTrailing != null) ...[
               AppSpacing.horizontalSm,
-              // Value next to arrow - dynamic flex (replaces hardcoded 45% constraint)
-              Flexible(
-                flex: 2,
-                fit: FlexFit.loose,
-                child: effectiveTrailing,
+              Expanded(
+                flex: 1,
+                child: Text(
+                  value!,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  textAlign: TextAlign.end,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: AppTypography.responsiveFontSize(context, 14.0),
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ] else ...[
+              // When no value exists: Title & Subtitle occupies full text space
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: AppTypography.responsiveFontSize(context, 16.0),
+                        fontWeight: FontWeight.w600,
+                        color: isDestructive
+                            ? theme.colorScheme.error
+                            : theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    if (subtitle != null && subtitle!.isNotEmpty) ...[
+                      AppSpacing.verticalXxs,
+                      Text(
+                        subtitle!,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontSize: AppTypography.responsiveFontSize(context, 12.0),
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+
+            // Fixed Trailing Icon Slot (Ensures all trailing icons align uniformly at the edge)
+            if (trailingIconWidget != null) ...[
+              AppSpacing.horizontalSm,
+              SizedBox(
+                width: 32,
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: trailingIconWidget,
+                ),
               ),
             ],
           ],

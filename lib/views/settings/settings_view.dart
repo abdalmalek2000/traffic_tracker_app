@@ -7,6 +7,7 @@ import '../../controllers/settings_controller.dart';
 import 'widgets/about_app_sheet.dart';
 import 'widgets/language_selector_sheet.dart';
 import 'widgets/palette_selector_sheet.dart';
+import 'widgets/pcap_location_selector_sheet.dart';
 import 'widgets/settings_section.dart';
 import 'widgets/settings_tile.dart';
 import 'widgets/theme_selector_sheet.dart';
@@ -71,6 +72,46 @@ class SettingsView extends StatelessWidget {
                   subtitle: 'color_scheme_subtitle'.tr,
                   value: settingsController.colorSchemeSummaryName,
                   onTap: () => PaletteSelectorSheet.show(context),
+                ),
+              ],
+            ),
+
+            AppSpacing.verticalXl,
+
+            // ==========================================
+            // APPLICATION PREFERENCES SECTION
+            // ==========================================
+            SettingsSection(
+              title: 'app_preferences_section'.tr,
+              children: [
+                // Battery Optimization Setting (Doze / Unrestricted Background Inspection)
+                SettingsTile(
+                  icon: AppIcons.battery,
+                  iconColor: theme.colorScheme.primary,
+                  title: 'battery_optimization_option'.tr,
+                  subtitle: 'battery_optimization_subtitle'.tr,
+                  trailing: Obx(() {
+                    final isIgnored =
+                        settingsController.isIgnoringBatteryOptimizations.value;
+                    return Icon(
+                      isIgnored ? AppIcons.checkCircle : AppIcons.minusCircle,
+                      color: isIgnored
+                          ? AppColors.statusSuccess
+                          : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                      size: AppSpacing.iconLg,
+                    );
+                  }),
+                  onTap: () => settingsController.requestIgnoreBatteryOptimization(),
+                ),
+
+                // PCAP Capture Save Location
+                SettingsTile(
+                  icon: AppIcons.folderDownload,
+                  iconColor: theme.colorScheme.primary,
+                  title: 'pcap_location_option'.tr,
+                  subtitle: 'pcap_location_subtitle'.tr,
+                  value: settingsController.pcapLocationDisplayName,
+                  onTap: () => PcapLocationSelectorSheet.show(context),
                 ),
               ],
             ),

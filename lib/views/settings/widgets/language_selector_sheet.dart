@@ -93,27 +93,23 @@ class LanguageSelectorSheet extends StatelessWidget {
                     final locale = lang['locale'] as Locale;
                     final isSelected = activeLocale.languageCode == locale.languageCode;
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-                      decoration: BoxDecoration(
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: Material(
                         color: isSelected
                             ? theme.colorScheme.primary.withValues(alpha: 0.08)
                             : Colors.transparent,
-                        borderRadius: AppSpacing.borderRadiusLg,
-                        border: Border.all(
-                          color: isSelected
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                          width: isSelected ? 1.5 : 1.0,
-                        ),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        borderRadius: AppSpacing.borderRadiusLg,
-                        child: ListTile(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: AppSpacing.borderRadiusLg,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: AppSpacing.borderRadiusLg,
+                          side: BorderSide(
+                            color: isSelected
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                            width: isSelected ? 1.5 : 1.0,
                           ),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: ListTile(
                           leading: Container(
                             width: 36,
                             height: 36,

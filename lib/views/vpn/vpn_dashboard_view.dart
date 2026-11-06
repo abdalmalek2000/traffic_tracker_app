@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../constants/icons.dart';
 import '../../controllers/vpn_controller.dart';
@@ -27,62 +26,6 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _showPcapExportDialog(String? pcapPath) {
-    Get.dialog(
-      AlertDialog(
-        title: Row(
-          children: [
-            const Icon(AppIcons.file, color: AppColors.protocolHttp),
-            AppSpacing.horizontalSm,
-            Expanded(
-              child: Text(
-                'pcap_export_title'.tr,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('pcap_export_desc'.tr, style: const TextStyle(fontSize: 13)),
-            AppSpacing.verticalMd,
-            Container(
-              padding: AppSpacing.paddingAll10,
-              decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.1),
-                borderRadius: AppSpacing.borderRadiusMd,
-              ),
-              child: SelectableText(
-                pcapPath ?? 'No capture session active',
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('close'.tr)),
-          if (pcapPath != null)
-            FilledButton.icon(
-              icon: const Icon(AppIcons.copy, size: AppSpacing.iconXs),
-              label: Text('copy_file_path'.tr),
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: pcapPath));
-                Get.back();
-                Get.rawSnackbar(
-                  message: 'copied_to_clipboard'.tr,
-                  duration: const Duration(seconds: 1),
-                  snackPosition: SnackPosition.BOTTOM,
-                );
-              },
-            ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -119,7 +62,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
             ),
             onSelected: (val) {
               if (val == 'pcap') {
-                _showPcapExportDialog(controller.currentPcapPath.value);
+                controller.exportPcapFile();
               } else if (val == 'clear') {
                 controller.clearConnections();
               } else if (val == 'settings') {

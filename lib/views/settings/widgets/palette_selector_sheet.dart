@@ -82,27 +82,22 @@ class PaletteSelectorSheet extends StatelessWidget {
                 Obx(() {
                   final isDynamicSelected = controller.useDynamicColor.value;
 
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: isDynamicSelected
-                          ? theme.colorScheme.primary.withValues(alpha: 0.08)
-                          : Colors.transparent,
+                  return Material(
+                    color: isDynamicSelected
+                        ? theme.colorScheme.primary.withValues(alpha: 0.08)
+                        : Colors.transparent,
+                    shape: RoundedRectangleBorder(
                       borderRadius: AppSpacing.borderRadiusLg,
-                      border: Border.all(
+                      side: BorderSide(
                         color: isDynamicSelected
                             ? theme.colorScheme.primary
                             : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
                         width: isDynamicSelected ? 1.5 : 1.0,
                       ),
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      borderRadius: AppSpacing.borderRadiusLg,
-                      child: ListTile(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: AppSpacing.borderRadiusLg,
-                        ),
-                        leading: Container(
+                    clipBehavior: Clip.antiAlias,
+                    child: ListTile(
+                      leading: Container(
                           width: 38,
                           height: 38,
                           decoration: BoxDecoration(
@@ -153,9 +148,8 @@ class PaletteSelectorSheet extends StatelessWidget {
                           Navigator.of(context).pop();
                         },
                       ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
 
                 AppSpacing.verticalBase,
 
@@ -185,27 +179,23 @@ class PaletteSelectorSheet extends StatelessWidget {
                       final isSelected = !isDynamicSelected &&
                           currentPaletteId == palette.id;
 
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-                        decoration: BoxDecoration(
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        child: Material(
                           color: isSelected
                               ? palette.primaryColor.withValues(alpha: 0.08)
                               : Colors.transparent,
-                          borderRadius: AppSpacing.borderRadiusLg,
-                          border: Border.all(
-                            color: isSelected
-                                ? palette.primaryColor
-                                : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                            width: isSelected ? 1.5 : 1.0,
-                          ),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          borderRadius: AppSpacing.borderRadiusLg,
-                          child: ListTile(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: AppSpacing.borderRadiusLg,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: AppSpacing.borderRadiusLg,
+                            side: BorderSide(
+                              color: isSelected
+                                  ? palette.primaryColor
+                                  : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                              width: isSelected ? 1.5 : 1.0,
                             ),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: ListTile(
                             leading: Container(
                               width: 36,
                               height: 36,

@@ -34,6 +34,10 @@ class AppIcons {
   static const IconData sun = HugeIcons.strokeRoundedSun01;
   static const IconData moon = HugeIcons.strokeRoundedMoon02;
   static const IconData checkCircle = HugeIcons.strokeRoundedCheckmarkCircle02;
+  static const IconData minusCircle = HugeIcons.strokeRoundedMinusSignCircle;
+  static const IconData battery = HugeIcons.strokeRoundedBatteryCharging01;
+  static const IconData folder = HugeIcons.strokeRoundedFolder01;
+  static const IconData folderDownload = HugeIcons.strokeRoundedFolderDownload;
   static const IconData info = HugeIcons.strokeRoundedInformationCircle;
 
   // Search & Filters

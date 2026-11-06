@@ -2,11 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import '../constants/colors.dart';
+import '../constants/icons.dart';
+import '../constants/spacing.dart';
 import '../models/app_info.dart';
 import '../models/captured_connection.dart';
 import '../models/traffic_record.dart';
 import '../services/vpn_native_bridge.dart';
-import '../constants/colors.dart';
+import 'settings_controller.dart';
 
 /// تبويبات تصنيف تطبيقات الجهاز في شاشة الاختيار
 enum AppViewTab {
@@ -272,6 +275,39 @@ class VpnController extends GetxController {
 
   void setAppSearchQuery(String query) {
     appSearchQuery.value = query;
+  }
+
+  /// تصدير ملف الـ PCAP إلى المكان المحدد في الإعدادات وإظهار رسالة بسيطة بإتمام الحفظ
+  Future<void> exportPcapFile() async {
+    final settings = SettingsController.to;
+    final savedPath = await VpnNativeBridge.exportPcapFile(
+      locationType: settings.pcapLocationType.value,
+      customUri: settings.customPcapUri.value,
+    );
+
+    if (savedPath == null || savedPath.isEmpty) {
+      Get.rawSnackbar(
+        message: 'pcap_no_data'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.black87,
+        margin: const EdgeInsets.all(AppSpacing.base),
+        borderRadius: AppSpacing.radiusMd,
+        duration: const Duration(seconds: 3),
+      );
+      return;
+    }
+
+    Get.rawSnackbar(
+      message: 'pcap_saved_success'.trParams({
+        'location': settings.pcapLocationDisplayName,
+      }),
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.statusSuccess,
+      icon: const Icon(AppIcons.checkCircle, color: Colors.white),
+      margin: const EdgeInsets.all(AppSpacing.base),
+      borderRadius: AppSpacing.radiusMd,
+      duration: const Duration(seconds: 3),
+    );
   }
 
   @override

@@ -62,6 +62,30 @@ class VpnNativeBridge {
     }
   }
 
+  /// تصدير وحفظ ملف الـ PCAP في المكان المخصص مع دفق كافة الحزم الحالية
+  static Future<String?> exportPcapFile({
+    required String locationType,
+    String? customUri,
+  }) async {
+    try {
+      return await _controlChannel.invokeMethod<String>('exportPcapFile', {
+        'locationType': locationType,
+        'customUri': customUri,
+      });
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// فتح منتقي المجلدات الرسمي لاختيار مجلد مخصص (SAF Document Tree)
+  static Future<Map<dynamic, dynamic>?> pickDirectory() async {
+    try {
+      return await _controlChannel.invokeMethod<Map<dynamic, dynamic>>('pickDirectory');
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// تحديث قائمة التطبيقات المسموحة ديناميكياً أثناء تشغيل الـ VPN
   static Future<void> updateAllowedPackages(List<String>? allowedPackages) async {
     try {

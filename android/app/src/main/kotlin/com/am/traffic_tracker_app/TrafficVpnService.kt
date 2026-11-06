@@ -45,11 +45,20 @@ class TrafficVpnService : VpnService() {
 
         var eventSink: EventChannel.EventSink? = null
         var pcapFilePath: String? = null
+        @Volatile
+        var activePcapStream: FileOutputStream? = null
         var packetCount = 0L
         var totalBytesCaptured = 0L
         val allowedPackageSet: HashSet<String> = hashSetOf()
 
         private val mainHandler = Handler(Looper.getMainLooper())
+
+        fun flushPcap() {
+            try {
+                activePcapStream?.flush()
+                activePcapStream?.fd?.sync()
+            } catch (_: Exception) {}
+        }
 
         fun updateAllowedPackages(packages: List<String>?) {
             synchronized(allowedPackageSet) {
@@ -242,6 +251,14 @@ class TrafficVpnService : VpnService() {
             fos.write(header.array())
             fos.flush()
             pcapOutputStream = fos
+            activePcapStream = fos
+
+            try {
+                getSharedPreferences("traffic_tracker_prefs", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString("last_pcap_path", file.absolutePath)
+                    .apply()
+            } catch (_: Exception) {}
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -564,6 +581,7 @@ class TrafficVpnService : VpnService() {
             pcapOutputStream?.flush()
             pcapOutputStream?.close()
             pcapOutputStream = null
+            activePcapStream = null
         } catch (_: Exception) {}
 
         sendEvent(mapOf(
