@@ -8,9 +8,9 @@
   <b>A High-Performance Network Traffic Inspector, Security Auditor & PCAP Capture Engine for Android & Flutter.</b>
 </p>
 
-<p align="center">
+<!-- <p align="center">
   <i>فاحص ومراقب حركة مرور الشبكة والأمان المتقدم لتطبيقات أندرويد وفلاتر بدون روت ومع تصدير PCAP مباشر لبرنامج Wireshark</i>
-</p>
+</p> -->
 
 <p align="center">
   <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.12%2B-02569B?logo=flutter&logoColor=white" alt="Flutter"></a>
@@ -32,27 +32,27 @@ It provides seamless, **no-root required** packet interception, deep REST API in
 
 ---
 
-## ✨ Key Features (الميزات الرئيسية)
+## ✨ Key Features
 
-### 1. 🛡️ System-Wide Network Inspector (مراقب شبكة النظام الشامل)
+### 1. 🛡️ System-Wide Network Inspector
 * **No Root Required**: Employs Android's native `android.net.VpnService` to capture IP packets (TCP, UDP, ICMP) on a virtual local TUN interface without modifying system partitions.
 * **Domain & SNI Discovery**: Inspects TLS Client Hello (`SNI` - Server Name Indication) and DNS queries (`UDP port 53`) to identify destination hostnames and domains without breaking SSL/TLS certificates or tripping SSL Pinning guards.
 * **Socket Attribution**: Identifies remote IP addresses, local & remote ports, transport protocols, connection timestamps, and transfer sizes.
 * **PCAP Export for Wireshark**: Records captured raw network packets into standard `.pcap` files compatible with **Wireshark**, **Zeek**, and **NetworkMiner**.
 * **Flexible Storage Selection**: Easily direct `.pcap` dump files to Public Downloads, Documents, App-specific external storage, or custom device folders.
 
-### 2. 🎯 Granular Per-App Isolation (تصفية وعزل التطبيقات)
+### 2. 🎯 Granular Per-App Isolation
 * **Target Mode**: Restrict network traffic capture to one or more specific installed applications (e.g., test app, browser, social media).
 * **Smart App Categorization**: Filter installed applications by **User Apps** vs. **System Apps**.
 * **Live Dynamic Sync**: Adding or removing target apps updates the live packet stream immediately without requiring VPN re-establishment.
 
-### 3. 🔍 In-App HTTP / REST API Inspector (فاحص طلبات الـ HTTP الداخلي)
+### 3. 🔍 In-App HTTP / REST API Inspector
 * **Real-time API Interception**: Intercepts outgoing and incoming HTTP/HTTPS transactions with latency, headers, queries, and payload metrics.
 * **cURL Command Generator**: Generate and copy ready-to-execute `cURL` commands with a single tap for testing in terminal, Postman, or Burp Suite.
 * **Interactive JSON Viewer**: Beautifully formats, expands, collapses, and copies JSON request/response payloads.
 * **Live Test Generator**: Built-in test sandbox to fire mock requests (`GET 200`, `POST JSON`, `PUT`, `DELETE`, `302 Redirect`, `404 Not Found`, `500 Server Error`, and custom endpoints).
 
-### 4. 🎨 Modern Material 3 & Customization (تصميم Material 3 متقدم وتخصيص كامل)
+### 4. 🎨 Modern Material 3 & Customization
 * **Material You Dynamic Color**: Seamlessly matches your Android 12+ wallpaper palette.
 * **6 Custom Static Palettes**: Forest Green (Default), Crimson Red, Ocean Blue, Royal Purple, Sunset Orange, and Emerald Teal.
 * **Light / Dark / System Themes**: Flawless contrast across all modes with zero text or container clipping.
@@ -61,7 +61,7 @@ It provides seamless, **no-root required** packet interception, deep REST API in
 
 ---
 
-## 🏛️ Architecture & Clean Design (معمارية المشروع)
+## 🏛️ Architecture & Clean Design
 
 The project adheres to a clean **MVC (Model-View-Controller)** pattern combined with **GetX** for reactive state handling and a dedicated native bridge:
 
@@ -101,7 +101,7 @@ lib/
     └── widgets/                   # Reusable components (e.g., JsonViewer)
 ```
 
-### 🌉 Native Bridge Architecture (أندرويد الأصيل)
+### 🌉 Native Bridge Architecture
 
 ```
 ┌─────────────────────────────────┐
@@ -123,7 +123,7 @@ lib/
 
 ---
 
-## 🚀 Getting Started (البدء وتثبيت المشروع)
+## 🚀 Getting Started
 
 ### 📋 Prerequisites
 * [Flutter SDK](https://docs.flutter.dev/get-started/install) (`^3.12.0` or later)
@@ -180,7 +180,7 @@ To enable packet interception and application listing without root privileges, t
 
 ---
 
-## 🛡️ Security & Privacy (الأمان والخصوصية)
+## 🛡️ Security & Privacy
 
 * **100% Local & Offline**: All packet inspection, parsing, and PCAP writes take place strictly on the user's device.
 * **Zero Telemetry**: No user data, connection logs, or analytics are sent to any remote server.
@@ -188,7 +188,7 @@ To enable packet interception and application listing without root privileges, t
 
 ---
 
-## 👨‍💻 Author (المطور)
+## 👨‍💻 Author
 
 Developed with ❤️ by **Abdulmalek Moh**:
 * **GitHub**: [@abdalmalek2000](https://github.com/abdalmalek2000)
@@ -196,6 +196,6 @@ Developed with ❤️ by **Abdulmalek Moh**:
 
 ---
 
-## 📄 License (الترخيص)
+## 📄 License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
