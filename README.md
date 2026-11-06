@@ -24,7 +24,7 @@
 
 ---
 
-## 📌 Overview (نظرة عامة)
+## 📌 Overview
 
 **Traffic Tracker** is a developer and security-focused mobile network diagnostics toolkit built with **Flutter** and powered by an **Android Native VpnService** engine (`Kotlin`). 
 
@@ -155,7 +155,7 @@ lib/
 
 ---
 
-## 🔒 Android Permissions (أذونات أندرويد المطلوبة)
+## 🔒 Android Permissions
 
 To enable packet interception and application listing without root privileges, the following permissions are declared in `AndroidManifest.xml`:
 
@@ -170,7 +170,7 @@ To enable packet interception and application listing without root privileges, t
 
 ---
 
-## 🔬 How It Works Under The Hood (آلية العمل التقنية)
+## 🔬 How It Works Under The Hood
 
 1. **Local TUN Interface**: When VPN inspection starts, `TrafficVpnService` establishes a virtual network interface (TUN) using Android's `VpnService.Builder`.
 2. **Transparent Forwarding**: Captured IPv4 packets are parsed by `PacketUtils.kt`. Non-intercepted traffic is transparently routed back to the internet, keeping network connectivity smooth and uninterrupted.
