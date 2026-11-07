@@ -275,7 +275,9 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                                 backgroundColor: isRunning
                                     ? AppColors.statusServerError
                                     : theme.colorScheme.primary,
-                                foregroundColor: Colors.white,
+                                foregroundColor: isRunning
+                                    ? Colors.white
+                                    : theme.colorScheme.onPrimary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: AppSpacing.borderRadiusLg,
                                 ),
@@ -438,14 +440,14 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                                     fontWeight: FontWeight.bold,
                                     color:
                                         controller.filterBySelectedAppsOnly.value
-                                        ? Colors.white
+                                        ? AppColors.getContrastingColor(AppColors.statusSuccess)
                                         : null,
                                   ),
                                 ),
                                 selected:
                                     controller.filterBySelectedAppsOnly.value,
                                 selectedColor: AppColors.statusSuccess,
-                                checkmarkColor: Colors.white,
+                                checkmarkColor: AppColors.getContrastingColor(AppColors.statusSuccess),
                                 onSelected: (val) =>
                                     controller.setFilterBySelectedAppsOnly(val),
                                 materialTapTargetSize:
@@ -609,8 +611,8 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
               ),
               child: Text(
                 item.protocol,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: AppColors.getContrastingColor(protocolColor),
                   fontWeight: FontWeight.bold,
                   fontSize: 10.5,
                 ),

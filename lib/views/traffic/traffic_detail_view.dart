@@ -71,8 +71,8 @@ class TrafficDetailView extends StatelessWidget {
                 ),
                 child: Text(
                   record.method.toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.getContrastingColor(methodColor),
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                   ),

@@ -75,8 +75,8 @@ class ConnectionDetailView extends StatelessWidget {
                   ),
                   child: Text(
                     connection.protocol,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppColors.getContrastingColor(protocolColor),
                       fontWeight: FontWeight.bold,
                       fontSize: 11,
                     ),

@@ -17,17 +17,31 @@ class AppTheme {
     AppColorPalette palette = AppPalettes.forestGreen,
     String fontFamily = AppTypography.primaryFont,
   }) {
+    final Color seed = dynamicSeedColor ?? palette.primaryColor;
     final ColorScheme baseScheme = dynamicScheme ??
         ColorScheme.fromSeed(
-          seedColor: dynamicSeedColor ?? palette.primaryColor,
+          seedColor: seed,
           brightness: Brightness.light,
-          primary: dynamicSeedColor ?? palette.primaryColor,
+          primary: dynamicSeedColor != null ? null : palette.primaryColor,
           secondary: dynamicSeedColor != null ? null : palette.secondaryColor,
           surface: AppColors.lightSurface,
           error: AppColors.statusServerError,
         );
 
+    final Color primaryColor = baseScheme.primary;
+    final Color onPrimaryColor = AppColors.getContrastingColor(primaryColor);
+    final Color primContainer = baseScheme.primaryContainer;
+    final Color onPrimContainer = AppColors.getContrastingColor(primContainer);
+    final Color secContainer = baseScheme.secondaryContainer;
+    final Color onSecContainer = AppColors.getContrastingColor(secContainer);
+
     final ColorScheme colorScheme = baseScheme.copyWith(
+      primary: primaryColor,
+      onPrimary: onPrimaryColor,
+      primaryContainer: primContainer,
+      onPrimaryContainer: onPrimContainer,
+      secondaryContainer: secContainer,
+      onSecondaryContainer: onSecContainer,
       onSurface: AppColors.lightTextPrimary,
       onSurfaceVariant: AppColors.lightTextSecondary,
       surface: AppColors.lightSurface,
@@ -52,6 +66,58 @@ class AppTheme {
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
         surfaceTintColor: Colors.transparent,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppSpacing.borderRadiusBase,
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.surface,
+          foregroundColor: colorScheme.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppSpacing.borderRadiusBase,
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.6)),
+          shape: RoundedRectangleBorder(
+            borderRadius: AppSpacing.borderRadiusBase,
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.borderRadiusLg,
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.borderRadiusBase,
+        ),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
       ),
       navigationBarTheme: NavigationBarThemeData(
         height: 60,
@@ -93,16 +159,33 @@ class AppTheme {
     AppColorPalette palette = AppPalettes.forestGreen,
     String fontFamily = AppTypography.primaryFont,
   }) {
+    final Color seed = dynamicSeedColor ?? palette.primaryColor;
     final ColorScheme baseScheme = dynamicScheme ??
         ColorScheme.fromSeed(
-          seedColor: dynamicSeedColor ?? palette.darkPrimaryColor,
+          seedColor: seed,
           brightness: Brightness.dark,
-          primary: dynamicSeedColor ?? palette.darkPrimaryColor,
+          // In Material 3 dark mode with dynamic accent color, allow ColorScheme.fromSeed
+          // to generate the optimal Tone 80 dynamic primary for proper contrast.
+          // For static palettes, use darkPrimaryColor.
+          primary: dynamicSeedColor != null ? null : palette.darkPrimaryColor,
           surface: AppColors.darkSurface,
           error: AppColors.statusServerError,
         );
 
+    final Color primaryColor = baseScheme.primary;
+    final Color onPrimaryColor = AppColors.getContrastingColor(primaryColor);
+    final Color primContainer = baseScheme.primaryContainer;
+    final Color onPrimContainer = AppColors.getContrastingColor(primContainer);
+    final Color secContainer = baseScheme.secondaryContainer;
+    final Color onSecContainer = AppColors.getContrastingColor(secContainer);
+
     final ColorScheme colorScheme = baseScheme.copyWith(
+      primary: primaryColor,
+      onPrimary: onPrimaryColor,
+      primaryContainer: primContainer,
+      onPrimaryContainer: onPrimContainer,
+      secondaryContainer: secContainer,
+      onSecondaryContainer: onSecContainer,
       onSurface: AppColors.darkTextPrimary,
       onSurfaceVariant: AppColors.darkTextSecondary,
       surface: AppColors.darkSurface,
@@ -127,6 +210,58 @@ class AppTheme {
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
         surfaceTintColor: Colors.transparent,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppSpacing.borderRadiusBase,
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.surface,
+          foregroundColor: colorScheme.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: AppSpacing.borderRadiusBase,
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.6)),
+          shape: RoundedRectangleBorder(
+            borderRadius: AppSpacing.borderRadiusBase,
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.borderRadiusLg,
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.borderRadiusBase,
+        ),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+        ),
       ),
       navigationBarTheme: NavigationBarThemeData(
         height: 60,

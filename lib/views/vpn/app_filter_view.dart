@@ -405,20 +405,25 @@ class _AppFilterViewState extends State<AppFilterView> {
     required bool isSelected,
     required VoidCallback onSelected,
   }) {
+    final chipBg = color ?? Theme.of(context).colorScheme.primary;
+    final onChipColor = isSelected
+        ? AppColors.getContrastingColor(chipBg)
+        : null;
+
     return FilterChip(
       label: Text(
         label,
         style: TextStyle(
           fontSize: 11.5,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? Colors.white : null,
+          color: onChipColor,
         ),
       ),
       selected: isSelected,
       onSelected: (_) => onSelected(),
       backgroundColor: Colors.transparent,
-      selectedColor: color ?? Theme.of(context).colorScheme.primary,
-      checkmarkColor: Colors.white,
+      selectedColor: chipBg,
+      checkmarkColor: onChipColor,
       padding: AppSpacing.paddingHXs,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );

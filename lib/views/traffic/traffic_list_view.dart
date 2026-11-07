@@ -326,7 +326,6 @@ class _TrafficListViewState extends State<TrafficListView> {
             ),
             AppSpacing.horizontalSm,
             Expanded(
-              flex: 12,
               child: Text(
                 'network_inspector'.tr,
                 overflow: TextOverflow.ellipsis,
@@ -334,73 +333,58 @@ class _TrafficListViewState extends State<TrafficListView> {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
-            const Spacer(),
-            Obx(() {
-              final isRec = controller.isRecording.value;
-              return Tooltip(
-                message: isRec
-                    ? 'monitoring_active'.tr
-                    : 'monitoring_paused'.tr,
-                child: IconButton(
-                  icon: Icon(
-                    isRec ? AppIcons.pause : AppIcons.play,
-                    color: isRec ? AppColors.statusSuccess : Colors.grey,
-                    size: 26,
-                  ),
-                  onPressed: () => controller.toggleRecording(),
-                ),
-              );
-            }),
-            PopupMenuButton<String>(
-              icon: const Icon(AppIcons.moreVert),
-              shape: RoundedRectangleBorder(
-                borderRadius: AppSpacing.borderRadiusLg,
-              ),
-              onSelected: (val) {
-                if (val == 'clear') {
-                  controller.clearRecords();
-                  Get.rawSnackbar(
-                    message: 'records_cleared'.tr,
-                    duration: const Duration(seconds: 1),
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
-                } else if (val == 'settings') {
-                  Get.to(() => const SettingsView());
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem<String>(
-                  value: 'clear',
-                  child: Row(
-                    children: [
-                      const Icon(
-                        AppIcons.delete,
-                        size: AppSpacing.iconMd,
-                        color: AppColors.statusServerError,
-                      ),
-                      AppSpacing.horizontal10,
-                      Text('clear_records'.tr),
-                    ],
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'settings',
-                  child: Row(
-                    children: [
-                      Icon(
-                        AppIcons.settings,
-                        size: AppSpacing.iconMd,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                      AppSpacing.horizontal10,
-                      Text('settings_title'.tr),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(AppIcons.moreVert),
+            shape: RoundedRectangleBorder(
+              borderRadius: AppSpacing.borderRadiusLg,
+            ),
+            onSelected: (val) {
+              if (val == 'clear') {
+                controller.clearRecords();
+                Get.rawSnackbar(
+                  message: 'records_cleared'.tr,
+                  duration: const Duration(seconds: 1),
+                  snackPosition: SnackPosition.BOTTOM,
+                );
+              } else if (val == 'settings') {
+                Get.to(() => const SettingsView());
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem<String>(
+                value: 'clear',
+                child: Row(
+                  children: [
+                    const Icon(
+                      AppIcons.delete,
+                      size: AppSpacing.iconMd,
+                      color: AppColors.statusServerError,
+                    ),
+                    AppSpacing.horizontal10,
+                    Text('clear_records'.tr),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(
+                      AppIcons.settings,
+                      size: AppSpacing.iconMd,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    AppSpacing.horizontal10,
+                    Text('settings_title'.tr),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       floatingActionButton: MediaQuery.sizeOf(context).height < 320
           ? null
@@ -410,12 +394,12 @@ class _TrafficListViewState extends State<TrafficListView> {
                       _isSendingTest ? null : _showTestRequestsBottomSheet,
                   tooltip: 'test_request_btn'.tr,
                   child: _isSendingTest
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: theme.colorScheme.onPrimaryContainer,
                           ),
                         )
                       : const Icon(AppIcons.send, size: 18),
@@ -424,12 +408,12 @@ class _TrafficListViewState extends State<TrafficListView> {
                   onPressed:
                       _isSendingTest ? null : _showTestRequestsBottomSheet,
                   icon: _isSendingTest
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: theme.colorScheme.onPrimaryContainer,
                           ),
                         )
                       : const Icon(AppIcons.send),
@@ -648,20 +632,25 @@ class _TrafficListViewState extends State<TrafficListView> {
     required bool isSelected,
     required VoidCallback onSelected,
   }) {
+    final chipBg = color ?? Theme.of(context).colorScheme.primary;
+    final onChipColor = isSelected
+        ? AppColors.getContrastingColor(chipBg)
+        : null;
+
     return FilterChip(
       label: Text(
         label,
         style: TextStyle(
           fontSize: 11.5,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? Colors.white : null,
+          color: onChipColor,
         ),
       ),
       selected: isSelected,
       onSelected: (_) => onSelected(),
       backgroundColor: Colors.transparent,
-      selectedColor: color ?? Theme.of(context).colorScheme.primary,
-      checkmarkColor: Colors.white,
+      selectedColor: chipBg,
+      checkmarkColor: onChipColor,
       padding: AppSpacing.paddingHXs,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
@@ -788,8 +777,8 @@ class _TrafficListViewState extends State<TrafficListView> {
       ),
       child: Text(
         method.toUpperCase(),
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: AppColors.getContrastingColor(color),
           fontSize: 10,
           fontWeight: FontWeight.bold,
           letterSpacing: 0.5,

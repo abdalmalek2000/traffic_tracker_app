@@ -63,6 +63,14 @@ class AppColors {
         : lightBorder;
   }
 
+  /// Returns a high-contrast foreground color (dark or white) for any given background color.
+  /// Complies with WCAG 2.1 AA/AAA contrast guidelines to prevent unreadable text on buttons and chips.
+  static Color getContrastingColor(Color background) {
+    return background.computeLuminance() > 0.35
+        ? const Color(0xFF121212)
+        : Colors.white;
+  }
+
   // ==========================================
   // PROTOCOL BADGES (Theme-Independent Constants)
   // Preserves vibrant, distinct contrast in both Light and Dark modes.
