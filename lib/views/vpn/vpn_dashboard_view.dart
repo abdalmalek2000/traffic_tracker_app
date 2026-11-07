@@ -432,37 +432,6 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                               ),
                             ),
                           ),
-                          if (selectedCount > 0) ...[
-                            AppSpacing.horizontalSm,
-                            Flexible(
-                              child: FilterChip(
-                                label: Text(
-                                  'mode_target_only'.tr,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        controller.filterBySelectedAppsOnly.value
-                                        ? AppColors.getContrastingColor(AppColors.statusSuccess)
-                                        : null,
-                                  ),
-                                ),
-                                selected:
-                                    controller.filterBySelectedAppsOnly.value,
-                                selectedColor: AppColors.statusSuccess,
-                                checkmarkColor: AppColors.getContrastingColor(AppColors.statusSuccess),
-                                onSelected: (val) =>
-                                    controller.setFilterBySelectedAppsOnly(val),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                ),
-                              ),
-                            ),
-                          ],
                           if (isRunning)
                             Row(
                               children: [
@@ -486,6 +455,83 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                               ],
                             ),
                         ],
+                      ),
+                    ),
+
+                    // Traffic Classification Filter Chips Bar
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 4,
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildTrafficFilterChip(
+                              context: context,
+                              theme: theme,
+                              label: 'filter_traffic_all'.tr,
+                              isSelected: controller.activeTrafficFilter.value ==
+                                  VpnTrafficFilter.all,
+                              onSelected: () => controller
+                                  .setTrafficFilter(VpnTrafficFilter.all),
+                            ),
+                            AppSpacing.horizontalXs,
+                            _buildTrafficFilterChip(
+                              context: context,
+                              theme: theme,
+                              label: 'filter_traffic_apps_only'.tr,
+                              icon: AppIcons.device,
+                              isSelected: controller.activeTrafficFilter.value ==
+                                  VpnTrafficFilter.appsOnly,
+                              onSelected: () => controller
+                                  .setTrafficFilter(VpnTrafficFilter.appsOnly),
+                            ),
+                            AppSpacing.horizontalXs,
+                            _buildTrafficFilterChip(
+                              context: context,
+                              theme: theme,
+                              label: 'filter_traffic_system'.tr,
+                              icon: AppIcons.settings,
+                              isSelected: controller.activeTrafficFilter.value ==
+                                  VpnTrafficFilter.systemOnly,
+                              onSelected: () => controller
+                                  .setTrafficFilter(VpnTrafficFilter.systemOnly),
+                            ),
+                            if (selectedCount > 0) ...[
+                              AppSpacing.horizontalXs,
+                              FilterChip(
+                                label: Text(
+                                  'mode_target_only'.tr,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: controller
+                                            .filterBySelectedAppsOnly.value
+                                        ? AppColors.getContrastingColor(
+                                            AppColors.statusSuccess)
+                                        : null,
+                                  ),
+                                ),
+                                selected:
+                                    controller.filterBySelectedAppsOnly.value,
+                                selectedColor: AppColors.statusSuccess,
+                                checkmarkColor: AppColors.getContrastingColor(
+                                    AppColors.statusSuccess),
+                                onSelected: (val) => controller
+                                    .setFilterBySelectedAppsOnly(val),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -588,6 +634,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
   }
 
   Widget _buildConnectionTile(BuildContext context, CapturedConnection item) {
+    final theme = Theme.of(context);
     // Protocol badge uses theme-independent AppColors
     final protocolColor = AppColors.getProtocolColor(item.protocol);
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -644,19 +691,23 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                               end: AppSpacing.space6,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.protocolHttp.withValues(
-                                alpha: 0.15,
-                              ),
+                              color: item.isSystemOrUnattributed
+                                  ? theme.colorScheme.surfaceContainerHighest
+                                  : AppColors.protocolHttp.withValues(
+                                      alpha: 0.15,
+                                    ),
                               borderRadius: AppSpacing.borderRadiusXs,
                             ),
                             child: Text(
                               item.appName!,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.protocolHttp,
+                                color: item.isSystemOrUnattributed
+                                    ? theme.colorScheme.onSurfaceVariant
+                                    : AppColors.protocolHttp,
                               ),
                             ),
                           ),
@@ -721,6 +772,43 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTrafficFilterChip({
+    required BuildContext context,
+    required ThemeData theme,
+    required String label,
+    IconData? icon,
+    required bool isSelected,
+    required VoidCallback onSelected,
+  }) {
+    final chipBg = theme.colorScheme.primary;
+    final onChipColor =
+        isSelected ? AppColors.getContrastingColor(chipBg) : null;
+
+    return FilterChip(
+      avatar: icon != null
+          ? Icon(
+              icon,
+              size: 13,
+              color: onChipColor ?? theme.colorScheme.onSurfaceVariant,
+            )
+          : null,
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          color: onChipColor,
+        ),
+      ),
+      selected: isSelected,
+      selectedColor: chipBg,
+      checkmarkColor: onChipColor,
+      onSelected: (_) => onSelected(),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
     );
   }
 }

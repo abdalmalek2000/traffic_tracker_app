@@ -19,6 +19,12 @@ enum AppViewTab {
   systemApps,
 }
 
+enum VpnTrafficFilter {
+  all,
+  appsOnly,
+  systemOnly,
+}
+
 /// متحكم خدمة مراقبة شبكة الجهاز بالكامل (System VPN Controller)
 class VpnController extends GetxController {
   static VpnController get to => Get.find();
@@ -34,6 +40,7 @@ class VpnController extends GetxController {
 
   final RxString searchQuery = ''.obs;
   final RxBool filterBySelectedAppsOnly = false.obs;
+  final Rx<VpnTrafficFilter> activeTrafficFilter = VpnTrafficFilter.all.obs;
   final Rx<AppViewTab> currentAppTab = AppViewTab.all.obs;
   final RxString appSearchQuery = ''.obs;
 
@@ -46,17 +53,30 @@ class VpnController extends GetxController {
     final query = searchQuery.value.trim().toLowerCase();
     final onlySelected =
         filterBySelectedAppsOnly.value || selectedPackages.isNotEmpty;
+    final trafficFilter = activeTrafficFilter.value;
 
     return connections.where((conn) {
-      // 1. تصفية بحسب التطبيقات المحددة
+      // 1. تصفية بحسب التطبيقات المحددة (Target Apps Mode - عزل صارم)
       if (onlySelected && selectedPackages.isNotEmpty) {
-        if (conn.packageName != null &&
+        if (conn.packageName == null ||
             !selectedPackages.contains(conn.packageName)) {
           return false;
         }
       }
 
-      // 2. تصفية بحسب نص البحث
+      // 2. تصفية بحسب نوع الحركة (الكل، تطبيقات فقط، النظام والشبكة)
+      switch (trafficFilter) {
+        case VpnTrafficFilter.all:
+          break;
+        case VpnTrafficFilter.appsOnly:
+          if (conn.isSystemOrUnattributed) return false;
+          break;
+        case VpnTrafficFilter.systemOnly:
+          if (!conn.isSystemOrUnattributed) return false;
+          break;
+      }
+
+      // 3. تصفية بحسب نص البحث
       if (query.isNotEmpty) {
         final matchesDomain =
             conn.domain?.toLowerCase().contains(query) ?? false;
@@ -275,6 +295,10 @@ class VpnController extends GetxController {
 
   void setFilterBySelectedAppsOnly(bool value) {
     filterBySelectedAppsOnly.value = value;
+  }
+
+  void setTrafficFilter(VpnTrafficFilter filter) {
+    activeTrafficFilter.value = filter;
   }
 
   void setAppTab(AppViewTab tab) {

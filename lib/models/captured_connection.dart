@@ -69,6 +69,20 @@ class CapturedConnection {
   /// Formatted packet size (e.g. "1.4 KB")
   String get formattedSize => TrafficRecord.formatBytes(length);
 
+  /// Whether this connection belongs to the OS, system daemons, DNS resolver, or general network infrastructure.
+  bool get isSystemOrUnattributed {
+    if (packageName == null) return true;
+    final pkg = packageName!.toLowerCase();
+    return pkg.startsWith('system.') ||
+        pkg.startsWith('android.') ||
+        pkg == 'android' ||
+        appName == null ||
+        appName!.startsWith('System');
+  }
+
+  /// Whether this connection belongs to an identified user installed application.
+  bool get isUserApp => !isSystemOrUnattributed;
+
   /// Formatted time string (HH:mm:ss)
   String get formattedTime {
     final h = timestamp.hour.toString().padLeft(2, '0');

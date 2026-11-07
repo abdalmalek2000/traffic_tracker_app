@@ -91,6 +91,9 @@ class AppTranslations extends Translations {
     'search_vpn_hint': 'Search domain, IP, app name, or port...',
     'mode_target_only': 'Target Apps Only',
     'mode_all_traffic': 'All Apps Traffic',
+    'filter_traffic_all': 'All',
+    'filter_traffic_apps_only': 'Apps Only',
+    'filter_traffic_system': 'System & Network',
     'target_mode_active_banner':
         'Target Mode Active: Inspecting only traffic from @count selected app(s).',
     'edit': 'Edit',
@@ -299,6 +302,9 @@ class AppTranslations extends Translations {
     'search_vpn_hint': 'ابحث بالنطاق أو IP أو التطبيق أو المنفذ...',
     'mode_target_only': 'تطبيقات محددة فقط',
     'mode_all_traffic': 'حركة مرور كافة التطبيقات',
+    'filter_traffic_all': 'الكل',
+    'filter_traffic_apps_only': 'تطبيقات فقط',
+    'filter_traffic_system': 'النظام والشبكة',
     'target_mode_active_banner':
         'وضع التحديد نشط: يتم فحص حركة المرور لـ @count تطبيق محدد فقط.',
     'edit': 'تعديل',

@@ -440,10 +440,42 @@ class TrafficVpnService : VpnService() {
                             resolvedPkgName = pkgs[0]
                             val appInfo = packageManager.getApplicationInfo(resolvedPkgName, 0)
                             resolvedAppName = packageManager.getApplicationLabel(appInfo).toString()
+                        } else {
+                            if (uid == 1000) {
+                                resolvedAppName = "Android System"
+                                resolvedPkgName = "android.system"
+                            } else if (uid == 1073) {
+                                resolvedAppName = "DNS Resolver"
+                                resolvedPkgName = "system.dns"
+                            } else {
+                                resolvedAppName = "System (UID $uid)"
+                                resolvedPkgName = "system.uid.$uid"
+                            }
                         }
+                    } else if (uid == 0) {
+                        resolvedAppName = "Kernel / Root"
+                        resolvedPkgName = "system.kernel"
                     }
                 }
             } catch (_: Exception) {}
+        }
+
+        // Smart attribution for system, DNS, discovery or unattributed network traffic
+        if (resolvedAppName == null) {
+            if (dstPort == 53 || srcPort == 53 || dstPort == 853 || srcPort == 853) {
+                resolvedAppName = "System DNS"
+                resolvedPkgName = "system.dns"
+            } else if (dstPort == 5353 || srcPort == 5353 || dstPort == 1900 || srcPort == 1900 ||
+                dstIp.startsWith("224.") || dstIp.startsWith("239.") || dstIp == "255.255.255.255") {
+                resolvedAppName = "Local Discovery"
+                resolvedPkgName = "system.discovery"
+            } else if (dstPort == 123 || srcPort == 123) {
+                resolvedAppName = "Time Sync (NTP)"
+                resolvedPkgName = "system.ntp"
+            } else {
+                resolvedAppName = "System / Network"
+                resolvedPkgName = "system.network"
+            }
         }
 
         // Forward packets to the real internet via Userspace Forwarder / NAT engine
@@ -460,7 +492,7 @@ class TrafficVpnService : VpnService() {
         // Active app filtering check for UI inspection reporting
         synchronized(allowedPackageSet) {
             if (allowedPackageSet.isNotEmpty()) {
-                if (resolvedPkgName != null && !allowedPackageSet.contains(resolvedPkgName)) {
+                if (resolvedPkgName == null || !allowedPackageSet.contains(resolvedPkgName)) {
                     return // Exclude packet from reporting if not in selected apps
                 }
             }
