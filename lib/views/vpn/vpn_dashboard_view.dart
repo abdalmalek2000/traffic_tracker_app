@@ -351,7 +351,7 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                             InkWell(
                               onTap: () => Get.to(() => const AppFilterView()),
                               child: Text(
-                                'Edit',
+                                'edit'.tr,
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,

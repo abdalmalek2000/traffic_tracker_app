@@ -93,6 +93,7 @@ class AppTranslations extends Translations {
     'mode_all_traffic': 'All Apps Traffic',
     'target_mode_active_banner':
         'Target Mode Active: Inspecting only traffic from @count selected app(s).',
+    'edit': 'Edit',
     'live_feed': 'LIVE',
     'download_pcap': 'Download PCAP',
     'delete_records': 'Delete Records',
@@ -300,6 +301,7 @@ class AppTranslations extends Translations {
     'mode_all_traffic': 'حركة مرور كافة التطبيقات',
     'target_mode_active_banner':
         'وضع التحديد نشط: يتم فحص حركة المرور لـ @count تطبيق محدد فقط.',
+    'edit': 'تعديل',
     'live_feed': 'مباشر',
     'download_pcap': 'تحميل PCAP',
     'delete_records': 'حذف السجلات',
