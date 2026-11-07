@@ -62,6 +62,16 @@ class VpnNativeBridge {
     }
   }
 
+  /// مسح وإعادة تعيين ملفات الـ PCAP المؤقتة
+  static Future<bool> clearPcap() async {
+    try {
+      final res = await _controlChannel.invokeMethod<bool>('clearPcap');
+      return res ?? true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// تصدير وحفظ ملف الـ PCAP في المكان المخصص مع دفق كافة الحزم الحالية
   static Future<String?> exportPcapFile({
     required String locationType,

@@ -154,7 +154,13 @@ class VpnController extends GetxController {
 
   Future<void> checkStatus() async {
     isVpnRunning.value = await VpnNativeBridge.isVpnRunning();
-    currentPcapPath.value = await VpnNativeBridge.getPcapPath();
+    if (isVpnRunning.value) {
+      currentPcapPath.value = await VpnNativeBridge.getPcapPath();
+    } else {
+      currentPcapPath.value = null;
+      // If VPN is not active upon opening the app, purge any stale PCAP files
+      await VpnNativeBridge.clearPcap();
+    }
   }
 
   Future<bool> startVpn() async {
@@ -259,6 +265,8 @@ class VpnController extends GetxController {
     connections.clear();
     totalPackets.value = 0;
     totalBytes.value = 0;
+    currentPcapPath.value = null;
+    VpnNativeBridge.clearPcap();
   }
 
   void setSearchQuery(String query) {
@@ -279,6 +287,19 @@ class VpnController extends GetxController {
 
   /// تصدير ملف الـ PCAP إلى المكان المحدد في الإعدادات وإظهار رسالة بسيطة بإتمام الحفظ
   Future<void> exportPcapFile() async {
+    // الاعتماد فقط وحصراً على السجلات والحزم المعروضة في الجلسة الحالية للشاشة
+    if (connections.isEmpty || totalPackets.value == 0) {
+      Get.rawSnackbar(
+        message: 'pcap_no_data'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.black87,
+        margin: const EdgeInsets.all(AppSpacing.base),
+        borderRadius: AppSpacing.radiusMd,
+        duration: const Duration(seconds: 3),
+      );
+      return;
+    }
+
     final settings = SettingsController.to;
     final savedPath = await VpnNativeBridge.exportPcapFile(
       locationType: settings.pcapLocationType.value,

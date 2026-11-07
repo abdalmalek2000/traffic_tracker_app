@@ -23,62 +23,87 @@ class PaletteSelectorSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final controller = SettingsController.to;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
-    return Material(
-      color: theme.colorScheme.surface,
-      borderRadius: const BorderRadius.vertical(
-        top: AppSpacing.radiusCircularXxl,
-      ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.base,
-          vertical: AppSpacing.lg,
-        ),
-        child: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Drag handle
-                Center(
-                  child: Container(
-                    width: 36,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.outlineVariant,
-                      borderRadius: AppSpacing.borderRadiusRound,
-                    ),
-                  ),
+    final isCompact = screenHeight < 500;
+    final initialFraction = isCompact ? 0.92 : 0.72;
+    final maxFraction = 0.95;
+    final minFraction = isCompact ? 0.40 : 0.30;
+
+    return DraggableScrollableSheet(
+      initialChildSize: initialFraction,
+      minChildSize: minFraction,
+      maxChildSize: maxFraction,
+      expand: false,
+      builder: (context, scrollController) {
+        return Material(
+          color: theme.colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(
+            top: AppSpacing.radiusCircularXxl,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag handle & Pinned Header
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: AppSpacing.base,
+                  right: AppSpacing.base,
+                  top: AppSpacing.md,
+                  bottom: AppSpacing.xs,
                 ),
-                AppSpacing.verticalBase,
-
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Text(
-                        'select_color_scheme'.tr,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
+                    Center(
+                      child: Container(
+                        width: 36,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.outlineVariant,
+                          borderRadius: AppSpacing.borderRadiusRound,
                         ),
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(AppIcons.close),
-                      onPressed: () => Navigator.of(context).pop(),
+                    AppSpacing.verticalBase,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'select_color_scheme'.tr,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(AppIcons.close),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                AppSpacing.verticalSm,
-
-                // ==========================================
-                // 1. MATERIAL YOU DYNAMIC COLOR OPTION
-                // ==========================================
+              ),
+              const Divider(height: 1, thickness: 0.5),
+              // Scrollable content
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  padding: const EdgeInsets.all(AppSpacing.base),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // ==========================================
+                      // 1. MATERIAL YOU DYNAMIC COLOR OPTION
+                      // ==========================================
                 Obx(() {
                   final isDynamicSelected = controller.useDynamicColor.value;
 
@@ -242,11 +267,14 @@ class PaletteSelectorSheet extends StatelessWidget {
                     }).toList(),
                   );
                 }),
-              ],
-            ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

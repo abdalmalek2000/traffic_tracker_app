@@ -60,6 +60,56 @@ class TrafficVpnService : VpnService() {
             } catch (_: Exception) {}
         }
 
+        fun clearPcap(context: Context) {
+            synchronized(this) {
+                try {
+                    activePcapStream?.flush()
+                    activePcapStream?.close()
+                    activePcapStream = null
+
+                    if (!pcapFilePath.isNullOrEmpty()) {
+                        val f = File(pcapFilePath!!)
+                        if (f.exists()) f.delete()
+                    }
+
+                    context.filesDir.listFiles { f -> f.name.endsWith(".pcap") }?.forEach { f ->
+                        try { f.delete() } catch (_: Exception) {}
+                    }
+
+                    try {
+                        context.getSharedPreferences("traffic_tracker_prefs", Context.MODE_PRIVATE)
+                            .edit()
+                            .remove("last_pcap_path")
+                            .apply()
+                    } catch (_: Exception) {}
+
+                    packetCount = 0L
+                    totalBytesCaptured = 0L
+
+                    if (isRunning) {
+                        val file = File(context.filesDir, "traffic_capture_${System.currentTimeMillis()}.pcap")
+                        pcapFilePath = file.absolutePath
+                        val fos = FileOutputStream(file)
+                        val header = ByteBuffer.allocate(24).order(ByteOrder.LITTLE_ENDIAN)
+                        header.putInt(0xa1b2c3d4.toInt()) // magic_number
+                        header.putShort(2.toShort())       // version_major
+                        header.putShort(4.toShort())       // version_minor
+                        header.putInt(0)                   // thiszone
+                        header.putInt(0)                   // sigfigs
+                        header.putInt(65535)               // snaplen
+                        header.putInt(12)                  // DLT_RAW (12)
+                        fos.write(header.array())
+                        fos.flush()
+                        activePcapStream = fos
+                    } else {
+                        pcapFilePath = null
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
         fun updateAllowedPackages(packages: List<String>?) {
             synchronized(allowedPackageSet) {
                 allowedPackageSet.clear()

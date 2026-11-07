@@ -46,8 +46,17 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
+        // Clear any stale PCAP files from previous app sessions if VPN is not actively running
+        if (!TrafficVpnService.isRunning) {
+            TrafficVpnService.clearPcap(this)
+        }
+
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, VPN_CONTROL_CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
+                "clearPcap" -> {
+                    TrafficVpnService.clearPcap(this)
+                    result.success(true)
+                }
                 "startVpn" -> {
                     if (!NetworkUtils.isNetworkConnected(this)) {
                         result.error("NO_INTERNET", "No active Wi-Fi or Mobile Data connection.", null)
@@ -265,45 +274,15 @@ class MainActivity : FlutterActivity() {
     private fun exportPcapInternal(locationType: String, customUri: String?): String? {
         TrafficVpnService.flushPcap()
 
-        val prefs = getSharedPreferences("traffic_tracker_prefs", Context.MODE_PRIVATE)
-        val savedPath = prefs.getString("last_pcap_path", null)
-
-        var srcFile: File? = if (!TrafficVpnService.pcapFilePath.isNullOrEmpty()) {
-            File(TrafficVpnService.pcapFilePath!!)
-        } else if (!savedPath.isNullOrEmpty()) {
-            File(savedPath)
-        } else {
-            null
+        val currentPath = TrafficVpnService.pcapFilePath
+        if (currentPath.isNullOrEmpty()) {
+            return null
         }
 
-        if (srcFile == null || !srcFile.exists()) {
-            // Find most recently modified .pcap file in filesDir
-            srcFile = filesDir.listFiles { f -> f.name.endsWith(".pcap") }
-                ?.maxByOrNull { it.lastModified() }
-        }
-
-        // If no file exists yet, generate a valid initial PCAP capture file
-        if (srcFile == null || !srcFile.exists()) {
-            val baseline = File(filesDir, "traffic_capture_${System.currentTimeMillis()}.pcap")
-            try {
-                val fos = java.io.FileOutputStream(baseline)
-                val header = java.nio.ByteBuffer.allocate(24).order(java.nio.ByteOrder.LITTLE_ENDIAN)
-                header.putInt(0xa1b2c3d4.toInt()) // magic_number
-                header.putShort(2.toShort())       // version_major
-                header.putShort(4.toShort())       // version_minor
-                header.putInt(0)                   // thiszone
-                header.putInt(0)                   // sigfigs
-                header.putInt(65535)               // snaplen
-                header.putInt(12)                  // DLT_RAW (12)
-                fos.write(header.array())
-                fos.flush()
-                fos.fd.sync()
-                fos.close()
-                srcFile = baseline
-                prefs.edit().putString("last_pcap_path", baseline.absolutePath).apply()
-            } catch (e: Exception) {
-                return null
-            }
+        val srcFile = File(currentPath)
+        // If file doesn't exist, has no captured packets (24 bytes is just the empty header), or packet count is 0:
+        if (!srcFile.exists() || srcFile.length() <= 24L || TrafficVpnService.packetCount == 0L) {
+            return null
         }
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())

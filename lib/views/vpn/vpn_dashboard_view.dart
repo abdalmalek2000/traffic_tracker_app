@@ -65,6 +65,11 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                 controller.exportPcapFile();
               } else if (val == 'clear') {
                 controller.clearConnections();
+                Get.rawSnackbar(
+                  message: 'records_cleared'.tr,
+                  duration: const Duration(seconds: 1),
+                  snackPosition: SnackPosition.BOTTOM,
+                );
               } else if (val == 'settings') {
                 Get.to(() => const SettingsView());
               }
