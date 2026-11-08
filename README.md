@@ -48,11 +48,6 @@
   - [5. Material 3 Design, Dynamic Themes & Full RTL](#5-material-3-design-dynamic-themes--full-rtl)
 - [📸 Screenshots & Preview](#-screenshots--preview)
 - [💻 System Requirements](#-system-requirements)
-- [🚀 Installation & Setup](#-installation--setup)
-  - [Prerequisites](#prerequisites)
-  - [Step-by-Step Installation](#step-by-step-installation)
-  - [Building for Production](#building-for-production)
-  - [Common Troubleshooting](#common-troubleshooting)
 - [📖 How to Use (Usage)](#-how-to-use-usage)
   - [Workflow 1: Device-Wide Network Monitoring](#workflow-1-device-wide-network-monitoring)
   - [Workflow 2: Isolating a Specific App (Target Mode)](#workflow-2-isolating-a-specific-app-target-mode)
@@ -139,29 +134,19 @@ Traffic Tracker bypasses these roadblocks by deploying Android's official virtua
 
 ## 📸 Screenshots & Preview
 
-| 1. VPN Dashboard | 2. Target App Filter | 3. Live Connection Detail |
+| 1. VPN Dashboard | 2. Target App Filter | 3.  HTTP Inspector |
 |:---:|:---:|:---:|
-| <!-- Add Screenshot: VPN Dashboard --> | <!-- Add Screenshot: App Filter --> | <!-- Add Screenshot: Connection Detail --> |
-| *Real-time packet monitor & status* | *Per-app granular traffic isolation* | *Deep socket & SNI inspection* |
+| ![Dashboard](assets/screenshots/dashboard.png) | ![App Filter](assets/screenshots/app_filter.png) |  ![Http Inspector](assets/screenshots/api_inspector.png) |
+| *Real-time packet monitor & status* | *Per-app granular traffic isolation* | *Status codes, filters & test sandbox*  |
 
 | 4. HTTP Inspector | 5. cURL & JSON Viewer | 6. Themes & Settings |
 |:---:|:---:|:---:|
-| <!-- Add Screenshot: HTTP Traffic List --> | <!-- Add Screenshot: cURL & JSON Details --> | <!-- Add Screenshot: Settings & Themes --> |
-| *Status codes, filters & test sandbox* | *Instant cURL export & payload viewer* | *Material You, palettes & PCAP storage* |
-
-> [!NOTE]
-> *To contribute screenshots, place your images in `assets/screenshots/` and update the table above.*
+| ![Api Response Detail](assets/screenshots/api_response_detail.png)  |![cURL](assets/screenshots/cURL.png) | ![Settings](assets/screenshots/settings.png) |
+| *Response header, Payload* | *Instant cURL export & payload viewer* | *Material You, palettes & PCAP storage* |
 
 ---
 
 ## 💻 System Requirements
-
-### Runtime Requirements (End-User)
-* **Operating System**: Android 7.0 (API Level 24) or higher.
-* **Recommended Android Version**: Android 12+ (API 31–34) for Dynamic Color & optimal VPN performance.
-* **Hardware**: ARMv7, ARM64, or x86_64 device with at least 2 GB RAM.
-* **Storage**: Minimum 50 MB free space (additional storage required for long PCAP recordings).
-* **Connectivity**: Active Wi-Fi or Mobile Data connection (required before initiating VPN tunnels).
 
 ### Development Requirements
 * **Flutter SDK**: Version `3.12.0` or higher.
@@ -169,65 +154,6 @@ Traffic Tracker bypasses these roadblocks by deploying Android's official virtua
 * **Java Development Kit (JDK)**: OpenJDK 17.
 * **Android SDK**: `compileSdkVersion 34`, `minSdkVersion 24`, `targetSdkVersion 34`.
 * **Kotlin**: Version `1.9.0` or higher.
-
----
-
-## 🚀 Installation & Setup
-
-### Prerequisites
-Ensure you have the Flutter SDK installed and configured on your path. Verify your installation by running:
-```bash
-flutter doctor
-```
-
-### Step-by-Step Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/abdalmalek2000/traffic_tracker_app.git
-   cd traffic_tracker_app
-   ```
-
-2. **Fetch dependencies:**
-   ```bash
-   flutter pub get
-   ```
-
-3. **Connect your Android device:**
-   Enable **USB Debugging** on your device via Developer Options and verify the connection:
-   ```bash
-   flutter devices
-   ```
-
-4. **Run the application:**
-   ```bash
-   flutter run
-   ```
-
-### Building for Production
-
-To build optimized release binaries:
-
-* **Release APK:**
-  ```bash
-  flutter build apk --release
-  ```
-  *Output: `build/app/outputs/flutter-apk/app-release.apk`*
-
-* **Google Play App Bundle (AAB):**
-  ```bash
-  flutter build appbundle --release
-  ```
-  *Output: `build/app/outputs/bundle/release/app-release.aab`*
-
-### Common Troubleshooting
-
-| Issue | Cause | Solution |
-|---|---|---|
-| `VpnService` permission dialog does not appear | Missing system dialog approval | Ensure no other 3rd-party VPN is locked in "Always-on VPN" mode under Android system settings. |
-| VPN immediately disconnects upon start | No active network connection | Connect to Wi-Fi or Cellular Data before starting inspection; Android VPN requires an active default network. |
-| Background packet capture stops after screen lock | Android Doze / Battery Optimization | Open **Settings > Battery Optimization** inside the app and tap "Disable Optimization". |
-| Release build fails with R8 missing rules | R8 Minification warnings | Verify that [`android/app/proguard-rules.pro`](android/app/proguard-rules.pro) includes `-dontwarn com.google.android.play.core.**`. |
 
 ---
 
@@ -376,33 +302,6 @@ Designed, architected, and developed with ❤️ by **Abdulmalek Moh**:
 
 ---
 
-## 🤝 Contributing
-
-Contributions to **Traffic Tracker** are welcome! To contribute:
-
-1. **Fork the Repository** on GitHub.
-2. **Create a Feature Branch**:
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Commit your changes**:
-   Follow conventional commits:
-   ```bash
-   git commit -m "feat: add support for IPv6 packet parsing"
-   ```
-4. **Ensure clean tests and static analysis**:
-   ```bash
-   flutter analyze
-   flutter test
-   ```
-5. **Push to your branch**:
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-6. **Open a Pull Request** describing your changes and technical motivation.
-
----
-
 ## ❓ FAQ
 
 <details>
@@ -472,7 +371,6 @@ See the full [LICENSE](LICENSE) file for details.
 ## 📞 Support & Contact
 
 * **Issues & Bug Reports**: [GitHub Issues](https://github.com/abdalmalek2000/traffic_tracker_app/issues)
-* **Feature Requests**: [GitHub Discussions](https://github.com/abdalmalek2000/traffic_tracker_app/discussions)
 * **Author Profile**: [@abdalmalek2000](https://github.com/abdalmalek2000)
 
 <p align="center">
