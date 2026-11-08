@@ -1,4 +1,4 @@
-<!-- <p align="center">
+<p align="center">
   <img src="assets/images/app_logo.png" alt="شعار راصد حركة الشبكة" width="130" height="130" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" />
 </p>
 
@@ -314,4 +314,4 @@
 ## 📞 الدعم والتواصل
 
 * للإبلاغ عن المشكلات والأخطاء: [GitHub Issues](https://github.com/abdalmalek2000/traffic_tracker_app/issues)
-* للاقتراحات والنقاشات: [GitHub Discussions](https://github.com/abdalmalek2000/traffic_tracker_app/discussions) -->
+* للاقتراحات والنقاشات: [GitHub Discussions](https://github.com/abdalmalek2000/traffic_tracker_app/discussions)
