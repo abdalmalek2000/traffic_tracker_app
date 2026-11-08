@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import '../../constants/icons.dart';
-import '../../models/traffic_record.dart';
 import '../../constants/colors.dart';
+import '../../constants/icons.dart';
 import '../../constants/spacing.dart';
+import '../../models/traffic_record.dart';
+import '../widgets/app_buttons.dart';
 import '../widgets/json_viewer_widget.dart';
+import 'widgets/traffic_headers_card.dart';
+import 'widgets/traffic_overview_tab.dart';
 
 /// Deep HTTP request & response detail inspection view.
 class TrafficDetailView extends StatelessWidget {
@@ -47,6 +50,99 @@ class TrafficDetailView extends StatelessWidget {
       default:
         return AppColors.protocolOther;
     }
+  }
+
+  Widget _buildRequestTab(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ListView(
+      padding: AppSpacing.paddingCard,
+      children: [
+        Text(
+          'req_headers'.tr,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        AppSpacing.verticalSm,
+        TrafficHeadersCard(headers: record.requestHeaders),
+        AppSpacing.verticalBase,
+        Text(
+          'request'.tr,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        AppSpacing.verticalSm,
+        JsonViewerWidget(
+          content: record.prettyRequestBody,
+          title: 'Request Payload',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildResponseTab(BuildContext context) {
+    final theme = Theme.of(context);
+    final resHeaders = record.responseHeaders ?? {};
+
+    return ListView(
+      padding: AppSpacing.paddingCard,
+      children: [
+        Text(
+          'res_headers'.tr,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        AppSpacing.verticalSm,
+        TrafficHeadersCard(headers: resHeaders),
+        AppSpacing.verticalBase,
+        Text(
+          'response'.tr,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        AppSpacing.verticalSm,
+        JsonViewerWidget(
+          content: record.prettyResponseBody,
+          title: 'Response Payload (${record.formattedResponseSize})',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCurlTab(BuildContext context) {
+    final curl = record.toCurlCommand();
+
+    return ListView(
+      padding: AppSpacing.paddingCard,
+      children: [
+        Text(
+          'curl_instruction'.tr,
+          style: const TextStyle(fontSize: 13),
+        ),
+        AppSpacing.verticalMd,
+        JsonViewerWidget(
+          content: curl,
+          title: 'cURL Command',
+        ),
+        AppSpacing.verticalBase,
+        AppPrimaryButton(
+          text: 'copy_curl'.tr,
+          icon: AppIcons.copy,
+          onPressed: () {
+            Clipboard.setData(ClipboardData(text: curl));
+            Get.rawSnackbar(
+              message: 'copied_to_clipboard'.tr,
+              duration: const Duration(seconds: 1),
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          },
+        ),
+      ],
+    );
   }
 
   @override
@@ -137,295 +233,12 @@ class TrafficDetailView extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            _buildOverviewTab(context),
+            TrafficOverviewTab(record: record),
             _buildRequestTab(context),
             _buildResponseTab(context),
             _buildCurlTab(context),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildOverviewTab(BuildContext context) {
-    return ListView(
-      padding: AppSpacing.paddingCard,
-      children: [
-        _buildInfoCard(
-          context,
-          title: 'full_url'.tr,
-          content: record.url,
-          canCopy: true,
-        ),
-        AppSpacing.verticalMd,
-        Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppSpacing.borderRadiusLg,
-            side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-          ),
-          child: Padding(
-            padding: AppSpacing.paddingCard,
-            child: Column(
-              children: [
-                _buildRow('host'.tr, record.host),
-                const Divider(),
-                _buildRow('path'.tr, record.path),
-                const Divider(),
-                _buildRow('method_label'.tr, record.method.toUpperCase()),
-                const Divider(),
-                _buildRow(
-                  'status'.tr,
-                  record.statusCode != null
-                      ? '${record.statusCode} (${record.statusMessage ?? ''})'
-                      : (record.isPending ? 'Pending...' : 'Failed'),
-                ),
-                const Divider(),
-                _buildRow('duration'.tr, record.formattedDuration),
-                const Divider(),
-                _buildRow('req_size'.tr, record.formattedRequestSize),
-                const Divider(),
-                _buildRow('res_size'.tr, record.formattedResponseSize),
-                const Divider(),
-                _buildRow('timestamp'.tr, record.timestamp.toLocal().toString()),
-                if (record.error != null) ...[
-                  const Divider(),
-                  _buildRow('Error', record.error!, isError: true),
-                ],
-              ],
-            ),
-          ),
-        ),
-        if (record.queryParameters.isNotEmpty) ...[
-          AppSpacing.verticalBase,
-          Text(
-            'query_params'.tr,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          AppSpacing.verticalSm,
-          _buildHeadersCard(context, record.queryParameters),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildRequestTab(BuildContext context) {
-    return ListView(
-      padding: AppSpacing.paddingCard,
-      children: [
-        Text(
-          'req_headers'.tr,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        AppSpacing.verticalSm,
-        _buildHeadersCard(context, record.requestHeaders),
-        AppSpacing.verticalBase,
-        Text(
-          'request'.tr,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        JsonViewerWidget(
-          content: record.prettyRequestBody,
-          title: 'Request Payload',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildResponseTab(BuildContext context) {
-    final resHeaders = record.responseHeaders ?? {};
-
-    return ListView(
-      padding: AppSpacing.paddingCard,
-      children: [
-        Text(
-          'res_headers'.tr,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        AppSpacing.verticalSm,
-        _buildHeadersCard(context, resHeaders),
-        AppSpacing.verticalBase,
-        Text(
-          'response'.tr,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        JsonViewerWidget(
-          content: record.prettyResponseBody,
-          title: 'Response Payload (${record.formattedResponseSize})',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCurlTab(BuildContext context) {
-    final curl = record.toCurlCommand();
-    return ListView(
-      padding: AppSpacing.paddingCard,
-      children: [
-        Text(
-          'curl_instruction'.tr,
-          style: const TextStyle(fontSize: 13),
-        ),
-        AppSpacing.verticalMd,
-        JsonViewerWidget(
-          content: curl,
-          title: 'cURL Command',
-        ),
-        AppSpacing.verticalBase,
-        FilledButton.icon(
-          onPressed: () {
-            Clipboard.setData(ClipboardData(text: curl));
-            Get.rawSnackbar(
-              message: 'copied_to_clipboard'.tr,
-              duration: const Duration(seconds: 1),
-              snackPosition: SnackPosition.BOTTOM,
-            );
-          },
-          icon: const Icon(AppIcons.copy),
-          label: Text('copy_curl'.tr),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoCard(BuildContext context,
-      {required String title, required String content, bool canCopy = false}) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: AppSpacing.borderRadiusLg,
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                  ),
-                ),
-                if (canCopy)
-                  IconButton(
-                    icon: const Icon(AppIcons.copy, size: AppSpacing.iconXs),
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: content));
-                      Get.rawSnackbar(
-                        message: 'copied_to_clipboard'.tr,
-                        duration: const Duration(seconds: 1),
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                    },
-                  ),
-              ],
-            ),
-            AppSpacing.verticalXs,
-            SelectableText(
-              content,
-              style: const TextStyle(fontSize: 13, height: 1.3),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeadersCard(BuildContext context, Map<String, String> headers) {
-    if (headers.isEmpty) {
-      return Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppSpacing.borderRadiusLg,
-          side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-        ),
-        child: Padding(
-          padding: AppSpacing.paddingCard,
-          child: Text('no_headers'.tr, style: TextStyle(color: AppColors.textSecondary(context))),
-        ),
-      );
-    }
-
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: AppSpacing.borderRadiusLg,
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: AppSpacing.paddingAllMd,
-        child: Column(
-          children: headers.entries.map((entry) {
-            return Padding(
-              padding: AppSpacing.paddingVXs,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: SelectableText(
-                      entry.key,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12.5,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ),
-                  const Text(' : '),
-                  Expanded(
-                    flex: 3,
-                    child: SelectableText(
-                      entry.value,
-                      style: const TextStyle(
-                        fontSize: 12.5,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRow(String label, String value, {bool isError = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: SelectableText(
-              value,
-              style: TextStyle(
-                fontSize: 13,
-                color: isError ? AppColors.statusServerError : null,
-                fontFamily: isError ? 'monospace' : null,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

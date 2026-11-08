@@ -8,25 +8,14 @@ import '../constants/spacing.dart';
 import '../models/app_info.dart';
 import '../models/captured_connection.dart';
 import '../models/traffic_record.dart';
+import '../models/vpn_filter_types.dart';
 import '../services/vpn_native_bridge.dart';
 import 'settings_controller.dart';
 
-/// تبويبات تصنيف تطبيقات الجهاز في شاشة الاختيار
-enum AppViewTab {
-  all,
-  selectedOnly,
-  userApps,
-  systemApps,
-}
-
-enum VpnTrafficFilter {
-  all,
-  appsOnly,
-  systemOnly,
-}
+export '../models/vpn_filter_types.dart';
 
 /// متحكم خدمة مراقبة شبكة الجهاز بالكامل (System VPN Controller)
-class VpnController extends GetxController {
+class VpnController extends GetxController with WidgetsBindingObserver {
   static VpnController get to => Get.find();
 
   final RxBool isVpnRunning = false.obs;
@@ -56,49 +45,27 @@ class VpnController extends GetxController {
     final trafficFilter = activeTrafficFilter.value;
 
     return connections.where((conn) {
-      // 1. تصفية بحسب التطبيقات المحددة (Target Apps Mode - عزل صارم)
-      if (onlySelected && selectedPackages.isNotEmpty) {
-        if (conn.packageName == null ||
-            !selectedPackages.contains(conn.packageName)) {
-          return false;
-        }
+      if (onlySelected &&
+          selectedPackages.isNotEmpty &&
+          (conn.packageName == null || !selectedPackages.contains(conn.packageName))) {
+        return false;
       }
-
-      // 2. تصفية بحسب نوع الحركة (الكل، تطبيقات فقط، النظام والشبكة)
-      switch (trafficFilter) {
-        case VpnTrafficFilter.all:
-          break;
-        case VpnTrafficFilter.appsOnly:
-          if (conn.isSystemOrUnattributed) return false;
-          break;
-        case VpnTrafficFilter.systemOnly:
-          if (!conn.isSystemOrUnattributed) return false;
-          break;
+      if (trafficFilter == VpnTrafficFilter.appsOnly && conn.isSystemOrUnattributed) {
+        return false;
       }
-
-      // 3. تصفية بحسب نص البحث
+      if (trafficFilter == VpnTrafficFilter.systemOnly && !conn.isSystemOrUnattributed) {
+        return false;
+      }
       if (query.isNotEmpty) {
-        final matchesDomain =
-            conn.domain?.toLowerCase().contains(query) ?? false;
-        final matchesDstIp = conn.dstIp.toLowerCase().contains(query);
-        final matchesSrcIp = conn.srcIp.toLowerCase().contains(query);
-        final matchesApp =
-            conn.appName?.toLowerCase().contains(query) ?? false;
-        final matchesPkg =
-            conn.packageName?.toLowerCase().contains(query) ?? false;
-        final matchesProto = conn.protocol.toLowerCase().contains(query);
-        final matchesPort = conn.dstPort.toString().contains(query) ||
+        return (conn.domain?.toLowerCase().contains(query) ?? false) ||
+            conn.dstIp.toLowerCase().contains(query) ||
+            conn.srcIp.toLowerCase().contains(query) ||
+            (conn.appName?.toLowerCase().contains(query) ?? false) ||
+            (conn.packageName?.toLowerCase().contains(query) ?? false) ||
+            conn.protocol.toLowerCase().contains(query) ||
+            conn.dstPort.toString().contains(query) ||
             conn.srcPort.toString().contains(query);
-
-        return matchesDomain ||
-            matchesDstIp ||
-            matchesSrcIp ||
-            matchesApp ||
-            matchesPkg ||
-            matchesProto ||
-            matchesPort;
       }
-
       return true;
     }).toList();
   }
@@ -109,27 +76,16 @@ class VpnController extends GetxController {
     final tab = currentAppTab.value;
 
     return installedApps.where((app) {
-      // 1. التصفية بحسب التبويب المحدد
-      switch (tab) {
-        case AppViewTab.all:
-          break;
-        case AppViewTab.selectedOnly:
-          if (!selectedPackages.contains(app.packageName)) return false;
-          break;
-        case AppViewTab.userApps:
-          if (app.isSystemApp) return false;
-          break;
-        case AppViewTab.systemApps:
-          if (!app.isSystemApp) return false;
-          break;
+      if (tab == AppViewTab.selectedOnly && !selectedPackages.contains(app.packageName)) {
+        return false;
       }
+      if (tab == AppViewTab.userApps && app.isSystemApp) return false;
+      if (tab == AppViewTab.systemApps && !app.isSystemApp) return false;
 
-      // 2. التصفية بنص البحث داخل التبويب
       if (query.isNotEmpty) {
         return app.appName.toLowerCase().contains(query) ||
             app.packageName.toLowerCase().contains(query);
       }
-
       return true;
     }).toList();
   }
@@ -137,8 +93,16 @@ class VpnController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     _initStream();
     checkStatus();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      checkStatus();
+    }
   }
 
   void _initStream() {
@@ -173,30 +137,70 @@ class VpnController extends GetxController {
   }
 
   Future<void> checkStatus() async {
-    isVpnRunning.value = await VpnNativeBridge.isVpnRunning();
-    if (isVpnRunning.value) {
-      currentPcapPath.value = await VpnNativeBridge.getPcapPath();
+    final sessionData = await VpnNativeBridge.getVpnSessionData();
+    if (sessionData != null) {
+      final running = sessionData['isRunning'] as bool? ?? false;
+      isVpnRunning.value = running;
+
+      if (running) {
+        currentPcapPath.value = sessionData['pcapPath'] as String?;
+        totalPackets.value = sessionData['totalPackets'] as int? ?? 0;
+        totalBytes.value = sessionData['totalBytes'] as int? ?? 0;
+
+        final rawList = sessionData['connections'] as List<dynamic>? ?? [];
+        final loadedConnections = rawList
+            .map((c) => CapturedConnection.fromMap(c as Map))
+            .toList();
+
+        if (connections.isEmpty) {
+          connections.assignAll(loadedConnections);
+        } else if (loadedConnections.isNotEmpty) {
+          final existingIds = connections.map((c) => c.id).toSet();
+          final newConnections = loadedConnections
+              .where((c) => !existingIds.contains(c.id))
+              .toList();
+          if (newConnections.isNotEmpty) {
+            connections.insertAll(0, newConnections);
+            if (connections.length > 500) {
+              connections.removeRange(500, connections.length);
+            }
+          }
+        }
+        return;
+      }
     } else {
-      currentPcapPath.value = null;
+      isVpnRunning.value = await VpnNativeBridge.isVpnRunning();
+      if (isVpnRunning.value) {
+        currentPcapPath.value = await VpnNativeBridge.getPcapPath();
+        return;
+      }
+    }
+
+    currentPcapPath.value = null;
+    if (connections.isEmpty) {
       // If VPN is not active upon opening the app, purge any stale PCAP files
       await VpnNativeBridge.clearPcap();
     }
+  }
+
+  void _showNoInternetSnackbar() {
+    Get.snackbar(
+      'no_internet_title'.tr,
+      'no_internet_message'.tr,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.statusServerError,
+      colorText: Colors.white,
+      icon: const Icon(Icons.wifi_off_rounded, color: Colors.white),
+      margin: const EdgeInsets.all(AppSpacing.base),
+      duration: const Duration(seconds: 4),
+    );
   }
 
   Future<bool> startVpn() async {
     // 1. التحقق المسبق من وجود اتصال نشط بشبكة Wi-Fi أو بيانات الجوال
     final isConnected = await VpnNativeBridge.isNetworkAvailable();
     if (!isConnected) {
-      Get.snackbar(
-        'no_internet_title'.tr,
-        'no_internet_message'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.statusServerError,
-        colorText: Colors.white,
-        icon: const Icon(Icons.wifi_off_rounded, color: Colors.white),
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 4),
-      );
+      _showNoInternetSnackbar();
       isVpnRunning.value = false;
       return false;
     }
@@ -209,16 +213,7 @@ class VpnController extends GetxController {
       return success;
     } on PlatformException catch (e) {
       if (e.code == 'NO_INTERNET') {
-        Get.snackbar(
-          'no_internet_title'.tr,
-          'no_internet_message'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: AppColors.statusServerError,
-          colorText: Colors.white,
-          icon: const Icon(Icons.wifi_off_rounded, color: Colors.white),
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 4),
-        );
+        _showNoInternetSnackbar();
       }
       isVpnRunning.value = false;
       return false;
@@ -311,24 +306,14 @@ class VpnController extends GetxController {
 
   /// تصدير ملف الـ PCAP إلى المكان المحدد في الإعدادات وإظهار رسالة بسيطة بإتمام الحفظ
   Future<void> exportPcapFile() async {
-    // الاعتماد فقط وحصراً على السجلات والحزم المعروضة في الجلسة الحالية للشاشة
-    if (connections.isEmpty || totalPackets.value == 0) {
-      Get.rawSnackbar(
-        message: 'pcap_no_data'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.black87,
-        margin: const EdgeInsets.all(AppSpacing.base),
-        borderRadius: AppSpacing.radiusMd,
-        duration: const Duration(seconds: 3),
-      );
-      return;
-    }
-
     final settings = SettingsController.to;
-    final savedPath = await VpnNativeBridge.exportPcapFile(
-      locationType: settings.pcapLocationType.value,
-      customUri: settings.customPcapUri.value,
-    );
+    final hasData = connections.isNotEmpty && totalPackets.value > 0;
+    final savedPath = hasData
+        ? await VpnNativeBridge.exportPcapFile(
+            locationType: settings.pcapLocationType.value,
+            customUri: settings.customPcapUri.value,
+          )
+        : null;
 
     if (savedPath == null || savedPath.isEmpty) {
       Get.rawSnackbar(
@@ -357,6 +342,7 @@ class VpnController extends GetxController {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     _eventSubscription?.cancel();
     super.onClose();
   }

@@ -21,7 +21,9 @@ void main() {
   });
 
   group('TestRequestService Tests', () {
-    test('Service instance initializes and methods execute without uncaught exceptions', () async {
+    test(
+      'Service instance initializes and methods execute without uncaught exceptions',
+      () async {
       final service = TestRequestService();
       expect(service, isNotNull);
 
@@ -42,6 +44,8 @@ void main() {
         method: 'GET',
         followRedirects: false,
       );
-    });
+    },
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
   });
 }

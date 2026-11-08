@@ -53,6 +53,18 @@ class VpnNativeBridge {
     }
   }
 
+  /// جلب بيانات جلسة الـ VPN الحالية بالكامل (الحالة، الحزم، الحجم، السجلات المحفوظة في الخلفية)
+  static Future<Map<String, dynamic>?> getVpnSessionData() async {
+    try {
+      final res =
+          await _controlChannel.invokeMethod<Map<dynamic, dynamic>>('getVpnSessionData');
+      if (res != null) {
+        return Map<String, dynamic>.from(res);
+      }
+    } catch (_) {}
+    return null;
+  }
+
   /// جلب مسار ملف الـ PCAP
   static Future<String?> getPcapPath() async {
     try {

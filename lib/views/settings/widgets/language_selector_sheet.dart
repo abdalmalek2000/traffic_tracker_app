@@ -3,18 +3,14 @@ import 'package:get/get.dart';
 import '../../../constants/icons.dart';
 import '../../../constants/spacing.dart';
 import '../../../controllers/settings_controller.dart';
+import '../../widgets/app_bottom_sheet.dart';
 
 /// Modal bottom sheet allowing users to select the app display language.
 class LanguageSelectorSheet extends StatelessWidget {
   const LanguageSelectorSheet({super.key});
 
   static void show(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const LanguageSelectorSheet(),
-    );
+    AppBottomSheet.show(context: context, child: const LanguageSelectorSheet());
   }
 
   @override
@@ -58,51 +54,7 @@ class LanguageSelectorSheet extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Drag handle & Pinned Header
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: AppSpacing.base,
-                  right: AppSpacing.base,
-                  top: AppSpacing.md,
-                  bottom: AppSpacing.xs,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 36,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.outlineVariant,
-                          borderRadius: AppSpacing.borderRadiusRound,
-                        ),
-                      ),
-                    ),
-                    AppSpacing.verticalBase,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'select_language'.tr,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(AppIcons.close),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1, thickness: 0.5),
+              AppBottomSheetHeader(title: 'select_language'.tr),
               // Scrollable Options List
               Expanded(
                 child: Obx(() {
@@ -122,63 +74,83 @@ class LanguageSelectorSheet extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                         child: Material(
                           color: isSelected
-                              ? theme.colorScheme.primary.withValues(alpha: 0.08)
+                              ? theme.colorScheme.primary.withValues(
+                                  alpha: 0.08,
+                                )
                               : Colors.transparent,
                           shape: RoundedRectangleBorder(
                             borderRadius: AppSpacing.borderRadiusLg,
                             side: BorderSide(
                               color: isSelected
                                   ? theme.colorScheme.primary
-                                  : theme.colorScheme.outlineVariant
-                                      .withValues(alpha: 0.3),
+                                  : theme.colorScheme.outlineVariant.withValues(
+                                      alpha: 0.3,
+                                    ),
                               width: isSelected ? 1.5 : 1.0,
                             ),
                           ),
-                          clipBehavior: Clip.antiAlias,
-                          child: ListTile(
-                            leading: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: (isSelected
-                                        ? theme.colorScheme.primary
-                                        : theme.colorScheme.surfaceContainerHighest)
-                                    .withValues(alpha: 0.15),
-                                borderRadius: AppSpacing.borderRadiusBase,
-                              ),
-                              alignment: Alignment.center,
-                              child: Icon(
-                                AppIcons.language,
-                                size: AppSpacing.iconSm,
-                                color: isSelected
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            title: Text(
-                              lang['title'] as String,
-                              style: TextStyle(
-                                fontWeight:
-                                    isSelected ? FontWeight.bold : FontWeight.w500,
-                                color: isSelected
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.onSurface,
-                              ),
-                            ),
-                            subtitle: Text(
-                              lang['subtitle'] as String,
-                              style: theme.textTheme.bodySmall,
-                            ),
-                            trailing: isSelected
-                                ? Icon(
-                                    AppIcons.checkCircle,
-                                    color: theme.colorScheme.primary,
-                                  )
-                                : null,
+                          child: InkWell(
+                            borderRadius: AppSpacing.borderRadiusBase,
                             onTap: () {
                               controller.setLocale(locale);
                               Navigator.of(context).pop();
                             },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.base,
+                                vertical: AppSpacing.md,
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          lang['title'] as String,
+                                          style: theme.textTheme.bodyLarge
+                                              ?.copyWith(
+                                                fontWeight: isSelected
+                                                    ? FontWeight.bold
+                                                    : FontWeight.w500,
+                                                color: isSelected
+                                                    ? theme.colorScheme.primary
+                                                    : theme
+                                                          .colorScheme
+                                                          .onSurface,
+                                              ),
+                                        ),
+                                        AppSpacing.verticalXxs,
+                                        Text(
+                                          lang['subtitle'] as String,
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                                color: isSelected
+                                                    ? theme
+                                                          .colorScheme
+                                                          .onPrimaryContainer
+                                                          .withValues(
+                                                            alpha: 0.8,
+                                                          )
+                                                    : theme
+                                                          .colorScheme
+                                                          .onSurfaceVariant,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (isSelected)
+                                    Icon(
+                                      AppIcons.checkCircle,
+                                      color:
+                                          theme.colorScheme.onPrimaryContainer,
+                                      size: AppSpacing.iconMd,
+                                    ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       );

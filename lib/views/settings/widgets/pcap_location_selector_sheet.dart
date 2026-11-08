@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../constants/icons.dart';
 import '../../../constants/spacing.dart';
 import '../../../controllers/settings_controller.dart';
+import '../../widgets/app_bottom_sheet.dart';
 
 /// Modal bottom sheet allowing users to select the destination directory
 /// where raw PCAP network capture files are saved.
@@ -10,11 +11,9 @@ class PcapLocationSelectorSheet extends StatelessWidget {
   const PcapLocationSelectorSheet({super.key});
 
   static void show(BuildContext context) {
-    showModalBottomSheet(
+    AppBottomSheet.show(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const PcapLocationSelectorSheet(),
+      child: const PcapLocationSelectorSheet(),
     );
   }
 
@@ -65,51 +64,9 @@ class PcapLocationSelectorSheet extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Drag handle & Pinned Header
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: AppSpacing.base,
-                  right: AppSpacing.base,
-                  top: AppSpacing.md,
-                  bottom: AppSpacing.xs,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 36,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.outlineVariant,
-                          borderRadius: AppSpacing.borderRadiusRound,
-                        ),
-                      ),
-                    ),
-                    AppSpacing.verticalBase,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'select_pcap_location'.tr,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(AppIcons.close),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              AppBottomSheetHeader(
+                title: 'select_pcap_location'.tr,
               ),
-              const Divider(height: 1, thickness: 0.5),
               // Scrollable Options List
               Expanded(
                 child: Obx(() {
@@ -150,7 +107,8 @@ class PcapLocationSelectorSheet extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: (isSelected
                                           ? theme.colorScheme.primary
-                                          : theme.colorScheme.surfaceContainerHighest)
+                                          : theme.colorScheme
+                                              .surfaceContainerHighest)
                                       .withValues(alpha: 0.15),
                                   borderRadius: AppSpacing.borderRadiusBase,
                                 ),
@@ -196,7 +154,11 @@ class PcapLocationSelectorSheet extends StatelessWidget {
                       }),
                       // Custom folder option
                       _buildCustomFolderTile(
-                          context, theme, controller, activeType),
+                        context,
+                        theme,
+                        controller,
+                        activeType,
+                      ),
                     ],
                   );
                 }),

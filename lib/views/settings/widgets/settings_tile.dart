@@ -65,8 +65,9 @@ class SettingsTile extends StatelessWidget {
     if (trailing != null) {
       trailingIconWidget = trailing;
     } else if (showChevron && onTap != null) {
+      final isRtl = Directionality.of(context) == TextDirection.rtl;
       trailingIconWidget = Icon(
-        AppIcons.chevronRight,
+        isRtl ? AppIcons.chevronLeft : AppIcons.chevronRight,
         size: AppSpacing.iconSm,
         color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
       );
@@ -103,7 +104,10 @@ class SettingsTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: theme.textTheme.bodyLarge?.copyWith(
-                        fontSize: AppTypography.responsiveFontSize(context, 16.0),
+                        fontSize: AppTypography.responsiveFontSize(
+                          context,
+                          14.0,
+                        ),
                         fontWeight: FontWeight.w600,
                         color: isDestructive
                             ? theme.colorScheme.error
@@ -117,7 +121,10 @@ class SettingsTile extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: AppTypography.responsiveFontSize(context, 12.0),
+                          fontSize: AppTypography.responsiveFontSize(
+                            context,
+                            11.0,
+                          ),
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -134,7 +141,7 @@ class SettingsTile extends StatelessWidget {
                   maxLines: 2,
                   textAlign: TextAlign.end,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: AppTypography.responsiveFontSize(context, 14.0),
+                    fontSize: AppTypography.responsiveFontSize(context, 12.0),
                     color: theme.colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
                   ),
@@ -152,7 +159,10 @@ class SettingsTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: theme.textTheme.bodyLarge?.copyWith(
-                        fontSize: AppTypography.responsiveFontSize(context, 16.0),
+                        fontSize: AppTypography.responsiveFontSize(
+                          context,
+                          14.0,
+                        ),
                         fontWeight: FontWeight.w600,
                         color: isDestructive
                             ? theme.colorScheme.error
@@ -166,7 +176,10 @@ class SettingsTile extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: AppTypography.responsiveFontSize(context, 12.0),
+                          fontSize: AppTypography.responsiveFontSize(
+                            context,
+                            11.0,
+                          ),
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -180,7 +193,7 @@ class SettingsTile extends StatelessWidget {
             if (trailingIconWidget != null) ...[
               AppSpacing.horizontalSm,
               SizedBox(
-                width: 32,
+                width: 16,
                 child: Align(
                   alignment: AlignmentDirectional.centerEnd,
                   child: trailingIconWidget,

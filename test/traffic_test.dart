@@ -1,10 +1,14 @@
+import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:traffic_tracker_app/models/traffic_record.dart';
 import 'package:traffic_tracker_app/models/captured_connection.dart';
 import 'package:traffic_tracker_app/models/app_info.dart';
+import 'package:traffic_tracker_app/controllers/settings_controller.dart';
 import 'package:traffic_tracker_app/controllers/traffic_controller.dart';
 import 'package:traffic_tracker_app/controllers/vpn_controller.dart';
+import 'package:traffic_tracker_app/services/test_request_service.dart';
 
 void main() {
   group('TrafficRecord Unit Tests', () {
@@ -162,6 +166,94 @@ void main() {
 
       vpnCtrl.togglePackage('com.whatsapp');
       expect(vpnCtrl.selectedPackages.contains('com.whatsapp'), isFalse);
+    });
+
+    test('Connections restoration and background sync handling', () {
+      final vpnCtrl = Get.find<VpnController>();
+      vpnCtrl.clearConnections();
+
+      final c1 = CapturedConnection.fromMap({
+        'timestamp': 1700000000000,
+        'protocol': 'TLS/HTTPS',
+        'srcIp': '10.0.0.2',
+        'srcPort': 52341,
+        'dstIp': '142.250.180.46',
+        'dstPort': 443,
+        'domain': 'google.com',
+        'packageName': 'com.android.chrome',
+        'appName': 'Chrome',
+        'length': 2048,
+      });
+
+      vpnCtrl.connections.add(c1);
+      vpnCtrl.totalPackets.value = 1;
+      vpnCtrl.totalBytes.value = 2048;
+
+      expect(vpnCtrl.connections.length, 1);
+      expect(vpnCtrl.totalPackets.value, 1);
+      expect(vpnCtrl.totalBytes.value, 2048);
+      expect(vpnCtrl.formattedTotalBytes, '2.0 KB');
+    });
+
+    test('TestRequestService adapts headers and body to current app language', () async {
+      SharedPreferences.setMockInitialValues({});
+      final trafficCtrl = Get.find<TrafficController>();
+      trafficCtrl.clearRecords();
+      final settingsCtrl = Get.isRegistered<SettingsController>()
+          ? Get.find<SettingsController>()
+          : Get.put(SettingsController());
+      final service = TestRequestService();
+
+      // 1. Test Arabic Mode (POST, GET, PUT)
+      settingsCtrl.setLocale(const Locale('ar', 'SA'));
+
+      // Test POST
+      await service.sendSamplePost();
+      expect(trafficCtrl.records.isNotEmpty, isTrue);
+      final arPost = trafficCtrl.records.first;
+      expect(arPost.method, 'POST');
+      expect(arPost.requestHeaders['Accept-Language']?.contains('ar-SA'), isTrue);
+      expect(arPost.requestHeaders['X-App-Language'], 'ar');
+      expect(arPost.requestHeaders['X-Payload-Type'], 'security_report_ar');
+      expect(arPost.requestBody?.contains('تقرير فحص أمني'), isTrue);
+
+      // Test PUT
+      await service.sendSamplePut();
+      final arPut = trafficCtrl.records.first;
+      expect(arPut.method, 'PUT');
+      expect(arPut.requestHeaders['X-Action-Type'], 'update_data_ar');
+      expect(arPut.requestBody?.contains('تحديث_سجل_الفحص'), isTrue);
+
+      // Test GET
+      await service.sendSampleGet();
+      final arGet = trafficCtrl.records.first;
+      expect(arGet.method, 'GET');
+      expect(arGet.queryParameters['lang'], 'ar');
+      expect(arGet.queryParameters['topic'], 'فحص_الشبكة');
+      expect(arGet.requestHeaders['Accept-Language']?.contains('ar-SA'), isTrue);
+
+      // 2. Test English Mode (POST, GET, PUT)
+      settingsCtrl.setLocale(const Locale('en', 'US'));
+
+      await service.sendSamplePost();
+      final enPost = trafficCtrl.records.first;
+      expect(enPost.method, 'POST');
+      expect(enPost.requestHeaders['Accept-Language']?.contains('en-US'), isTrue);
+      expect(enPost.requestHeaders['X-App-Language'], 'en');
+      expect(enPost.requestHeaders['X-Payload-Type'], 'security_report_en');
+      expect(enPost.requestBody?.contains('Security Audit Inspection Report'), isTrue);
+
+      await service.sendSamplePut();
+      final enPut = trafficCtrl.records.first;
+      expect(enPut.method, 'PUT');
+      expect(enPut.requestHeaders['X-Action-Type'], 'update_data_en');
+      expect(enPut.requestBody?.contains('update_inspection_record'), isTrue);
+
+      await service.sendSampleGet();
+      final enGet = trafficCtrl.records.first;
+      expect(enGet.method, 'GET');
+      expect(enGet.queryParameters['lang'], 'en');
+      expect(enGet.queryParameters['topic'], 'network_inspection');
     });
   });
 }

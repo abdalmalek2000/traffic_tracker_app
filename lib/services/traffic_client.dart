@@ -47,6 +47,14 @@ class TrafficHttpClient extends http.BaseClient {
 
     _controller?.addRecord(record);
 
+    // Ensure all header values conform to Latin-1/ASCII to protect dart:io HttpClient from FormatException
+    final sanitizedHeaders = <String, String>{};
+    request.headers.forEach((k, v) {
+      sanitizedHeaders[k] = v.codeUnits.any((c) => c > 255) ? Uri.encodeComponent(v) : v;
+    });
+    request.headers.clear();
+    request.headers.addAll(sanitizedHeaders);
+
     try {
       final streamedResponse = await _inner.send(request);
       final responseBodyBytes = await streamedResponse.stream.toBytes();

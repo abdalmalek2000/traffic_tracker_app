@@ -58,6 +58,12 @@ class MainActivity : FlutterActivity() {
                     result.success(true)
                 }
                 "startVpn" -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 0x1099)
+                        }
+                    }
+
                     if (!NetworkUtils.isNetworkConnected(this)) {
                         result.error("NO_INTERNET", "No active Wi-Fi or Mobile Data connection.", null)
                         return@setMethodCallHandler
@@ -85,6 +91,15 @@ class MainActivity : FlutterActivity() {
                 }
                 "isVpnRunning" -> {
                     result.success(TrafficVpnService.isRunning)
+                }
+                "getVpnSessionData" -> {
+                    result.success(mapOf(
+                        "isRunning" to TrafficVpnService.isRunning,
+                        "totalPackets" to TrafficVpnService.packetCount,
+                        "totalBytes" to TrafficVpnService.totalBytesCaptured,
+                        "pcapPath" to TrafficVpnService.pcapFilePath,
+                        "connections" to TrafficVpnService.getCapturedConnections()
+                    ))
                 }
                 "isNetworkAvailable" -> {
                     result.success(NetworkUtils.isNetworkConnected(this))

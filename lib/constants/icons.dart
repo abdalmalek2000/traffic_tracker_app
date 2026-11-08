@@ -39,6 +39,7 @@ class AppIcons {
   static const IconData folder = HugeIcons.strokeRoundedFolder01;
   static const IconData folderDownload = HugeIcons.strokeRoundedFolderDownload;
   static const IconData info = HugeIcons.strokeRoundedInformationCircle;
+  static const IconData circle = HugeIcons.strokeRoundedCircle;
 
   // Search & Filters
   static const IconData search = HugeIcons.strokeRoundedSearch01;

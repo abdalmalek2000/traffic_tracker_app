@@ -325,4 +325,24 @@ void main() {
       expect(checkIcon.color, AppColors.statusSuccess);
     });
   });
+
+  group('AppTranslations Parity & Completeness Tests', () {
+    test('enUS and arAR have 100% key parity with no missing or empty translations', () {
+      final enKeys = AppTranslations.enUS.keys.toSet();
+      final arKeys = AppTranslations.arAR.keys.toSet();
+
+      final missingInAr = enKeys.difference(arKeys);
+      final missingInEn = arKeys.difference(enKeys);
+
+      expect(missingInAr, isEmpty, reason: 'Keys present in English but missing in Arabic: $missingInAr');
+      expect(missingInEn, isEmpty, reason: 'Keys present in Arabic but missing in English: $missingInEn');
+
+      for (final entry in AppTranslations.enUS.entries) {
+        expect(entry.value.trim(), isNotEmpty, reason: 'Empty en translation for key: ${entry.key}');
+      }
+      for (final entry in AppTranslations.arAR.entries) {
+        expect(entry.value.trim(), isNotEmpty, reason: 'Empty ar translation for key: ${entry.key}');
+      }
+    });
+  });
 }

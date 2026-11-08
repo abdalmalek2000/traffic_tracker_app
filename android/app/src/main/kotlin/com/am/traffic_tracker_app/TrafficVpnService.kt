@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
@@ -15,6 +16,8 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelFileDescriptor
 import io.flutter.plugin.common.EventChannel
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -23,6 +26,9 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.Collections
+import java.util.Locale
+import java.util.concurrent.Executors
 
 class TrafficVpnService : VpnService() {
 
@@ -40,6 +46,9 @@ class TrafficVpnService : VpnService() {
         const val ACTION_STOP = "com.am.traffic_tracker_app.STOP"
         const val EXTRA_ALLOWED_PACKAGES = "allowed_packages"
 
+        @Volatile
+        var instance: TrafficVpnService? = null
+
         var isRunning = false
             private set
 
@@ -52,6 +61,104 @@ class TrafficVpnService : VpnService() {
         val allowedPackageSet: HashSet<String> = hashSetOf()
 
         private val mainHandler = Handler(Looper.getMainLooper())
+
+        private const val MAX_SAVED_CONNECTIONS = 1000
+        private val capturedConnections = Collections.synchronizedList(ArrayList<Map<String, Any?>>())
+        private const val SESSION_CACHE_FILE = "vpn_session_cache.json"
+        private val cacheSaveExecutor = Executors.newSingleThreadExecutor()
+        @Volatile
+        private var lastSaveTime = 0L
+
+        fun addCapturedConnection(conn: Map<String, Any?>) {
+            synchronized(capturedConnections) {
+                capturedConnections.add(0, conn)
+                if (capturedConnections.size > MAX_SAVED_CONNECTIONS) {
+                    capturedConnections.removeAt(capturedConnections.size - 1)
+                }
+            }
+        }
+
+        fun getCapturedConnections(): List<Map<String, Any?>> {
+            synchronized(capturedConnections) {
+                return ArrayList(capturedConnections)
+            }
+        }
+
+        fun getCapturedConnectionCount(): Int {
+            synchronized(capturedConnections) {
+                return capturedConnections.size
+            }
+        }
+
+        fun scheduleSessionCacheSave(context: Context) {
+            val now = System.currentTimeMillis()
+            if (now - lastSaveTime < 1500L) return
+            lastSaveTime = now
+            saveSessionCache(context)
+        }
+
+        fun saveSessionCache(context: Context) {
+            cacheSaveExecutor.execute {
+                try {
+                    val connectionsCopy = getCapturedConnections()
+                    val root = JSONObject()
+                    root.put("packetCount", packetCount)
+                    root.put("totalBytes", totalBytesCaptured)
+                    root.put("pcapFilePath", pcapFilePath ?: "")
+
+                    val jsonArray = JSONArray()
+                    for (item in connectionsCopy) {
+                        jsonArray.put(JSONObject(item))
+                    }
+                    root.put("connections", jsonArray)
+
+                    val file = File(context.filesDir, SESSION_CACHE_FILE)
+                    file.writeText(root.toString())
+                } catch (_: Exception) {}
+            }
+        }
+
+        fun restoreSessionCache(context: Context) {
+            try {
+                val file = File(context.filesDir, SESSION_CACHE_FILE)
+                if (!file.exists()) return
+                val content = file.readText()
+                if (content.isEmpty()) return
+                val root = JSONObject(content)
+                if (packetCount == 0L) {
+                    packetCount = root.optLong("packetCount", 0L)
+                }
+                if (totalBytesCaptured == 0L) {
+                    totalBytesCaptured = root.optLong("totalBytes", 0L)
+                }
+                val savedPcap = root.optString("pcapFilePath", "")
+                if (pcapFilePath.isNullOrEmpty() && savedPcap.isNotEmpty()) {
+                    pcapFilePath = savedPcap
+                }
+                val jsonArray = root.optJSONArray("connections")
+                if (jsonArray != null && capturedConnections.isEmpty()) {
+                    synchronized(capturedConnections) {
+                        for (i in 0 until jsonArray.length()) {
+                            val obj = jsonArray.getJSONObject(i)
+                            val map = mutableMapOf<String, Any?>()
+                            val keys = obj.keys()
+                            while (keys.hasNext()) {
+                                val key = keys.next()
+                                map[key] = if (obj.isNull(key)) null else obj.get(key)
+                            }
+                            capturedConnections.add(map)
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+
+        fun deleteSessionCache(context: Context) {
+            try {
+                val file = File(context.filesDir, SESSION_CACHE_FILE)
+                if (file.exists()) file.delete()
+            } catch (_: Exception) {}
+        }
 
         fun flushPcap() {
             try {
@@ -85,6 +192,10 @@ class TrafficVpnService : VpnService() {
 
                     packetCount = 0L
                     totalBytesCaptured = 0L
+                    synchronized(capturedConnections) {
+                        capturedConnections.clear()
+                    }
+                    deleteSessionCache(context)
 
                     if (isRunning) {
                         val file = File(context.filesDir, "traffic_capture_${System.currentTimeMillis()}.pcap")
@@ -101,6 +212,9 @@ class TrafficVpnService : VpnService() {
                         fos.write(header.array())
                         fos.flush()
                         activePcapStream = fos
+
+                        // Update notification metrics to 0
+                        instance?.updateForegroundNotification()
                     } else {
                         pcapFilePath = null
                     }
@@ -129,6 +243,7 @@ class TrafficVpnService : VpnService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        instance = this
         val action = intent?.action
         if (action == ACTION_STOP) {
             stopVpn()
@@ -145,6 +260,15 @@ class TrafficVpnService : VpnService() {
         updateAllowedPackages(allowedList)
         startVpn(allowedList)
         return START_STICKY
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        // Keep VPN service alive and pinned even if the user removes the app from recent tasks
+        if (isRunning) {
+            saveSessionCache(this)
+            updateForegroundNotification()
+        }
     }
 
     fun writeToTun(packet: ByteArray) {
@@ -218,6 +342,8 @@ class TrafficVpnService : VpnService() {
             return
         }
 
+        instance = this
+        restoreSessionCache(this)
         startForegroundNotification()
 
         try {
@@ -261,13 +387,14 @@ class TrafficVpnService : VpnService() {
                 defaultDnsServers = dnsServers
             )
 
-            initPcapFile()
+            if (activePcapStream == null) {
+                initPcapFile()
+            }
             registerNetworkCallback()
 
             isRunning = true
             isThreadRunning = true
-            packetCount = 0L
-            totalBytesCaptured = 0L
+            updateForegroundNotification()
 
             sendEvent(mapOf(
                 "type" to "STATUS_CHANGED",
@@ -518,7 +645,10 @@ class TrafficVpnService : VpnService() {
             "totalBytes" to totalBytesCaptured
         )
 
+        addCapturedConnection(event)
+        scheduleSessionCacheSave(this)
         sendEvent(event)
+        scheduleNotificationUpdate()
     }
 
     private fun extractSniFromTls(packet: ByteArray, offset: Int, length: Int): String? {
@@ -593,21 +723,45 @@ class TrafficVpnService : VpnService() {
         return null
     }
 
-    private fun startForegroundNotification() {
-        val channelId = "traffic_vpn_channel"
+    private val NOTIFICATION_ID = 1001
+    private val CHANNEL_ID = "traffic_vpn_channel"
+    private var lastNotificationUpdateTime = 0L
+    private val notificationUpdateLock = Any()
+    @Volatile
+    private var isNotificationUpdateScheduled = false
+
+    private fun formatBytes(bytes: Long): String {
+        if (bytes < 1024) return "$bytes B"
+        val kb = bytes / 1024.0
+        if (kb < 1024) return String.format(Locale.US, "%.1f KB", kb)
+        val mb = kb / 1024.0
+        if (mb < 1024) return String.format(Locale.US, "%.1f MB", mb)
+        val gb = mb / 1024.0
+        return String.format(Locale.US, "%.2f GB", gb)
+    }
+
+    private fun buildNotification(): Notification {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                channelId,
+                CHANNEL_ID,
                 "خدمة مراقبة الشبكة (Traffic Tracker)",
                 NotificationManager.IMPORTANCE_LOW
-            )
-            channel.description = "إشعار استمرار فحص حركة مرور حزم الشبكة"
+            ).apply {
+                description = "إشعار استمرار فحص حركة مرور حزم الشبكة"
+                setShowBadge(false)
+                enableVibration(false)
+                enableLights(false)
+                setSound(null, null)
+            }
             notificationManager.createNotificationChannel(channel)
         }
 
-        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+        // Tap to open app
+        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
         val pendingIntent = PendingIntent.getActivity(
             this,
             0,
@@ -615,26 +769,97 @@ class TrafficVpnService : VpnService() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val notification: Notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder(this, channelId)
-                .setContentTitle("مراقب الشبكة نشط")
-                .setContentText("يتم فحص وتسجيل حزم الشبكة محلياً")
-                .setSmallIcon(android.R.drawable.stat_notify_sync)
-                .setContentIntent(pendingIntent)
-                .setOngoing(true)
-                .build()
+        // Action button to stop VPN directly from notification
+        val stopIntent = Intent(this, TrafficVpnService::class.java).apply {
+            action = ACTION_STOP
+        }
+        val stopPendingIntent = PendingIntent.getService(
+            this,
+            1,
+            stopIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val formattedPackets = String.format(Locale.US, "%,d", packetCount)
+        val formattedBytes = formatBytes(totalBytesCaptured)
+        val formattedConnections = String.format(Locale.US, "%,d", getCapturedConnectionCount())
+
+        val contentTitle = "مراقب الشبكة نشط"
+        val contentText = "الحزم: $formattedPackets • البيانات: $formattedBytes • الاتصالات: $formattedConnections"
+        val bigText = "عدد الحزم: $formattedPackets حزمة\nحجم البيانات: $formattedBytes\nالاتصالات المسجلة: $formattedConnections اتصال"
+
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder(this, CHANNEL_ID)
         } else {
             @Suppress("DEPRECATION")
             Notification.Builder(this)
-                .setContentTitle("مراقب الشبكة نشط")
-                .setContentText("يتم فحص وتسجيل حزم الشبكة محلياً")
-                .setSmallIcon(android.R.drawable.stat_notify_sync)
-                .setContentIntent(pendingIntent)
-                .setOngoing(true)
-                .build()
         }
 
-        startForeground(1001, notification)
+        builder.setContentTitle(contentTitle)
+            .setContentText(contentText)
+            .setSmallIcon(android.R.drawable.stat_notify_sync)
+            .setContentIntent(pendingIntent)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setAutoCancel(false)
+            .setStyle(Notification.BigTextStyle().bigText(bigText))
+            .addAction(
+                Notification.Action.Builder(
+                    android.R.drawable.ic_menu_close_clear_cancel,
+                    "إيقاف VPN",
+                    stopPendingIntent
+                ).build()
+            )
+
+        try {
+            val appIconBitmap = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
+            if (appIconBitmap != null) {
+                builder.setLargeIcon(appIconBitmap)
+            }
+        } catch (_: Exception) {}
+
+        return builder.build()
+    }
+
+    private fun startForegroundNotification() {
+        val notification = buildNotification()
+        if (Build.VERSION.SDK_INT >= 34) {
+            startForeground(
+                NOTIFICATION_ID,
+                notification,
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
+    }
+
+    fun scheduleNotificationUpdate() {
+        if (!isRunning || isNotificationUpdateScheduled) return
+        val now = System.currentTimeMillis()
+        if (now - lastNotificationUpdateTime >= 800L) {
+            updateForegroundNotification()
+        } else {
+            isNotificationUpdateScheduled = true
+            mainHandler.postDelayed({
+                isNotificationUpdateScheduled = false
+                if (isRunning) {
+                    updateForegroundNotification()
+                }
+            }, 800L - (now - lastNotificationUpdateTime))
+        }
+    }
+
+    fun updateForegroundNotification() {
+        if (!isRunning) return
+        synchronized(notificationUpdateLock) {
+            lastNotificationUpdateTime = System.currentTimeMillis()
+            try {
+                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                val notification = buildNotification()
+                notificationManager.notify(NOTIFICATION_ID, notification)
+            } catch (_: Exception) {}
+        }
     }
 
     private fun stopVpn() {
@@ -642,6 +867,11 @@ class TrafficVpnService : VpnService() {
 
         isThreadRunning = false
         isRunning = false
+        instance = null
+
+        try {
+            saveSessionCache(this)
+        } catch (_: Exception) {}
 
         try {
             forwarder?.stop()
@@ -671,6 +901,11 @@ class TrafficVpnService : VpnService() {
             "isRunning" to false,
             "pcapPath" to pcapFilePath
         ))
+
+        try {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(NOTIFICATION_ID)
+        } catch (_: Exception) {}
 
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()

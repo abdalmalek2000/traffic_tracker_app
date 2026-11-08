@@ -52,7 +52,7 @@ class TrafficTrackerApp extends StatelessWidget {
           fontFamily: fontFamily,
         ),
         translations: AppTranslations(),
-        locale: const Locale('en', 'US'),
+        locale: settingsController.currentLocale.value,
         fallbackLocale: const Locale('en', 'US'),
         home: const MainNavigationView(),
         builder: (context, child) {
