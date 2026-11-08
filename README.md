@@ -9,10 +9,6 @@
 </p>
 
 <p align="center">
-  <i>فاحص ومراقب حركة مرور الشبكة والأمان المتقدم لتطبيقات أندرويد وفلاتر بدون روت ومع تصدير PCAP مباشر لبرنامج Wireshark</i>
-</p>
-
-<p align="center">
   <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.12%2B-02569B?logo=flutter&logoColor=white" alt="Flutter"></a>
   <a href="https://dart.dev"><img src="https://img.shields.io/badge/Dart-3.0%2B-0175C2?logo=dart&logoColor=white" alt="Dart"></a>
   <a href="https://developer.android.com"><img src="https://img.shields.io/badge/Platform-Android_API_24%2B-3DDC84?logo=android&logoColor=white" alt="Android"></a>
@@ -20,10 +16,6 @@
   <a href="https://pub.dev/packages/get"><img src="https://img.shields.io/badge/State_Management-GetX-8A2BE2" alt="GetX"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
   <a href="https://github.com/abdalmalek2000/traffic_tracker_app/stargazers"><img src="https://img.shields.io/github/stars/abdalmalek2000/traffic_tracker_app?style=social" alt="GitHub Stars"></a>
-</p>
-
-<p align="center">
-  <b>English</b> • <a href="README.ar.md"><b>العربية</b></a>
 </p>
 
 <p align="center">
