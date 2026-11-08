@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:traffic_tracker_app/constants/app_palettes.dart';
 import 'package:traffic_tracker_app/constants/colors.dart';
 import 'package:traffic_tracker_app/constants/icons.dart';
+import 'package:traffic_tracker_app/constants/spacing.dart';
 import 'package:traffic_tracker_app/constants/typography.dart';
 import 'package:traffic_tracker_app/controllers/settings_controller.dart';
 import 'package:traffic_tracker_app/localization/app_translations.dart';
@@ -13,6 +14,7 @@ import 'package:traffic_tracker_app/views/settings/widgets/about_app_sheet.dart'
 import 'package:traffic_tracker_app/views/settings/widgets/language_selector_sheet.dart';
 import 'package:traffic_tracker_app/views/settings/widgets/palette_selector_sheet.dart';
 import 'package:traffic_tracker_app/views/settings/widgets/pcap_location_selector_sheet.dart';
+import 'package:traffic_tracker_app/views/settings/widgets/settings_tile.dart';
 import 'package:traffic_tracker_app/views/settings/widgets/theme_selector_sheet.dart';
 
 void main() {
@@ -342,6 +344,44 @@ void main() {
       }
       for (final entry in AppTranslations.arAR.entries) {
         expect(entry.value.trim(), isNotEmpty, reason: 'Empty ar translation for key: ${entry.key}');
+      }
+    });
+
+    testWidgets('SettingsTile trailing icon strictly within bounds in LTR and RTL', (tester) async {
+      for (final direction in [TextDirection.ltr, TextDirection.rtl]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Directionality(
+              textDirection: direction,
+              child: Scaffold(
+                body: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    Card(
+                      child: SettingsTile(
+                        icon: AppIcons.battery,
+                        title: 'Battery Optimization',
+                        subtitle: 'Disable optimization',
+                        trailing: const Icon(
+                          AppIcons.checkCircle,
+                          color: Colors.green,
+                          size: AppSpacing.iconLg,
+                        ),
+                        onTap: () {},
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        final cardRect = tester.getRect(find.byType(Card));
+        final iconRect = tester.getRect(find.byIcon(AppIcons.checkCircle));
+
+        expect(iconRect.left, greaterThan(cardRect.left));
+        expect(iconRect.right, lessThan(cardRect.right));
       }
     });
   });

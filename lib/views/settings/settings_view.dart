@@ -97,11 +97,14 @@ class SettingsView extends StatelessWidget {
                       isIgnored ? AppIcons.checkCircle : AppIcons.minusCircle,
                       color: isIgnored
                           ? AppColors.statusSuccess
-                          : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                          : theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.6,
+                            ),
                       size: AppSpacing.iconLg,
                     );
                   }),
-                  onTap: () => settingsController.requestIgnoreBatteryOptimization(),
+                  onTap: () =>
+                      settingsController.requestIgnoreBatteryOptimization(),
                 ),
 
                 // PCAP Capture Save Location

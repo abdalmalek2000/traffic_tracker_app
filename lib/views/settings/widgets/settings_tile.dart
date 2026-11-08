@@ -189,16 +189,10 @@ class SettingsTile extends StatelessWidget {
               ),
             ],
 
-            // Fixed Trailing Icon Slot (Ensures all trailing icons align uniformly at the edge)
+            // Trailing icon/widget slot
             if (trailingIconWidget != null) ...[
               AppSpacing.horizontalSm,
-              SizedBox(
-                width: 16,
-                child: Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: trailingIconWidget,
-                ),
-              ),
+              trailingIconWidget,
             ],
           ],
         ),
