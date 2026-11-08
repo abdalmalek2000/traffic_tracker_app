@@ -170,6 +170,12 @@ To enable packet interception and application listing without root privileges, t
 
 ---
 
+## 📸 Screenshots
+
+<!-- Add your application screenshots here -->
+
+---
+
 ## 🔬 How It Works Under The Hood
 
 1. **Local TUN Interface**: When VPN inspection starts, `TrafficVpnService` establishes a virtual network interface (TUN) using Android's `VpnService.Builder`.
@@ -185,6 +191,14 @@ To enable packet interception and application listing without root privileges, t
 * **100% Local & Offline**: All packet inspection, parsing, and PCAP writes take place strictly on the user's device.
 * **Zero Telemetry**: No user data, connection logs, or analytics are sent to any remote server.
 * **No Root Required**: Operates strictly within standard Android system security boundaries.
+
+---
+
+## 🙏 Acknowledgements & Third-Party Services
+
+Special thanks to the open-source projects and services that made this project possible:
+
+* **[httpbin.org](https://httpbin.org/)**: A fantastic open-source HTTP Request & Response Service used for testing and validating in-app HTTP/HTTPS traffic inspection, status codes, and payloads.
 
 ---
 
