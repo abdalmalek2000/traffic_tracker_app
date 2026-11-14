@@ -10,12 +10,12 @@ import 'package:traffic_tracker_app/constants/typography.dart';
 import 'package:traffic_tracker_app/controllers/settings_controller.dart';
 import 'package:traffic_tracker_app/localization/app_translations.dart';
 import 'package:traffic_tracker_app/views/settings/settings_view.dart';
-import 'package:traffic_tracker_app/views/settings/widgets/about_app_sheet.dart';
-import 'package:traffic_tracker_app/views/settings/widgets/language_selector_sheet.dart';
-import 'package:traffic_tracker_app/views/settings/widgets/palette_selector_sheet.dart';
-import 'package:traffic_tracker_app/views/settings/widgets/pcap_location_selector_sheet.dart';
-import 'package:traffic_tracker_app/views/settings/widgets/settings_tile.dart';
-import 'package:traffic_tracker_app/views/settings/widgets/theme_selector_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/settings/about_app_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/settings/language_selector_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/settings/palette_selector_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/settings/pcap_location_selector_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/settings/settings_tile.dart';
+import 'package:traffic_tracker_app/shared_views/settings/theme_selector_sheet.dart';
 
 void main() {
   group('SettingsController Tests', () {

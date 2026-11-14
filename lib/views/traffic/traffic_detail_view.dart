@@ -5,10 +5,10 @@ import '../../constants/colors.dart';
 import '../../constants/icons.dart';
 import '../../constants/spacing.dart';
 import '../../models/traffic_record.dart';
-import '../widgets/app_buttons.dart';
-import '../widgets/json_viewer_widget.dart';
-import 'widgets/traffic_headers_card.dart';
-import 'widgets/traffic_overview_tab.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_buttons.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/json_viewer_widget.dart';
+import 'package:traffic_tracker_app/shared_views/traffic/traffic_headers_card.dart';
+import 'package:traffic_tracker_app/shared_views/traffic/traffic_overview_tab.dart';
 
 /// Deep HTTP request & response detail inspection view.
 class TrafficDetailView extends StatelessWidget {

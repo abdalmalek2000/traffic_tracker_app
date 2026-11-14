@@ -4,13 +4,13 @@ import '../../constants/colors.dart';
 import '../../constants/icons.dart';
 import '../../constants/spacing.dart';
 import '../../controllers/settings_controller.dart';
-import 'widgets/about_app_sheet.dart';
-import 'widgets/language_selector_sheet.dart';
-import 'widgets/palette_selector_sheet.dart';
-import 'widgets/pcap_location_selector_sheet.dart';
-import 'widgets/settings_section.dart';
-import 'widgets/settings_tile.dart';
-import 'widgets/theme_selector_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/settings/about_app_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/settings/language_selector_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/settings/palette_selector_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/settings/pcap_location_selector_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/settings/settings_section.dart';
+import 'package:traffic_tracker_app/shared_views/settings/settings_tile.dart';
+import 'package:traffic_tracker_app/shared_views/settings/theme_selector_sheet.dart';
 
 /// Settings screen allowing users to configure language, theme, and view application info.
 /// Designed modularly with easily extendable sections and tiles.

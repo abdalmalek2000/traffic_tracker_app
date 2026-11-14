@@ -1,19 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../../../constants/colors.dart';
-import '../../../constants/icons.dart';
-import '../../../constants/spacing.dart';
-import '../../../models/traffic_record.dart';
-import '../traffic_detail_view.dart';
+import '../../constants/colors.dart';
+import '../../constants/icons.dart';
+import '../../constants/spacing.dart';
+import '../../models/traffic_record.dart';
 
 /// Single item tile in the traffic list showing status code, method, host, path, size, and duration.
 class TrafficItemTile extends StatelessWidget {
   final TrafficRecord item;
+  final VoidCallback? onTap;
+  final bool isSelected;
 
   const TrafficItemTile({
     super.key,
     required this.item,
+    this.onTap,
+    this.isSelected = false,
   });
+
+  static Color getMethodColor(String method) {
+    switch (method.toUpperCase()) {
+      case 'GET':
+        return AppColors.protocolHttp;
+      case 'POST':
+        return AppColors.statusSuccess;
+      case 'PUT':
+        return AppColors.protocolDns;
+      case 'DELETE':
+        return AppColors.statusServerError;
+      case 'PATCH':
+        return AppColors.protocolTls;
+      default:
+        return AppColors.protocolOther;
+    }
+  }
 
   static Widget buildMethodBadge(String method, Color color) {
     return Container(
@@ -43,13 +62,15 @@ class TrafficItemTile extends StatelessWidget {
       item.statusCode,
       isPending: item.isPending,
     );
-    final methodColor = TrafficDetailView.getMethodColor(item.method);
+    final methodColor = getMethodColor(item.method);
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isNarrow = screenWidth < 360;
 
-    return InkWell(
-      onTap: () => Get.to(() => TrafficDetailView(record: item)),
-      child: Padding(
+    return Container(
+      color: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.12) : null,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: isNarrow ? AppSpacing.space8 : AppSpacing.space14,
           vertical: isNarrow ? AppSpacing.space10 : AppSpacing.md,
@@ -157,6 +178,7 @@ class TrafficItemTile extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

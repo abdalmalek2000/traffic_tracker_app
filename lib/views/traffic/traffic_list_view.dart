@@ -5,12 +5,13 @@ import '../../constants/icons.dart';
 import '../../constants/spacing.dart';
 import '../../controllers/traffic_controller.dart';
 import '../settings/settings_view.dart';
-import '../widgets/app_buttons.dart';
-import '../widgets/app_search_field.dart';
-import 'widgets/custom_request_dialog.dart';
-import 'widgets/test_requests_sheet.dart';
-import 'widgets/traffic_filter_bar.dart';
-import 'widgets/traffic_item_tile.dart';
+import '../traffic/traffic_detail_view.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_buttons.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_search_field.dart';
+import 'package:traffic_tracker_app/shared_views/traffic/custom_request_dialog.dart';
+import 'package:traffic_tracker_app/shared_views/traffic/test_requests_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/traffic/traffic_filter_bar.dart';
+import 'package:traffic_tracker_app/shared_views/traffic/traffic_item_tile.dart';
 
 /// In-App HTTP/HTTPS Traffic Inspector View
 class TrafficListView extends StatefulWidget {
@@ -270,7 +271,10 @@ class _TrafficListViewState extends State<TrafficListView> {
                         );
                       }
                       final item = records[itemIndex];
-                      return TrafficItemTile(item: item);
+                      return TrafficItemTile(
+                        item: item,
+                        onTap: () => Get.to(() => TrafficDetailView(record: item)),
+                      );
                     },
                     childCount: records.isEmpty ? 0 : (records.length * 2) - 1,
                   ),

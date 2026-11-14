@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import '../../../constants/colors.dart';
-import '../../../constants/icons.dart';
-import '../../../constants/spacing.dart';
-import '../../../models/captured_connection.dart';
-import '../connection_detail_view.dart';
+import '../../constants/colors.dart';
+import '../../constants/icons.dart';
+import '../../constants/spacing.dart';
+import '../../models/captured_connection.dart';
 
 /// Connection tile displaying protocol badge, app/host information, packet size, and time.
 class BuildConnectionTile extends StatelessWidget {
   final CapturedConnection item;
+  final VoidCallback? onTap;
+  final bool isSelected;
 
   const BuildConnectionTile({
     super.key,
     required this.item,
+    this.onTap,
+    this.isSelected = false,
   });
 
   @override
@@ -21,9 +24,11 @@ class BuildConnectionTile extends StatelessWidget {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isNarrow = screenWidth < 360;
 
-    return InkWell(
-      onTap: () => ConnectionDetailView.show(item),
-      child: Padding(
+    return Container(
+      color: isSelected ? theme.colorScheme.primary.withValues(alpha: 0.12) : null,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: isNarrow ? AppSpacing.space8 : AppSpacing.base,
           vertical: isNarrow ? AppSpacing.space8 : AppSpacing.space10,
@@ -150,6 +155,7 @@ class BuildConnectionTile extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

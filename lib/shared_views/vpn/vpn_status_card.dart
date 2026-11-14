@@ -4,17 +4,18 @@ import '../../../constants/colors.dart';
 import '../../../constants/icons.dart';
 import '../../../constants/spacing.dart';
 import '../../../controllers/vpn_controller.dart';
-import '../../widgets/app_buttons.dart';
-import '../app_filter_view.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_buttons.dart';
 import 'build_metric.dart';
 
 /// Status and metrics card at the top of the VPN Dashboard.
 class VpnStatusCard extends StatelessWidget {
   final VpnController controller;
+  final VoidCallback? onOpenAppFilter;
 
   const VpnStatusCard({
     super.key,
     required this.controller,
+    this.onOpenAppFilter,
   });
 
   @override
@@ -77,7 +78,7 @@ class VpnStatusCard extends StatelessWidget {
                 // Target Apps Pill button
                 Flexible(
                   child: InkWell(
-                    onTap: () => Get.to(() => const AppFilterView()),
+                    onTap: onOpenAppFilter,
                     borderRadius: AppSpacing.borderRadiusXxl,
                     child: Container(
                       padding: const EdgeInsets.symmetric(

@@ -3,15 +3,16 @@ import 'package:get/get.dart';
 import '../../../constants/colors.dart';
 import '../../../constants/icons.dart';
 import '../../../constants/spacing.dart';
-import '../app_filter_view.dart';
 
 /// Banner shown when target apps filter is active in VPN monitoring.
 class VpnTargetBanner extends StatelessWidget {
   final int selectedCount;
+  final VoidCallback? onEdit;
 
   const VpnTargetBanner({
     super.key,
     required this.selectedCount,
+    this.onEdit,
   });
 
   @override
@@ -55,7 +56,7 @@ class VpnTargetBanner extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: () => Get.to(() => const AppFilterView()),
+            onTap: onEdit,
             child: Text(
               'edit'.tr,
               style: TextStyle(

@@ -4,7 +4,7 @@ import '../../../constants/app_palettes.dart';
 import '../../../constants/icons.dart';
 import '../../../constants/spacing.dart';
 import '../../../controllers/settings_controller.dart';
-import '../../widgets/app_bottom_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_bottom_sheet.dart';
 
 /// Modal bottom sheet allowing users to select between Android Material You
 /// dynamic wallpaper-derived colors and various rich static palettes.

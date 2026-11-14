@@ -214,4 +214,22 @@ const Map<String, String> enTranslations = {
   'feature_app_filtering': 'Targeted application filtering & isolation',
   'feature_pcap_export':
       'Raw PCAP file capture for Wireshark & security analysis',
+
+  // Tablet & Additional UI Localizations
+  'apps_selected_banner': '@count apps selected',
+  'clear': 'Clear',
+  'clear_connections_menu': 'Clear Connections',
+  'clear_logs': 'Clear Logs',
+  'connections_count': '@count connections',
+  'core_features_title': 'Key Capabilities',
+  'custom_request_title': 'Custom Request',
+  'custom_request_subtitle': 'Compose a manual HTTP request and inspect response',
+  'export_pcap_menu': 'Export PCAP File',
+  'material_you_title': 'Material You (Dynamic Colors)',
+  'material_you_desc': 'Extract app theme colors automatically from your wallpaper (Android 12+)',
+  'search_traffic_hint': 'Search URL, path, or status code...',
+  'select_record_detail': 'Select a request to view details',
+  'send_btn': 'Send',
+  'static_palettes_title': 'Preset Color Palettes',
+  'test_requests_desc': 'Send sample requests to inspect API responses in real-time',
 };

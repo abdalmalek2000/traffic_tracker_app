@@ -4,8 +4,8 @@ import '../../../constants/colors.dart';
 import '../../../constants/icons.dart';
 import '../../../constants/spacing.dart';
 import '../../../services/test_request_service.dart';
-import '../../widgets/app_bottom_sheet.dart';
-import '../../widgets/app_buttons.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_bottom_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_buttons.dart';
 import 'traffic_item_tile.dart';
 
 /// Modal bottom sheet allowing users to dispatch sample HTTP requests for inspection.

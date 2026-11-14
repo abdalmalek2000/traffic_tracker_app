@@ -4,9 +4,9 @@ import '../../constants/colors.dart';
 import '../../constants/icons.dart';
 import '../../constants/spacing.dart';
 import '../../models/captured_connection.dart';
-import '../widgets/app_bottom_sheet.dart';
-import '../widgets/app_buttons.dart';
-import 'widgets/vpn_detail_card.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_bottom_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_buttons.dart';
+import 'package:traffic_tracker_app/shared_views/vpn/vpn_detail_card.dart';
 
 /// Modal BottomSheet displaying deep details of a captured connection.
 class ConnectionDetailView extends StatelessWidget {

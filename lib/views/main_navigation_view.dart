@@ -5,7 +5,7 @@ import '../constants/icons.dart';
 import '../controllers/navigation_controller.dart';
 import 'traffic/traffic_list_view.dart';
 import 'vpn/vpn_dashboard_view.dart';
-import 'widgets/app_nav_bar.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_nav_bar.dart';
 
 /// Main navigation view hosting the bottom navigation bar.
 class MainNavigationView extends StatelessWidget {

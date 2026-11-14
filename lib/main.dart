@@ -7,7 +7,7 @@ import 'controllers/traffic_controller.dart';
 import 'controllers/vpn_controller.dart';
 import 'localization/app_translations.dart';
 import 'theme/app_theme.dart';
-import 'views/main_navigation_view.dart';
+import 'layout_managment.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +54,7 @@ class TrafficTrackerApp extends StatelessWidget {
         translations: AppTranslations(),
         locale: settingsController.currentLocale.value,
         fallbackLocale: const Locale('en', 'US'),
-        home: const MainNavigationView(),
+        home: const LayoutManagement(),
         builder: (context, child) {
           final mediaQuery = MediaQuery.of(context);
           final fluidScale = AppTypography.getResponsiveFontScale(

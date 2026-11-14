@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import '../../../constants/colors.dart';
 import '../../../constants/spacing.dart';
 import '../../../controllers/traffic_controller.dart';
-import '../../widgets/app_filter_chip.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_filter_chip.dart';
 
 /// Horizontal filter chips bar for HTTP traffic status codes.
 class TrafficFilterBar extends StatelessWidget {

@@ -4,12 +4,14 @@ import '../../constants/colors.dart';
 import '../../constants/icons.dart';
 import '../../constants/spacing.dart';
 import '../../controllers/vpn_controller.dart';
+import 'app_filter_view.dart';
+import 'connection_detail_view.dart';
 import '../settings/settings_view.dart';
-import '../widgets/app_search_field.dart';
-import 'widgets/build_connection_tile.dart';
-import 'widgets/vpn_filter_bar.dart';
-import 'widgets/vpn_status_card.dart';
-import 'widgets/vpn_target_banner.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_search_field.dart';
+import 'package:traffic_tracker_app/shared_views/vpn/build_connection_tile.dart';
+import 'package:traffic_tracker_app/shared_views/vpn/vpn_filter_bar.dart';
+import 'package:traffic_tracker_app/shared_views/vpn/vpn_status_card.dart';
+import 'package:traffic_tracker_app/shared_views/vpn/vpn_target_banner.dart';
 
 /// System VPN Traffic Inspector Dashboard View
 class VpnDashboardView extends StatefulWidget {
@@ -140,10 +142,16 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Status and Metrics Card
-                    VpnStatusCard(controller: controller),
+                    VpnStatusCard(
+                      controller: controller,
+                      onOpenAppFilter: () => Get.to(() => const AppFilterView()),
+                    ),
 
                     // Active Target Mode Banner
-                    VpnTargetBanner(selectedCount: selectedCount),
+                    VpnTargetBanner(
+                      selectedCount: selectedCount,
+                      onEdit: () => Get.to(() => const AppFilterView()),
+                    ),
 
                     // Unified Search Field
                     AppSearchField(
@@ -261,7 +269,10 @@ class _VpnDashboardViewState extends State<VpnDashboardView> {
                   ),
                   itemBuilder: (context, index) {
                     final item = filteredList[index];
-                    return BuildConnectionTile(item: item);
+                    return BuildConnectionTile(
+                      item: item,
+                      onTap: () => ConnectionDetailView.show(item),
+                    );
                   },
                 ),
             ],

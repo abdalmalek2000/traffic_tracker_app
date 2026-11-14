@@ -4,9 +4,9 @@ import '../../constants/colors.dart';
 import '../../constants/icons.dart';
 import '../../constants/spacing.dart';
 import '../../controllers/vpn_controller.dart';
-import '../widgets/app_filter_chip.dart';
-import '../widgets/app_search_field.dart';
-import 'widgets/app_filter_item_tile.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_filter_chip.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_search_field.dart';
+import 'package:traffic_tracker_app/shared_views/vpn/app_filter_item_tile.dart';
 
 /// Target Applications Selector View
 class AppFilterView extends StatefulWidget {

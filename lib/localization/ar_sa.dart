@@ -208,4 +208,22 @@ const Map<String, String> arTranslations = {
   'feature_app_filtering': 'حصر الفحص والالتقاط على تطبيقات محددة بدقة',
   'feature_pcap_export':
       'تصدير حزم الشبكة الخام بصيغة PCAP للتحليل عبر Wireshark',
+
+  // Tablet & Additional UI Localizations
+  'apps_selected_banner': '@count تطبيق محدد',
+  'clear': 'مسح',
+  'clear_connections_menu': 'مسح سجل الاتصالات',
+  'clear_logs': 'مسح السجلات',
+  'connections_count': '@count اتصال',
+  'core_features_title': 'أهم المميزات والقدرات',
+  'custom_request_title': 'طلب شبكة مخصص',
+  'custom_request_subtitle': 'إنشاء طلب HTTP يدوي وفحص الاستجابة فوراً',
+  'export_pcap_menu': 'تصدير ملف PCAP',
+  'material_you_title': 'ألوان النظام (Material You)',
+  'material_you_desc': 'استخراج الألوان الرئيسية تلقائياً من خلفية شاشة جهازك (Android 12+)',
+  'search_traffic_hint': 'ابحث في الرابط، المسار، أو كود الحالة...',
+  'select_record_detail': 'اختر طلباً من القائمة لعرض تفاصيله الكاملة',
+  'send_btn': 'إرسال',
+  'static_palettes_title': 'لوحات الألوان المحددة مسبقاً',
+  'test_requests_desc': 'إرسال طلبات اختبارية لفحص الاستجابة في راصد الشبكة',
 };

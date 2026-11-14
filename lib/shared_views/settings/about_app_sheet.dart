@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/icons.dart';
 import '../../../constants/spacing.dart';
-import '../../widgets/app_bottom_sheet.dart';
-import '../../widgets/app_buttons.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_bottom_sheet.dart';
+import 'package:traffic_tracker_app/shared_views/widgets/app_buttons.dart';
 
 /// Modal bottom sheet showcasing information about Traffic Tracker,
 /// application version, core features, and architectural notes.
